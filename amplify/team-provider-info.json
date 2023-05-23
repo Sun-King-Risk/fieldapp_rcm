@@ -1,0 +1,26 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-sunking-dev-160820-authRole",
+      "UnauthRoleArn": "arn:aws:iam::522863258728:role/amplify-sunking-dev-160820-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::522863258728:role/amplify-sunking-dev-160820-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-sunking-dev-160820-deployment",
+      "UnauthRoleName": "amplify-sunking-dev-160820-unauthRole",
+      "StackName": "amplify-sunking-dev-160820",
+      "StackId": "arn:aws:cloudformation:us-east-1:522863258728:stack/amplify-sunking-dev-160820/969366e0-ee6a-11ed-87a1-12b9405c0e1d",
+      "AmplifyAppId": "d4y4nsr36rqrf"
+    },
+    "categories": {
+      "storage": {
+        "sunkinga9792733": {
+          "bucketName": "fieldappv2",
+          "region": "us-east-1"
+        }
+      },
+      "auth": {
+        "sunking": {}
+      }
+    }
+  }
+}
