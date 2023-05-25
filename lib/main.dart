@@ -16,6 +16,7 @@ import 'package:aws_s3_private_flutter/export.dart';
 import 'add_task.dart';
 import 'amplifyconfiguration.dart';
 import 'firebase_options.dart';
+import 'new_design.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -167,7 +168,7 @@ class _MyAppState extends State<MyApp> {
         theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
         builder: Authenticator.builder(),
-        home:AddTask(),
+        home:TaskRadio(),
       ),
     );
   }
