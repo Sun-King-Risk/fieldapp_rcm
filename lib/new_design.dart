@@ -830,7 +830,7 @@ class PortfolioTable extends StatefulWidget {
 }
 
 class _PortfolioTableState extends State<PortfolioTable> {
-  List? taskDataList = []; // List to store selected items
+  List<Map<String, dynamic>> taskDataList = []; // List to store selected items
   int currentPage = 1;
   int itemsPerPage = 10;
   List? taskData = [];
@@ -987,8 +987,12 @@ class ActionScreenNew extends StatefulWidget {
 
 class _ActionScreenNewState extends State<ActionScreenNew> {
   bool target = false;
+  List<String> items = ["Item 1", "Item 2"];
+  Map<String, String> selectedValues = {};
   List<String> _priorities = ['High', 'Medium', 'Low'];
   Map<String, Map<String, String>> _actions = {};
+  List<String> textFieldValues = [];
+  List<String> dropdownValues = [];
 
   @override
   Widget build(BuildContext context) {
@@ -999,7 +1003,6 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
       body: Container(
         child: Column(
           children: [
-            Text(widget.taskdata.toString()),
             Expanded(
               child: target
                   ? ListView.builder(
@@ -1063,70 +1066,70 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                   );
                 },
               )
-                  : ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  List? data = widget.taskdata;
-                  print("$data");
-                  String dataaction =  widget.taskdata![index].toString();
-                  if (!_actions.containsKey(data)) {
-                    _actions["customer"] = {'action': '', 'priority': _priorities[0]};
-                    //print( _actions[dataaction]);
+                  :ListView.builder(
+                itemCount: widget.taskdata!.length,
+                itemBuilder: (context,int index) {
+                  Map<String, dynamic> data = widget.taskdata![index];
+                  String agent = data['Agent'];
+                  if (!_actions.containsKey(agent)) {
+                    _actions[agent] = {'action': '', 'priority': _priorities[0]};
                   }
+                  //String priority = data['Priority'];
+                  //String actionPlan = data['ActionPlan'];
+                  String datanew = widget.taskdata![index].toString();
                   return Card(
-                    elevation: 6,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Name: ${data![index]['Agent']}',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 8),
-                          TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Enter action plan',
-                              labelText: 'Action Plan',
-                            ),
-                            onChanged: (value) {
-                              setState(() {
-                                print(value);
-                                 _actions[dataaction]!['action'] = value;
-                                 print("Action ${ _actions[dataaction]!['action']}");
-                              });
-                            },
-                            maxLines: 3,
-                          ),
-                          SizedBox(height: 8),
-                          Text('Priority'),
-                          DropdownButtonFormField<String>(
-                            value: _actions[data]?['priority'],
-                            items: _priorities.map((priority) {
-                              return DropdownMenuItem<String>(
-                                value: priority,
-                                child: Text(priority),
-                              );
-                            }).toSet().toList(),
-                            onChanged: (value) {
-                              print(value);
-                              setState(() {
-                                _actions["plan"]!['priority'] = value!;
-                                print("Denn ${_actions}");
-                              });
-                            },
-                          ),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                  child: Column(
+
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(datanew),
+                      Text(_actions[agent].toString()),
+                      Text(
+                        'Name: $agent',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    ),
+                      SizedBox(height: 8),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Enter action plan',
+                          labelText: 'Action Plan',
+                        ),
+                        onChanged: (value) {
+                          print(value);
+                          setState(() {
+                            _actions[agent]!['action'] = value;
+                          });
+                        },
+                        maxLines: 3,
+                      ),
+                      SizedBox(height: 8),
+                      AppDropDown(
+                          disable: true,
+                          label: "Priority",
+                          items: _priorities,
+                          hint: "Priority",
+                          onChanged: (value){
+                            setState(() {
+                              _actions[agent]!['priority'] = value;
+                            });
+
+                            print(value);
+                          })
+
+                    ],
+                  )
+                      )
+
                   );
                 },
               ),
+
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
+               Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => PreviewScreenNew(
@@ -1138,7 +1141,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                           customers:widget.taskdata,
                           actions: _actions!,
                     )));
-                print(  _actions);
+                print(   _actions);
 
 
               },
@@ -1181,21 +1184,124 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
     super.initState();
   }
   Widget build(BuildContext context) {
-    return  Scaffold(
-        appBar: AppBar(
-          title: Text('Preview'),
+     return Scaffold(
+      appBar: AppBar(
+        title: Text('Preview ${widget.target}'),
+      ),
+      body: widget.target?SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Region: ${widget.region}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Area: ${widget.area}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Task: ${widget.task}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Sub Task: ${widget.subTask}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Task Action:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: widget.customers!.map((customer) {
+                Map<String, String>? action1 = widget.actions[customer];
+                List<String> items = customer.split("-");
+                String? perc = items[1].substring(0, items[1].length - 1);
+                double total = double.parse(action1!['target']!)+double.parse(perc!);
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Name: ${customer}'),
+                    SizedBox(height: 8),
+                    Text("Priority: ${action1!['priority']}"),
+                    Text("Action Plan: ${action1!['action']}"),
+                    Text('Current: ${items[1]}'),
+                    Text('Target: ${action1!['target']}'),
+                    Text('Goal: $total'),
 
+                    SizedBox(height: 8),
+                  ],
+                );
+              }).toList(),
+            ),
+            ElevatedButton(onPressed:
+                (){
+              //_save();
+            }, child: Text("Submit"))
+          ],
         ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Text("Task:${widget.task}"),
-          Text("Sub Task:${widget.subTask}"),
-          Text("Region:${widget.region}"),
-          Text("Are:${widget.area}"),
-          Text("List:${widget.customers.toString()}"),
-          Text("Action:${widget.actions.toString()}"),
-        ],
+      ):
+
+      SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Region: ${widget.region}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Area: ${widget.area}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Task: ${widget.task}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Sub Task: ${widget.subTask}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Task Action:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: widget.customers!.map((customer) {
+                Map<String, String>? action = widget.actions[customer];
+                //List<String> items = customer.split("-");
+                // String? perc = items[1].substring(0, items[1].length - 1);
+                //double total = double.parse(action1!['target']!)+double.parse(perc!);
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Name: ${widget.customers}'),
+                    SizedBox(height: 8),
+                    //Text("Priority: ${action1!['priority']}"),
+                   // Text("Action Plan: ${action1!['action']}"),
+                    SizedBox(height: 8),
+                  ],
+                );
+              }).toList(),
+            ),
+            ElevatedButton(onPressed:
+                (){
+             // _save();
+            }, child: Text("Submit"))
+          ],
+        ),
       ),
     );
   }
