@@ -1084,10 +1084,17 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
 
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(datanew),
-                      Text(_actions[agent].toString()),
                       Text(
                         'Name: $agent',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+
+                        'Name: ${data['%Unrechabled rate within SLA:']}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),Text(
+
+                        'Name: ${data}',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 8),
@@ -1182,6 +1189,44 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
     print(widget.customers);
     // TODO: implement initState
     super.initState();
+  }
+  void _save() async{
+    Map data = {
+      'task_title': widget.task,
+      'sub_task': widget.subTask,
+      'task_region': widget.region,
+      'task_area':widget.area,
+      "task_start_date": "2023-05-05",
+      "timestamp": 1683282979,
+      "task_end_date": "2023-05-10",
+      "submited_by":"Test User",
+      'is_approved': 'No'
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://1d39-102-89-46-32.ngrok-free.app/api/create');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    var result_task = jsonDecode(response.body);
+
+  }
+  void taskAction() async {
+    Map data =  {
+      "task":" items[0]",
+      "account_number":"items[0]",
+      "goals":" total",
+      "task_description": widget.actions?['action'],
+      "priority": widget.actions?['priority'],
+      "task_status": "Pending"
+    };
+    print(data);
+    var body = json.encode(data);
+    var url = Uri.parse('https://f2e3-102-89-32-23.ngrok-free.app/api/taskgoals/create');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    print(response.body);
+
   }
   Widget build(BuildContext context) {
      return Scaffold(
@@ -1280,17 +1325,19 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widget.customers!.map((customer) {
-                Map<String, String>? action = widget.actions[customer];
+                String agentName = customer['Agent'];
+                Map<String, String>? actions = widget.actions[agentName];
+                Map<String, String>? action = widget.actions["Agent"];
                 //List<String> items = customer.split("-");
                 // String? perc = items[1].substring(0, items[1].length - 1);
                 //double total = double.parse(action1!['target']!)+double.parse(perc!);
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Name: ${widget.customers}'),
+                    Text('Name: $agentName'),
                     SizedBox(height: 8),
-                    //Text("Priority: ${action1!['priority']}"),
-                   // Text("Action Plan: ${action1!['action']}"),
+                    Text("Priority: Priority: ${actions?['priority'] ?? 'N/A'}"),
+                   Text("Action: ${actions?['action'] ?? 'N/A'}"),
                     SizedBox(height: 8),
                   ],
                 );
@@ -1298,7 +1345,9 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             ),
             ElevatedButton(onPressed:
                 (){
-             // _save();
+              print(widget.actions);
+              print(widget.customers);
+              _save();
             }, child: Text("Submit"))
           ],
         ),

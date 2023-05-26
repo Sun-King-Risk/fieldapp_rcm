@@ -1,5 +1,6 @@
 
 import 'package:fieldapp_rcm/add_task.dart';
+import 'package:fieldapp_rcm/new_design.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/step_form.dart';
 import 'package:fieldapp_rcm/task_table.dart';
@@ -44,7 +45,7 @@ class Task extends StatelessWidget {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => AddTask(),
+                                      builder: (context) => TaskRadio(),
                                     ));
                             },
                             child: Text("Add New Task")),

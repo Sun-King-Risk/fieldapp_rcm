@@ -168,7 +168,7 @@ class _MyAppState extends State<MyApp> {
         theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
         builder: Authenticator.builder(),
-        home:TaskRadio(),
+        home:NavPage(),
       ),
     );
   }
