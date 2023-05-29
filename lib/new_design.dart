@@ -834,6 +834,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
   int currentPage = 1;
   int itemsPerPage = 10;
   List? taskData = [];
+  String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
@@ -855,6 +856,18 @@ class _PortfolioTableState extends State<PortfolioTable> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Search',
+                prefixIcon: Icon(Icons.search),
+              ),
+            ),
+
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
@@ -1203,7 +1216,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
       'is_approved': 'No'
     };
     var body = json.encode(data);
-    var url = Uri.parse('https://1d39-102-89-46-32.ngrok-free.app/api/create');
+    var url = Uri.parse('https:/Sun-kingfieldapp.com/api/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
