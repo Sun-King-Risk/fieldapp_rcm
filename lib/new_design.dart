@@ -642,6 +642,7 @@ class _TaskTableState extends State<TaskTable> {
   }
   @override
   Widget build(BuildContext context) {
+    List<String> keys = widget.taskdata!.isNotEmpty ? widget.taskdata![0].keys.toList() : [];
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
@@ -650,25 +651,24 @@ class _TaskTableState extends State<TaskTable> {
           SizedBox(
             width: double.infinity,
           child: DataTable(
-              columns: [
-                DataColumn(label: Text('Agent')),
-                DataColumn(label: Text('Country')),
-                DataColumn(label: Text('Region')),
-                DataColumn(label: Text('Area')),
-                DataColumn(label: Text('% Unreachability Rate')),
-              ],
+              columns: List.generate(
+                keys.length,
+                      (index) => DataColumn(
+                        label: Text(keys[index]),
+                      )
+
+              ),
             rows:widget.taskdata!.map((item) {
               final bool isSelected = selectedItems.contains(item);
               return DataRow(
                 selected: isSelected,
                 onSelectChanged: (_) => selectItem(item),
-                  cells: [
-                    DataCell(Text(item['Agent'])),
-                    DataCell(Text(item['Country'])),
-                    DataCell(Text(item['Region'] ?? 'N/A')),
-                    DataCell(Text(item['Area'])),
-                    DataCell(Text(item['%Unreachabled rate within SLA'])),
-                  ]
+                  cells: List.generate(
+                    keys.length,
+              (index) => DataCell(
+                Text(item[keys[index]].toString()),
+              )
+                  )
               );
             },
           ).toList()
@@ -698,6 +698,7 @@ class MyPaginatedTable extends StatefulWidget {
 class _MyPaginatedTableState extends State<MyPaginatedTable> {
   int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
   int _currentPage = 0;
+
   List<Map<String, dynamic>> data = [
     {
       'Agent': 'Aliyu Test',
@@ -737,14 +738,14 @@ class _MyPaginatedTableState extends State<MyPaginatedTable> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> keys = widget.taskdata!.isNotEmpty ? widget.taskdata![0].keys.toList() : [];
     final paginatedDataTable = PaginatedDataTable(
-      columns: [
-        DataColumn(label: Text('Agent')),
-        DataColumn(label: Text('Country')),
-        DataColumn(label: Text('Region')),
-        DataColumn(label: Text('Area')),
-        DataColumn(label: Text('% Unreachability Rate')),
-      ],
+      columns: List.generate(
+        keys.length,
+            (index) => DataColumn(
+              label: Text(keys[index]),
+            )
+      ),
       source: _TableDataSource(data, selectedItems),
       rowsPerPage: _rowsPerPage,
       onPageChanged: (pageIndex) {
@@ -835,6 +836,9 @@ class _PortfolioTableState extends State<PortfolioTable> {
   int itemsPerPage = 10;
   List? taskData = [];
   String searchQuery = '';
+  int _sortColumnIndex = 2;
+  bool _sortAscending = true;
+
 
   @override
   Widget build(BuildContext context) {
@@ -849,6 +853,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
     // Get the items for the current page
     List currentPageItems =
     taskData!.sublist(startIndex, endIndex);
+   List<String> keys = widget.taskdata!.isNotEmpty ? widget.taskdata![0].keys.toList() : [];
 
     return Scaffold(
       appBar: AppBar(),
@@ -856,6 +861,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            Text(keys.toString()),
             TextField(
               onChanged: (value) {
                 setState(() {
@@ -872,59 +878,83 @@ class _PortfolioTableState extends State<PortfolioTable> {
               scrollDirection: Axis.horizontal,
               child: DataTable(
                 columns: [
-                  DataColumn(label: Text('Agent')),
-                  DataColumn(label: Text('Country')),
-                  DataColumn(label: Text('Region')),
-                  DataColumn(label: Text('Area')),
-                  DataColumn(label: Text('% Unreachabled rate within SLA')),
+                  for (int index = 0; index < keys.length; index++)
+                    if (keys[index] != 'Country' && keys[index] != 'Region' && keys[index] != 'Area')
+                      DataColumn(
+                        label: Row(
+                          children: [
+                            Text(keys[index]),
+                            if (_sortColumnIndex == index)
+                              _sortAscending
+                                  ? Icon(Icons.arrow_upward)
+                                  : Icon(Icons.arrow_downward),
+                          ],
+                        ),
+                        onSort: (columnIndex, ascending) {
+                          setState(() {
+                            if (_sortColumnIndex == columnIndex) {
+                              // Toggle the sorting direction if the same column is selected
+                              _sortAscending = !_sortAscending;
+                            } else {
+                              _sortAscending = true;
+                              _sortColumnIndex = columnIndex;
+                            }
+                            widget.taskdata!.sort((a, b) {
+                              var aValue = a[keys[columnIndex]].toString();
+                              var bValue = b[keys[columnIndex]].toString();
+                              return _sortAscending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
+                            });
+                          });
+                        },
+                      ),
                   DataColumn(label: Text('Select')),
                 ],
-                rows: currentPageItems.map((item) {
-                  bool isSelected = taskDataList!.contains(item);
-                  return DataRow(
-                    selected: isSelected,
-                    onSelectChanged: (value) {
-                      setState(() {
-                        if (isSelected) {
-                          taskDataList!.remove(item);
-                        } else {
-                          taskDataList!.add(item);
-                          if(taskDataList!.length <= 5){
-                            if (kDebugMode) {
-                              print(taskDataList);
-                            }
-                          }else{
-                            safePrint('Only 5 task allowed');
-                          }
-                        }
-                      });
-                    },
-                    cells: [
-                      DataCell(Text(item['Agent'] ?? '')),
-                      DataCell(Text(item['Country'] ?? '')),
-                      DataCell(Text(item['Region'] ?? '')),
-                      DataCell(Text(item['Area'] ?? '')),
-                      DataCell(Text(item['%Unreachabled rate within SLA'] ?? '')),
-                      DataCell(
-                        Checkbox(
-                          value: isSelected,
-                          onChanged: (value) {
-                            setState(() {
-                              if (isSelected) {
-                                taskDataList!.remove(item);
-                              } else {
-                                taskDataList!.add(item);
-
-
-                              }
-                            });
-                          },
+                rows: [
+                  for (final item in widget.taskdata!)
+                    DataRow(
+                      cells: [
+                        for (int cellIndex = 0; cellIndex < keys.length; cellIndex++)
+                          if (keys[cellIndex] != 'Country' && keys[cellIndex] != 'Region' && keys[cellIndex] != 'Area')
+                            DataCell(
+                              Text(item[keys[cellIndex]].toString()),
+                            ),
+                        DataCell(
+                          Checkbox(
+                            value: taskDataList!.contains(item),
+                            onChanged: (value) {
+                              setState(() {
+                                if (taskDataList!.contains(item)) {
+                                  taskDataList!.remove(item);
+                                } else {
+                                  taskDataList!.add(item);
+                                }
+                              });
+                            },
+                          ),
                         ),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
+                      ],
+                      selected: taskDataList!.contains(item),
+                      onSelectChanged: (value) {
+                        setState(() {
+                          if (taskDataList!.contains(item)) {
+                            taskDataList!.remove(item);
+                          } else {
+                            taskDataList!.add(item);
+                            if (taskDataList!.length <= 5) {
+                              if (kDebugMode) {
+                                print(taskDataList);
+                              }
+                            } else {
+                              safePrint('Only 5 tasks allowed');
+                            }
+                          }
+                        });
+                      },
+                    ),
+                ],
+              )
+
+              ,
             ),
 
 
@@ -1006,6 +1036,19 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
   Map<String, Map<String, String>> _actions = {};
   List<String> textFieldValues = [];
   List<String> dropdownValues = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if(
+    widget.subtask == 'Work with the Agents with low welcome calls to improve' ||
+    widget.subtask == ''
+    ){
+      target = true;
+    }else{
+      target = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1021,7 +1064,11 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                   ? ListView.builder(
                 itemCount: widget.taskdata!.length,
                 itemBuilder: (context, index) {
-                  String data = widget.taskdata![index];
+                  Map<String, dynamic> data = widget.taskdata![index];
+                  String agent = data['Agent'];
+                  if (!_actions.containsKey(agent)) {
+                    _actions[agent] = {'action': '', 'current':"45",'priority': _priorities[0]};
+                  }
                   return Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -1029,7 +1076,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Customer: ',
+                            'Customer: ${agent}  - ${widget.taskdata![index]['Area']}',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 8),
@@ -1040,7 +1087,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                             ),
                             onChanged: (value) {
                               setState(() {
-                                //_actions[customer]!['action'] = value;
+                                _actions[agent]!['action'] = value;
                               });
                             },
                             maxLines: 3,
@@ -1054,25 +1101,22 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                             ),
                             onChanged: (value) {
                               setState(() {
-                                _actions["data"]!['target'] = value!;
+                                _actions[agent]!['target'] = value;
                               });
                             },
                           ),
-                          Text('Priority'),
-                          DropdownButtonFormField<String>(
-                            value: _actions[widget.taskdata]!['priority'],
-                            items: _priorities.map((priority) {
-                              return DropdownMenuItem<String>(
-                                value: priority,
-                                child: Text(priority),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _actions[widget.taskdata]!['priority'] = value!;
-                              });
-                            },
-                          ),
+                          AppDropDown(
+                              disable: true,
+                              label: "Priority",
+                              items: _priorities,
+                              hint: "Priority",
+                              onChanged: (value){
+                                setState(() {
+                                  _actions[agent]!['priority'] = value;
+                                });
+
+                                print(value);
+                              }),
                         ],
                       ),
                     ),
@@ -1083,7 +1127,8 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                 itemCount: widget.taskdata!.length,
                 itemBuilder: (context,int index) {
                   Map<String, dynamic> data = widget.taskdata![index];
-                  String agent = data['Agent'];
+
+                 String agent = data['Agent'];
                   if (!_actions.containsKey(agent)) {
                     _actions[agent] = {'action': '', 'priority': _priorities[0]};
                   }
@@ -1165,7 +1210,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
 
 
               },
-              child: Text('Go to Another Page'),
+              child: Text('Next'),
             ),
           ],
         ),
@@ -1199,7 +1244,7 @@ class PreviewScreenNew extends StatefulWidget {
 class _PreviewScreenNewState extends State<PreviewScreenNew> {
   @override
   void initState() {
-    print(widget.customers);
+    print("test ${widget.customers}");
     // TODO: implement initState
     super.initState();
   }
@@ -1216,35 +1261,44 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
       'is_approved': 'No'
     };
     var body = json.encode(data);
-    var url = Uri.parse('https:/Sun-kingfieldapp.com/api/create');
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
     var result_task = jsonDecode(response.body);
+    taskAction(result_task,);
 
   }
-  void taskAction() async {
-    Map data =  {
-      "task":" items[0]",
-      "account_number":"items[0]",
-      "goals":" total",
-      "task_description": widget.actions?['action'],
-      "priority": widget.actions?['priority'],
-      "task_status": "Pending"
-    };
-    print(data);
-    var body = json.encode(data);
-    var url = Uri.parse('https://f2e3-102-89-32-23.ngrok-free.app/api/taskgoals/create');
-    http.Response response = await http.post(url, body: body, headers: {
-      "Content-Type": "application/json",
-    });
-    print(response.body);
+  void taskAction(id) async {
+
+    for (final entry in widget.actions.entries) {
+      Map data =   {
+        "task": id,
+        "account_number":entry.key,
+        "goals": 0,
+        "task_description": entry.value['action'],
+        "priority": entry.value['priority'],
+        "task_status": "pending"
+      };
+      var body = json.encode(data);
+      var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/create');
+      http.Response response = await http.post(url, body: body, headers: {
+        "Content-Type": "application/json",
+      });
+      print(response.body);
+
+    }
+
+
+
+
+
 
   }
   Widget build(BuildContext context) {
      return Scaffold(
       appBar: AppBar(
-        title: Text('Preview ${widget.target}'),
+        title: Text('Preview'),
       ),
       body: widget.target?SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -1271,26 +1325,28 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             ),
             SizedBox(height: 16),
             Text(
-              'Task Action:',
+              'Task Action: ${widget.customers![0]["%Unreachabled rate within SLA"]}',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widget.customers!.map((customer) {
-                Map<String, String>? action1 = widget.actions[customer];
-                List<String> items = customer.split("-");
-                String? perc = items[1].substring(0, items[1].length - 1);
-                double total = double.parse(action1!['target']!)+double.parse(perc!);
+                String agentName = customer['Agent'];
+                String current = customer['%Unreachabled rate within SLA'];
+                Map<String, String>? actions = widget.actions[agentName];
+                //List<String> items = customer.split("-");
+                String? percvalue = current.substring(0,current.length - 1);
+                double total = double.parse(actions!['target']!)+double.parse(percvalue!);
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Name: ${customer}'),
+                    Text('Name: ${agentName}'),
                     SizedBox(height: 8),
-                    Text("Priority: ${action1!['priority']}"),
-                    Text("Action Plan: ${action1!['action']}"),
-                    Text('Current: ${items[1]}'),
-                    Text('Target: ${action1!['target']}'),
+                    Text("Priority: ${actions!['priority']}"),
+                    Text("Action Plan: ${actions!['action']}"),
+                    Text('Current: $percvalue'),
+                    Text('Target: ${actions!['target']}'),
                     Text('Goal: $total'),
 
                     SizedBox(height: 8),
@@ -1358,9 +1414,10 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             ),
             ElevatedButton(onPressed:
                 (){
+                 _save();
               print(widget.actions);
               print(widget.customers);
-              _save();
+
             }, child: Text("Submit"))
           ],
         ),

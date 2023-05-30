@@ -1,10 +1,11 @@
 
-import 'package:fieldapp_rcm/add_task.dart';
+
+import 'dart:convert';
+
 import 'package:fieldapp_rcm/new_design.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
-import 'package:fieldapp_rcm/step_form.dart';
 import 'package:fieldapp_rcm/task_table.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
 import 'pending_task.dart';
 import 'team_task.dart';
 import 'package:flutter/material.dart';
@@ -136,6 +137,18 @@ class TaskList extends StatefulWidget {
 }
 
 class _TaskListState extends State<TaskList> {
+  List? data = [];
+  void fetchData() async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      setState(() {
+        data = jsonDecode(response.body);
+      });
+    }else{
+      print('Request failed with status: ${response.statusCode}');
+    }
+  }
   @override
   Widget build(BuildContext context) {
 

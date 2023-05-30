@@ -24,6 +24,18 @@ class MyTaskViewState extends State<MyTaskView> {
   bool decoration = false;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  List? data = [];
+  void fetchData() async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      setState(() {
+        data = jsonDecode(response.body);
+      });
+    }else{
+      print('Request failed with status: ${response.statusCode}');
+    }
+  }
   Future<int> TaskCount(id) async{
     QuerySnapshot querySnapshot =
         await firestore.collection("task").doc(id).collection('action').get();
@@ -33,14 +45,18 @@ class MyTaskViewState extends State<MyTaskView> {
     });
     return querySnapshot.docs.length;
   }
+  List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
-    QuerySnapshot querySnapshot =
-    await firestore.collection("task").doc(id).collection('action').get();
-    setState(() {
-      _action = querySnapshot.docs;
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/72/');
+    http.Response response = await http.get(url, headers: {
+      "Content-Type": "application/json",
 
     });
-    _TaskList(id, subtask);
+    setState(() {
+      taskgoal = [jsonDecode(response.body)];
+      print(taskgoal);
+    });
+    _TaskList(72, subtask);
   }
   void _TaskList(id,subtask){
     showDialog(
@@ -48,7 +64,7 @@ class MyTaskViewState extends State<MyTaskView> {
       builder: (BuildContext context) {
         return SingleChildScrollView(
           child: AlertDialog(
-            title: Text('Task Details'),
+            title: Text('Task Details $id'),
             content: Column(
               children: [
                 TextField(
@@ -59,11 +75,11 @@ class MyTaskViewState extends State<MyTaskView> {
                 Container(
                   height: 400,
                   child: ListView.builder(
-                    itemCount: 3,
+                    itemCount: taskgoal!.length,
                     itemBuilder: (context, index) {
-                      DocumentSnapshot _dataaction = _action[index];
-                      double? percentvalue = double.parse(_dataaction["Current"].substring(0, _dataaction["Current"].length - 1));
-                      double perc = percentvalue/_dataaction["Goal"];
+                      var taskdetail = taskgoal![index];
+                      /*double? percentvalue = double.parse(_dataaction["Current"].substring(0, _dataaction["Current"].length - 1));
+                      double perc = percentvalue/_dataaction["Goal"];*/
                       return  GestureDetector(
                         onTap: () {
                           if(widget.title == "Portfolio Quality")
@@ -72,7 +88,7 @@ class MyTaskViewState extends State<MyTaskView> {
                               MaterialPageRoute(
                                 builder: (context) => PortfolioUpdate(
                                   task: id,
-                                  id: _dataaction.id,
+                                  id: id,
                                   title: widget.title,
                                   subtask: subtask,
 
@@ -84,7 +100,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                 MaterialPageRoute(
                                   builder: (context) => CollectionUpdate(
                                     task: id,
-                                    id: _dataaction.id,
+                                    id: id,
                                     title: widget.title,
                                     subtask: subtask,
 
@@ -96,7 +112,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                 MaterialPageRoute(
                                   builder: (context) => PilotUpdate(
                                     task: id,
-                                    id: _dataaction.id,
+                                    id: id,
                                     title: widget.title,
                                     subtask: subtask,
 
@@ -108,7 +124,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                 MaterialPageRoute(
                                   builder: (context) => CustomerUpdate(
                                     task: id,
-                                    id: _dataaction.id,
+                                    id: id,
                                     title: widget.title,
                                     subtask: subtask,
 
@@ -120,7 +136,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                 MaterialPageRoute(
                                   builder: (context) => TeamUpdate(
                                     task: id,
-                                    id: _dataaction.id,
+                                    id: id,
                                     title: widget.title,
                                     subtask: subtask,
 
@@ -142,24 +158,24 @@ class MyTaskViewState extends State<MyTaskView> {
                                     children: [
                                       decoration?
                                       Text(
-                                        "Name: ${_dataaction["Customer"]}",
+                                        "Name: ${taskdetail["account_number"]}",
                                         style: TextStyle(
                                             fontSize: 18,
                                           decoration: TextDecoration.lineThrough,
                                         ),
 
                                       ):Text(
-                                        "Name: ${_dataaction["Customer"]}",
+                                        "Name: ${taskdetail["account_number"]}",
                                         style: TextStyle(
                                             fontSize: 18),
 
                                       ),
                                       Text(
-                                        "Current: ${_dataaction["Current"]}",
+                                        "Current: ${taskdetail["previous_goal"]}",
                                         style: TextStyle(fontSize: 18),
                                       ),
                                       Text(
-                                        "Goal: ${_dataaction["Goal"]}",
+                                        "Goal: ${taskdetail["goals"]}",
                                         style: TextStyle(fontSize: 18),
                                       ),
                                       SizedBox(height: 5),
@@ -169,9 +185,9 @@ class MyTaskViewState extends State<MyTaskView> {
                                         animation: true,
                                         animationDuration: 1000,
                                         lineHeight: 15.0,
-                                        percent:perc,
+                                        percent:0.5,
                                         progressColor: Colors.green,
-                                        center: Text('${(perc*100).toStringAsFixed(0)}%'),
+                                        center: Text('${(0.5*100).toStringAsFixed(0)}%'),
                                       )
 
                                     ],
@@ -202,32 +218,11 @@ class MyTaskViewState extends State<MyTaskView> {
   }
 
 
-  final List<Map<String, dynamic>> _allUsers = [
-    {"id": 1, "name": "Collection Drive", "request": "New Request","priority":"High"},
-    {"id": 2, "name": "Team Management", "request": "pending Approval","priority":"Normal"},
-    {"id": 3, "name": "Customer Management", "request": "New Request","priority":"Normal"},
-    {"id": 4, "name": "Pilot Management", "request": "Rejected","priority":"Low"},
-    {"id": 5, "name": "Process Management", "request": "New Request","priority":"Low"},
-    {"id": 6, "name": "Customer Management", "request": "Pending","priority":"High"},
-    {"id": 7, "name": "Process Management", "request": "Rejected","priority":"Normal"},
-    {"id": 8, "name": "Portfolio Quality", "request": "Rejected","priority":"High"},
-    {"id": 9, "name": "Team Management","request": "Pending Approval","priority":"High"},
-    {"id": 10, "name": "Pilot Management", "request": "Rejected ","priority":"Normal"},
-    {"id": 10, "name": "Collection Drive", "request": "Rejected ","priority":"Normal"},
-  ];
+
   List<Map<String, dynamic>> _foundUsers = [];
   void _searchFilter(String enteredKeyword) {
     List<Map<String, dynamic>> results = [];
-    if (enteredKeyword.isEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
-      results = _allUsers;
-    } else {
-      results = _allUsers
-          .where((user) =>
-          user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
-      // we use the toLowerCase() method to make it case-insensitive
-    }
+
 
     // Refresh the UI
     setState(() {
@@ -236,29 +231,6 @@ class MyTaskViewState extends State<MyTaskView> {
   }
   void _statusFilter(String _status) {
     List<Map<String, dynamic>> results = [];
-    switch(_status) {
-
-      case "high": {results = _allUsers
-          .where((user) =>
-          user["priority"].toLowerCase().contains(_status.toLowerCase())).where((user) =>  user["name"].toLowerCase().contains(widget.title.toLowerCase()))
-          .toList();}
-      break;
-
-      case "normal": {  results = _allUsers
-          .where((user) =>
-          user["priority"].toLowerCase().contains(_status.toLowerCase())).where((user) =>  user["name"].toLowerCase().contains(widget.title.toLowerCase()))
-          .toList(); }
-      break;
-
-      case "low": { results = _allUsers
-          .where((user) =>
-          user["priority"].toLowerCase().contains(_status.toLowerCase())).where((user) =>  user["name"].toLowerCase().contains(widget.title.toLowerCase()))
-          .toList();}
-      break;
-      case "All": { results = _allUsers
-          .where((user) =>  user["name"].toLowerCase().contains(widget.title.toLowerCase()))
-          .toList();; }
-    }
 
 
     // Refresh the UI
@@ -266,7 +238,7 @@ class MyTaskViewState extends State<MyTaskView> {
       _foundUsers = results;
     });
   }
-  List data =[];
+  List data2 =[];
   var _key=GlobalKey();
 
   Future<String> getData() async {
@@ -444,23 +416,18 @@ class MyTaskViewState extends State<MyTaskView> {
       const SizedBox(
         height: 10,
       ),
-
-          StreamBuilder<QuerySnapshot>(
-              stream:TaskData().getData(widget.title,'approved').asStream(),
-    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if(snapshot.hasData){
-          return Expanded(
-              child:snapshot.hasData
-                  ? ListView.separated(
-                  itemCount: snapshot.data!.size,
+          Expanded(
+              child: ListView.separated(
+                  itemCount: data!.length,
                 itemBuilder: (BuildContext context, int index) {
-                  DocumentSnapshot data = snapshot.data!.docs[index];
-                  var tasklist = TaskCount(data.id);
+                  var task = data![index];
                   return
                     GestureDetector(
                       onTap: () {
-                        _getAction(data.id,data['sub_task']);
-                        //_TaskList(data.id,data['sub_task']);
+                       // _getAction(task["id"],task['sub_task']);
+                        _TaskList(task['sub_task'],task['sub_task']);
+                        print(task["id"]);
+
                       },
                       child: Row(
                         children: [
@@ -475,7 +442,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Task: ${data['sub_task']}",
+                                      "Task: ${task['sub_task']}",
                                       style: TextStyle(fontSize: 18),
                                     ),
                                     SizedBox(height: 5),
@@ -486,7 +453,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                           children: [
                                             Icon(Icons.location_on),
                                             Text(
-                                              "${data['task_area']}",
+                                              "${task['task_area']}",
                                               style: TextStyle(fontSize: 14, color: Colors.grey),
                                             ),
                                           ],
@@ -504,7 +471,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                           children: [
                                             Icon(Icons.access_time),
                                             Text(
-                                              "20/4/2023",
+                                              "${task['task_end_date']}",
                                               style: TextStyle(fontSize: 14, color: Colors.grey),
                                             ),
                                           ],
@@ -520,28 +487,8 @@ class MyTaskViewState extends State<MyTaskView> {
                         ],
                       ),
                     );
-
-
                 },
-                separatorBuilder: (BuildContext context, int index) { return  Divider();}):const Text(
-                'No results found',
-                style: TextStyle(fontSize: 15),
-              ));;
-        }else if(snapshot.hasError){
-          return Expanded(child:Text('Error Loding data'));
-        }else{
-          return Column(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(
-                height: 10,
-              ),
-              Text('Loading...'),
-            ],
-          );
-        }
-    }
-          )
+                separatorBuilder: (BuildContext context, int index) { return  Divider();}))
         ],
       ),
       /*SingleChildScrollView(

@@ -57,7 +57,6 @@ _taskStatus(docid)async{
       builder: (BuildContext context) {
         return SingleChildScrollView(
             child: AlertDialog(
-              title: Text('Customer Feedback'),
         content: Text('Do you approve or reject this action?'),
                 actions: <Widget>[
                   Row(
@@ -65,25 +64,36 @@ _taskStatus(docid)async{
                     children: [
                       TextButton(
                         child: Text('Approve'),
-                        onPressed: () async {
-                          await FirebaseFirestore.instance.collection('task').doc(docid).update({
-                            'is_approved':'approved'
+                        onPressed: ()async{
+                          Map data = {
+                            'is_approved': 'Approved',
+                            'task_status': 'Pending'
+                          };
+                          var body = json.encode(data);
+                          var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                          http.Response response = await http.put(url, body: body, headers: {
+                            "Content-Type": "application/json",
+
                           });
-                          sendFCMNotification('','Task Approved','You can now proceed with your task as it approved');
-                          print(docid);
-                          Navigator.of(context).pop(true); // Return true to caller
+                          var result_task = jsonDecode(response.body);
+
+                          print(result_task);
+
                         },
                       ),
                       TextButton(
                         child: Text('Reject'),
-                        onPressed: () async {
-                          sendFCMNotification('fGK0oUkSRH6yBay7UKDA31:APA91bE_ohSsbtZ_sxs4hMDUt1rx4TzD8WYSr7_f_1IngMOCSUVJUgAF-HhuXEhGB-T9HSJbMUMKakN75G8o6oQkAlMWsZB6G3e6eurEBLK4sYkJX-MGIK3Uq0sgtNcLIctSeuaVC5Tj','Task Rejected','Your task has been rejected by your manager');
-                          await FirebaseFirestore.instance.collection('task').doc(docid).update({
-                            'task_status':'reject'
+                        onPressed: () async{
+                          Map data = {
+                            'is_approved': 'Rejected'
+                          };
+                          var body = json.encode(data);
+                          var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                          http.Response response = await http.put(url, body: body, headers: {
+                            "Content-Type": "application/json",
                           });
+                          var result_task = jsonDecode(response.body);
 
-                          print(docid);
-                          Navigator.of(context).pop(true); // Return true to caller
                         },
                       )
                     ],
@@ -102,13 +112,26 @@ _taskStatus(docid)async{
 
   // This list holds the data for the list view
   List<Map<String, dynamic>> _foundUsers = [];
+List? data = [];
   @override
   initState() {
     // at the beginning, all users are shown
     super.initState();
+    fetchData();
 
   }
 
+  void fetchData() async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      setState(() {
+        data = jsonDecode(response.body);
+      });
+    }else{
+      print('Request failed with status: ${response.statusCode}');
+    }
+  }
 
    Future<QuerySnapshot> getFilteredData() async {
     // Get a reference to the Firestore collection
@@ -212,70 +235,61 @@ _taskStatus(docid)async{
             const SizedBox(
               height: 20,
             ),
-            StreamBuilder(
-              stream: TaskData().PendingTaskRequest('Pending').asStream(),
-              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
-                }return Expanded(
-                  child: snapshot.hasData
-                      ? ListView.separated(
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder:  (BuildContext context, int index) {
-                      DocumentSnapshot data = snapshot.data!.docs[index];
-                      /*final sortedItems = _foundUsers
-                        ..sort((item1, item2) => isDescending
-                            ? item2['name'].compareTo(item1['name'])
-                            : item1['name'].compareTo(item2['name']));
-                      final name = sortedItems[index]['name'];*/
-                      return InkWell(
-                        onTap: () {
-                          _taskStatus(data.id);
-                        },
-                        key: ValueKey(snapshot.data!.docs[index]),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundColor: Colors.blueGrey.shade800,
-                              radius: 35,
-                              child: Text("1"),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Flexible(
-                              child: Container(
-                                width: 350,
-                                height: 90,
-                                child: Card(
-                                  elevation: 5,
-                                  child: Padding(
-                                    padding:
-                                    EdgeInsets.fromLTRB(20.0, 10, 0, 0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Requester : ${data['submited_by']}"),
-                                        Text("Task : ${data['sub_task']}"),
-                                        Text("Area : ${data['task_area']}"),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }, separatorBuilder: (BuildContext context, int index) => Divider(),)
-                      : const Text(
-                    'No results found',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                );
+    Expanded(
+      child: ListView.separated(
+        itemCount: data!.length, // Replace with your actual item count
+        separatorBuilder: (BuildContext context, int index) {
+          return Divider(
+            color: Colors.grey,
+            height: 1,
+          );
+        },
+        itemBuilder: (BuildContext context, int index) {
+          var task = data![index];
+          return InkWell(
+              onTap: () {
+                _taskStatus(task["id"]);
               },
+            key: ValueKey(task),
+            child: Row(
+              children: [
+            CircleAvatar(
+            backgroundColor: Colors.blueGrey.shade800,
+              radius: 35,
+              child: Text(task["id"].toString()),
+
             ),
+                SizedBox(
+                  width: 5,
+                ),
+              Flexible(
+                child: Container(
+                  width: 350,
+                  height: 100,
+                  child: Card(
+                    elevation: 5,
+                    child: Padding(
+                      padding:  EdgeInsets.fromLTRB(20.0, 10, 0, 0),
+                      child: Column(
+                        crossAxisAlignment:CrossAxisAlignment.start,
+                          children: [
+                            Text("Requester : ${task!['submited_by']}"),
+                            Text("Task : ${task!['sub_task']}"),
+                            Text("Area : ${task!['task_area']}"),
+                          ],
+                      )
+                    ),
+                  ),
+                ),
+              )
+            ]
+            )
+
+
+          );
+        },
+      ),
+    )
           ],
         );
   }
