@@ -47,16 +47,28 @@ class MyTaskViewState extends State<MyTaskView> {
   }
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/72/');
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
     http.Response response = await http.get(url, headers: {
       "Content-Type": "application/json",
 
     });
-    setState(() {
-      taskgoal = [jsonDecode(response.body)];
-      print(taskgoal);
-    });
-    _TaskList(72, subtask);
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['task'] == id)
+          .toList();
+      setState(() {
+        taskgoal = filteredTasks;
+        print(taskgoal);
+      });
+
+      // Return the count value
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+
+
+    _TaskList(subtask, subtask);
   }
   void _TaskList(id,subtask){
     showDialog(
@@ -241,13 +253,19 @@ class MyTaskViewState extends State<MyTaskView> {
   List data2 =[];
   var _key=GlobalKey();
 
-  Future<String> getData() async {
+  Future<String> getData(title) async {
     const apiUrl = 'https://sun-kingfieldapp.herokuapp.com/api/tasks';
     final response = await http.get(Uri.parse(apiUrl,),headers:{
       "Content-Type": "application/json",});
+    final List<dynamic> jsonData = json.decode(response.body);
+    final List<dynamic> filteredTasks = jsonData
+        .where((task) => task['task_title'] == title)
+    .where((task) => task['is_approved'] == 'Approved')
+    .where((task) => task['task_status'] == 'Pending')
+    .toList();
 
-    this.setState(() {
-      data = json.decode(response.body);
+    setState(() {
+      data = filteredTasks;
     });
 
 
@@ -255,9 +273,9 @@ class MyTaskViewState extends State<MyTaskView> {
   }
   @override
   void initState(){
-    this.getData();
-    this._statusFilter("All");
-    this._searchFilter(widget.title);
+    getData(widget.title);
+    _statusFilter("All");
+    _searchFilter(widget.title);
   }
 
 
@@ -344,20 +362,20 @@ class MyTaskViewState extends State<MyTaskView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    StreamBuilder(
-                      stream: TaskData().CountPriority(widget.title,'high').asStream(),
+                    FutureBuilder(
+                      future: TaskData().CountPriority(widget.title,'high'),
                       builder: (context, snapshot){
                         return  Text(snapshot.data.toString()+" High",style: TextStyle(color: Colors.green));
                       },
                     ),
-                    StreamBuilder(
-                      stream: TaskData().CountPriority(widget.title,'normal').asStream(),
+                    FutureBuilder(
+                      future: TaskData().CountPriority(widget.title,'normal'),
                       builder: (context, snapshot){
                         return  Text(snapshot.data.toString()+" Normal",style: TextStyle(color: Colors.orange));
                       },
                     ),
-                    StreamBuilder(
-                      stream: TaskData().CountPriority(widget.title,'low').asStream(),
+                    FutureBuilder(
+                      future: TaskData().CountPriority(widget.title,'low'),
                       builder: (context, snapshot){
                         return  Text(snapshot.data.toString()+" Low",style: TextStyle(color: Colors.red));
                       },
@@ -424,8 +442,8 @@ class MyTaskViewState extends State<MyTaskView> {
                   return
                     GestureDetector(
                       onTap: () {
-                       // _getAction(task["id"],task['sub_task']);
-                        _TaskList(task['sub_task'],task['sub_task']);
+                       _getAction(task["id"],task['sub_task']);
+                        //_TaskList(task['id'],task['sub_task']);
                         print(task["id"]);
 
                       },
@@ -442,7 +460,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Task: ${task['sub_task']}",
+                                      "Task: ${task['sub_task']} ${task["id"]}",
                                       style: TextStyle(fontSize: 18),
                                     ),
                                     SizedBox(height: 5),
@@ -491,196 +509,8 @@ class MyTaskViewState extends State<MyTaskView> {
                 separatorBuilder: (BuildContext context, int index) { return  Divider();}))
         ],
       ),
-      /*SingleChildScrollView(
-        child: Column(
-          children: [
-            ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                return TaskDetail(task_title: data[index]['task_title'].toString(),
-                  priority: data[index]['priority'].toString(),
-                  ahq_name: data[index]['task_area'].toString(),
-                  date: data[index]['task_start_date'].toString(),
-                  task: data[index]['id'].toString(),
-                  status: data[index]['task_status'].toString(),
-                  sub_task: data[index]['sub_task'].toString(),
-                  description: data[index]['task_description'].toString(),
-                  task_with: data[index]['task_with'].toString(),
-                  region: data[index]['task_region'].toString(),
-                  color: Colors.red,
-                );
-              })*/
     );
   }
 
 
 }
-
-class TaskDetail extends StatelessWidget {
-  final String task_title;
-  final String region;
-  final String sub_task;
-  final String priority;
-  final String ahq_name;
-  final String description;
-  final String date;
-  final String task;
-  final String status;
-  final String task_with;
-  final Color color;
-  const TaskDetail({Key? key,
-    required this.task_title,
-    required this.region,
-    required this.task_with,
-    required this.sub_task,
-    required this.description,
-    required this.priority,
-    required this.ahq_name,
-    required this.date,
-    required this.task,
-    required this.status,
-    required this.color,
-
-
-  });
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-      ),
-      elevation: 3,
-      margin: EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Row(
-          children: [
-            //task label
-            Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Task Name:", style:TextStyle(fontWeight: FontWeight.bold,fontSize:12),),
-                  Text("Sub Task:", style:TextStyle(fontWeight: FontWeight.bold,fontSize:12),),
-                  Text("Task description:", style:TextStyle(fontWeight: FontWeight.bold,fontSize:12),),
-                  Text("Task task with:", style:TextStyle(fontWeight: FontWeight.bold,fontSize:12),),
-                  Text("Task Priority:", style:TextStyle(fontWeight: FontWeight.bold,fontSize:12),)
-                ],
-              ),
-
-            ),
-            SizedBox(width: 10,),
-            Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(task_title, style:TextStyle(fontSize:13),),
-                  Text(sub_task,style:TextStyle(fontSize:13)),
-                  Text(description,style:TextStyle(fontSize:13)),
-                  Text(task_with,style:TextStyle(fontSize:13)),
-                  Text(priority,style:TextStyle(fontSize:13)),
-
-                ],
-              ),
-            )
-
-          ],
-        ),
-      ),
-    );
-  }
-}
-/*Column(
-children: [
-Center(child: Text(task_title,
-style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),),
-Row(
-children: [
-style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-SizedBox(width: 15),
-Text(sub_task, style: TextStyle(fontSize: 15,)),
-],
-),
-Row(
-children: [
-Text("Task Description:",
-style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-SizedBox(width: 15),
-Flexible
-(child: new Text(description,
-style: TextStyle(
-color: Colors.black,
-fontSize: 15.0,),
-overflow: TextOverflow.clip,),)
-],
-),
-Row(
-children: [
-Text("Task With:",
-style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-SizedBox(width: 15),
-Text(task_with, style: TextStyle(fontSize: 15,)),
-],
-),
-Row(
-children: [
-Text("Region:",
-style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-SizedBox(width: 15),
-Text(region, style: TextStyle(fontSize: 15,)),
-],
-),
-Row(
-children: [
-Text("Area:",
-style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-SizedBox(width: 15),
-Text(ahq_name, style: TextStyle(fontSize: 15,)),
-],
-),
-Row(
-children: [
-Text("Priority:",
-style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-SizedBox(width: 5),
-Text(priority, style: TextStyle(fontSize: 15,)),
-SizedBox(width: 20),
-Text("Status:",
-style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
-SizedBox(width: 5),
-Text(status, style: TextStyle(fontSize: 15,)),
-],
-),
-Row(
-children: [
-Text("Date start:",
-style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-SizedBox(width: 5),
-Text(date, style: TextStyle(fontSize: 15,)),
-SizedBox(width: 20),
-Text("Date end:",
-style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-SizedBox(width: 5),
-Text(date, style: TextStyle(fontSize: 15,)),
-],
-),
-ElevatedButton(
-style: ElevatedButton.styleFrom(
-minimumSize: Size.fromHeight(
-40), // fromHeight use double.infinity as width and 40 is the height
-),
-onPressed: () {
-showDialog(
-context: context,
-builder: (BuildContext context) {
-return AlertDialog(
-title: Text(sub_task.toString()),
-content: Text(sub_task.toString()+" Saved successfully"),
-);
-}
-);
-},
-child: Text("Update Task")),
-SizedBox(height: 5),
-],
-)*/

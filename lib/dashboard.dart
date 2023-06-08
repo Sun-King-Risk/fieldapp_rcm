@@ -194,22 +194,16 @@ class _RowDataState extends State<RowData> {
   Widget build(BuildContext context) {
 
     return Expanded(
-      child:  FutureBuilder(
-          future:  RegionData().getData(),
-          builder: (BuildContext context, snapshot) {
-    if (snapshot.hasData) {
-      //DocumentSnapshot data = snapshot.data;
-      var data = snapshot.data!.docs[0];
-      return InkWell(
+      child:  InkWell(
         onTap: () {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DashView(widget.value,data[widget.value]),
+                builder: (context) => DashView(widget.value,widget.value),
               ));
 
         },
-        key: ValueKey(snapshot.data),
+        key: ValueKey("dad"),
         child: Card(
           elevation: 8,
           child: Container(
@@ -217,45 +211,13 @@ class _RowDataState extends State<RowData> {
             width: 50,
             child: Column(
               children: [
-                Text(data[widget.value], style: TextStyle(fontSize: 20,)),
+                Text("4", style: TextStyle(fontSize: 20,)),
                 Text(widget.label, style: TextStyle(fontSize: 9))
               ],
             ),
           ),
         ),
-      );
-    }
-    else if(snapshot.hasError){
-      return InkWell(
-        onTap: (){},
-
-        child: Card(
-          elevation: 8,
-          child: Container(
-            height: 70,
-            width: 50,
-            child: Column(
-              children: [
-                Text('000', style: TextStyle(fontSize: 30,)),
-                Text(snapshot.error.toString(), style: TextStyle(fontSize: 9))
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-    else{
-      return Column(children: [
-        CircularProgressIndicator(),
-        SizedBox(
-          height: 10,
-        ),
-        Text('run...'),
-      ]);
-    }
-    }
-
-      ),
+    )
     );
   }
 }

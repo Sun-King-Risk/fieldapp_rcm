@@ -915,6 +915,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
                       cells: [
                         for (int cellIndex = 0; cellIndex < keys.length; cellIndex++)
                           if (keys[cellIndex] != 'Country' && keys[cellIndex] != 'Region' && keys[cellIndex] != 'Area')
+
                             DataCell(
                               Text(item[keys[cellIndex]].toString()),
                             ),
@@ -1036,17 +1037,20 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
   Map<String, Map<String, String>> _actions = {};
   List<String> textFieldValues = [];
   List<String> dropdownValues = [];
+  List? data = [];
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     if(
-    widget.subtask == 'Work with the Agents with low welcome calls to improve' ||
-    widget.subtask == ''
+    widget.subtask == 'Work with the Agents with low welcome calls to improve'
     ){
+
       target = true;
     }else{
       target = false;
+       data = widget.taskdata;
     }
   }
 
@@ -1067,7 +1071,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                   Map<String, dynamic> data = widget.taskdata![index];
                   String agent = data['Agent'];
                   if (!_actions.containsKey(agent)) {
-                    _actions[agent] = {'action': '', 'current':"45",'priority': _priorities[0]};
+                    _actions[agent] = {'action': '','priority': _priorities[0]};
                   }
                   return Card(
                     child: Padding(
@@ -1258,7 +1262,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
       "timestamp": 1683282979,
       "task_end_date": "2023-05-10",
       "submited_by":"Test User",
-      'is_approved': 'No'
+      'is_approved': 'Pending'
     };
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/create');
@@ -1266,7 +1270,8 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
       "Content-Type": "application/json",
     });
     var result_task = jsonDecode(response.body);
-    taskAction(result_task,);
+    print(result_task);
+    taskAction(result_task["id"]);
 
   }
   void taskAction(id) async {
@@ -1281,7 +1286,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
         "task_status": "pending"
       };
       var body = json.encode(data);
-      var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/create');
+      var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
       http.Response response = await http.post(url, body: body, headers: {
         "Content-Type": "application/json",
       });
@@ -1356,7 +1361,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             ),
             ElevatedButton(onPressed:
                 (){
-              //_save();
+              _save();
             }, child: Text("Submit"))
           ],
         ),
@@ -1414,7 +1419,8 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             ),
             ElevatedButton(onPressed:
                 (){
-                 _save();
+                _save();
+                 //taskAction(112);
               print(widget.actions);
               print(widget.customers);
 

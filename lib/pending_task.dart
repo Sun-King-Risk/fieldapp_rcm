@@ -59,45 +59,53 @@ _taskStatus(docid)async{
             child: AlertDialog(
         content: Text('Do you approve or reject this action?'),
                 actions: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  Column(
                     children: [
-                      TextButton(
-                        child: Text('Approve'),
-                        onPressed: ()async{
-                          Map data = {
-                            'is_approved': 'Approved',
-                            'task_status': 'Pending'
-                          };
-                          var body = json.encode(data);
-                          var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
-                          http.Response response = await http.put(url, body: body, headers: {
-                            "Content-Type": "application/json",
+                      Text(docid.toString()),
 
-                          });
-                          var result_task = jsonDecode(response.body);
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
 
-                          print(result_task);
+                          TextButton(
+                            child: Text('Approve'),
+                            onPressed: ()async{
+                              Map data = {
+                                'is_approved': 'Approved',
+                                'task_status': 'Pending'
+                              };
+                              var body = json.encode(data);
+                              var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                              http.Response response = await http.put(url, body: body, headers: {
+                                "Content-Type": "application/json",
 
-                        },
-                      ),
-                      TextButton(
-                        child: Text('Reject'),
-                        onPressed: () async{
-                          Map data = {
-                            'is_approved': 'Rejected'
-                          };
-                          var body = json.encode(data);
-                          var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
-                          http.Response response = await http.put(url, body: body, headers: {
-                            "Content-Type": "application/json",
-                          });
-                          var result_task = jsonDecode(response.body);
+                              });
+                              var result_task = jsonDecode(response.body);
 
-                        },
+                              print(result_task);
+
+                            },
+                          ),
+                          TextButton(
+                            child: Text('Reject'),
+                            onPressed: () async{
+                              Map data = {
+                                'is_approved': 'Rejected'
+                              };
+                              var body = json.encode(data);
+                              var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                              http.Response response = await http.put(url, body: body, headers: {
+                                "Content-Type": "application/json",
+                              });
+                              var result_task = jsonDecode(response.body);
+
+                            },
+                          )
+                        ],
                       )
                     ],
-                  )
+                  ),
+
 
 
                 ]
@@ -113,6 +121,7 @@ _taskStatus(docid)async{
   // This list holds the data for the list view
   List<Map<String, dynamic>> _foundUsers = [];
 List? data = [];
+  List? singledata = [];
   @override
   initState() {
     // at the beginning, all users are shown
@@ -121,12 +130,19 @@ List? data = [];
 
   }
 
+  void singleTask(){
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+
+  }
+
   void fetchData() async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
-        data = jsonDecode(response.body);
+        data = jsonDecode(response.body).where((approval){
+          return approval['is_approved'] == 'Pending';
+        }).toList();
       });
     }else{
       print('Request failed with status: ${response.statusCode}');
@@ -248,7 +264,12 @@ List? data = [];
           var task = data![index];
           return InkWell(
               onTap: () {
-                _taskStatus(task["id"]);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SinglePending(id:task["id"]),
+                    ));
+
               },
             key: ValueKey(task),
             child: Row(
@@ -293,4 +314,52 @@ List? data = [];
           ],
         );
   }
+}
+
+class SinglePending extends StatefulWidget{
+
+  final id;
+  @override
+  const SinglePending({Key? key,required this.id}) : super(key: key);
+
+  @override
+  SinglePendingState createState() => SinglePendingState();
+  
+}
+class SinglePendingState extends State<SinglePending> {
+  List? data = [];
+  void fetchData() async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks/${widget.id}');
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      setState(() {
+        data = jsonDecode(response.body);
+      });
+    }else{
+      print('Request failed with status: ${response.statusCode}');
+    }
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchData();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: SingleChildScrollView(child: Padding(
+        padding: EdgeInsets.all(8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+
+            
+          ],
+        ),
+      ),),
+    );
+  }
+  
 }

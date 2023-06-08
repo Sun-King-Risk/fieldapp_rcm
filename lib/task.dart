@@ -10,6 +10,41 @@ import 'pending_task.dart';
 import 'team_task.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+class TaskData {
+  Future<int> countTask(String taskTitle) async {
+    final url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['task_title'] == taskTitle)
+          .toList();
+      return filteredTasks.length;
+
+      // Return the count value
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+  }
+
+  Future<int> countByStatus(String taskTitle, String status) async {
+    final url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['task_title'] == taskTitle).where((task) => task['task_status'] == status)
+          .toList();
+
+      // Process jsonData to count tasks with the given status
+      return filteredTasks.length; // Return the count value
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+  }
+}
 
 class Task extends StatelessWidget {
   @override
@@ -61,37 +96,31 @@ class Task extends StatelessWidget {
 
                         TaskList(
                           task_title: 'Collection Drive',
-                          
-                          task_complete:"9",
-                          task: '5',
+
 
                         ),
                         TaskList(
                           task_title: 'Process Management',
                          
-                          task_complete: '45',
-                          task: '5',
+
 
                         ),
                         TaskList(
                           task_title: 'Pilot Management',
                          
-                          task_complete: '45',
-                          task: '5',
+
 
                         ),
                         TaskList(
                           task_title: 'Portfolio Quality',
                           
-                          task_complete: '45',
-                          task: '5',
+
 
                         ),
                         TaskList(
                           task_title: 'Customer Management',
                          
-                          task_complete: '45',
-                          task: '5',
+
 
                         ),
                       ],
@@ -119,13 +148,8 @@ class Task extends StatelessWidget {
 class TaskList extends StatefulWidget {
 
   final String task_title;
-  
-  final String task;
-  final String task_complete;
   const TaskList({Key? key,
     required this.task_title,
-    required this.task,
-    required this.task_complete,
 
   })
       : super(key: key);
@@ -147,8 +171,10 @@ class _TaskListState extends State<TaskList> {
       });
     }else{
       print('Request failed with status: ${response.statusCode}');
+
     }
   }
+  final TaskData taskData = TaskData();
   @override
   Widget build(BuildContext context) {
 
@@ -163,64 +189,80 @@ class _TaskListState extends State<TaskList> {
             ));
       },
 
-      child: StreamBuilder<int>(
-        stream: TaskData().CountTask(widget.task_title).asStream(),
-        builder: (context, snapshot) {
-          if(snapshot.hasData){
-            return Container(
-              height: 60,
-              padding:EdgeInsets.only(left: 5,right: 5,bottom: 0,top: 5),
-              margin: EdgeInsets.only(left: 5,right: 5,bottom: 10,top: 5),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.black)
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(widget.task_title,
-                    style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
-                  SizedBox(height:5),
-                  Row(children: [
-                    StreamBuilder(
-                      stream: TaskData().CountTask(widget.task_title).asStream(),
-                      builder: (context, snapshot){
-                    return Text(snapshot.data.toString()+" Total,",style: TextStyle(color: Colors.red),);
-                    },
-                    ),
-                    StreamBuilder(
-                      stream: TaskData().CountByStatus(widget.task_title,'Completed').asStream(),
-                      builder: (context, snapshot){
-                        return Text(snapshot.data.toString()+" Completed, ",style: TextStyle(color: Colors.green),);
-                      },
-                    ),
-                    StreamBuilder(
-                      stream: TaskData().CountByStatus(widget.task_title,'Pending').asStream(),
-                      builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Pending",style: TextStyle(color: Colors.orange));
-                      },
-                    ),
-                  ],),
-
-                ],
-              ),
-            );
-          }
-          else if(snapshot.hasError){
-            return Text('Error Loding data');
-          }else{
-            return Column(
+      child:Container(
+        height: 70,
+        padding: EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 5),
+        margin: EdgeInsets.only(left: 5, right: 5, bottom: 10, top: 5),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.black),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              widget.task_title,
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(
-                  height: 10,
+                FutureBuilder<int>(
+                  future: taskData.countTask(widget.task_title),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasData) {
+                      return Text(
+                        snapshot.data.toString() + " Total",
+                        style: TextStyle(color: Colors.green),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return Text('No data available');
+                    }
+                  },
                 ),
-                Text('Loading...'),
+                FutureBuilder<int>(
+                  future: taskData.countByStatus(widget.task_title, 'Completed'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasData) {
+                      return Text(
+                        snapshot.data.toString() + " Completed",
+                        style: TextStyle(color: Colors.yellow),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return Text('No data available');
+                    }
+                  },
+                ),
+                FutureBuilder<int>(
+                  future: taskData.countByStatus(widget.task_title, 'Pending'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasData) {
+                      return Text(
+                        snapshot.data.toString() + " Pending",
+                        style: TextStyle(color: Colors.red),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return Text('No data available');
+                    }
+                  },
+                ),
               ],
-            );
-          }
-
-        }
+            ),
+          ],
+        ),
       ),
 
     );
