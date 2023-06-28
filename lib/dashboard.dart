@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:fieldapp_rcm/dash_view.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'utils/themes/theme.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:http/http.dart' as http;
 
 
 
@@ -27,7 +31,7 @@ class Home extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            Text("${currentUser?.displayName}",style: TextStyle(fontSize: 10),),
+            Text("Dennis Juma",style: TextStyle(fontSize: 10),),
             Text("sd",style: TextStyle(fontSize: 10),),
 //summary
             SizedBox(height: 5,),
@@ -138,7 +142,7 @@ class Home extends StatelessWidget {
                         label: 'Audit Reports',
                       ),
                       RowData(
-                        value: 'Count Replacements',
+                        value: 'Detached Rate',
                         label: 'Repossession Rate',
                       ),
                     ],
@@ -188,7 +192,89 @@ class RowData extends StatefulWidget {
 }
 
 class _RowDataState extends State<RowData> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    listItems('Reginal');
+  }
+  List? data = [];
+  bool isLoading = true;
+  List<String> region= [];
+  Future<StorageItem?> listItems(key) async {
+    try {
+      StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
+      operation = await Amplify.Storage.list(
+        options: const StorageListOptions(
+          accessLevel: StorageAccessLevel.guest,
+          pluginOptions: S3ListPluginOptions.listAll(),
+        ),
+      );
+
+      Future<StorageListResult<StorageItem>> result = operation.result;
+      List<StorageItem> resultList = (await operation.result).items;
+      resultList = resultList.where((file) => file.key.contains(key)).toList();
+      if (resultList.isNotEmpty) {
+        // Sort the files by the last modified timestamp in descending order
+        resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
+        StorageItem latestFile = resultList.first;
+        RegionTask(latestFile.key);
+        print(latestFile.key);
+        print("Key: $key");
+
+        return resultList.first;
+
+      } else {
+        print('No files found in the S3 bucket with key containing "$key".');
+        return null;
+      }
+
+      for (StorageItem item in resultList) {
+        print('Key: ${item.key}');
+        print('Last Modified: ${item.lastModified}');
+        // Access other properties as needed
+      }
+
+      safePrint('Got items: ${resultList.length}');
+    } on StorageException catch (e) {
+      safePrint('Error listing items: $e');
+    }
+  }
+  Future<void> RegionTask(key) async {
+    List<String> uniqueRegion = [];
+    print("object: $key");
+
+    try {
+      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
+          key: key)
+          .result;
+
+      final response = await http.get(urlResult.url);
+      final jsonData = jsonDecode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['Region'] == 'Central' && task['Country'] =='Tanzania' )
+          .toList();
+      print('File_team: $jsonData');
+      for (var item in filteredTasks) {
+        //String region = item['Region'];
+        //region?.add(region);
+        if(item['Region'] == null){
+        }else{
+          uniqueRegion.add(item['Region']);
+        }
+
+      }
+      setState(() {
+        data = filteredTasks;
+        region = uniqueRegion.toSet().toList();
+        safePrint('File_team: $jsonData');
+        isLoading = false;
+      });
+    } on StorageException catch (e) {
+      safePrint('Could not retrieve properties: ${e.message}');
+      rethrow;
+    }
+  }
   @override
 
   Widget build(BuildContext context) {
@@ -211,7 +297,7 @@ class _RowDataState extends State<RowData> {
             width: 50,
             child: Column(
               children: [
-                Text("4", style: TextStyle(fontSize: 20,)),
+                Text(data![0][widget.value], style: TextStyle(fontSize: 20,)),
                 Text(widget.label, style: TextStyle(fontSize: 9))
               ],
             ),

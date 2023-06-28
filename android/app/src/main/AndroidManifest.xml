@@ -3,6 +3,8 @@
         android:label="fieldapp_rcm"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCxmwQB8Kkkvj2I4rLpsreA54-XAlvUryk"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

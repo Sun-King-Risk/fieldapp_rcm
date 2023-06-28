@@ -6,6 +6,7 @@ import 'package:fieldapp_rcm/new_design.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/task_table.dart';
 import 'package:http/http.dart' as http;
+import 'location.dart';
 import 'pending_task.dart';
 import 'team_task.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +78,18 @@ class Task extends StatelessWidget {
                             style: ElevatedButton.styleFrom(
                               minimumSize: Size.fromHeight(40), // fromHeight use double.infinity as width and 40 is the height
                             ),
+                            onPressed: (){
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LocationMap(),
+                                  )
+                              );
+                            }, child: Text("Map")),
+                        ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size.fromHeight(40), // fromHeight use double.infinity as width and 40 is the height
+                            ),
                             onPressed: () {
                                 Navigator.push(
                                     context,
@@ -100,26 +113,26 @@ class Task extends StatelessWidget {
 
                         ),
                         TaskList(
-                          task_title: 'Process Management',
-                         
+                          task_title: 'Pilot/Process Management',
+
 
 
                         ),
                         TaskList(
                           task_title: 'Pilot Management',
-                         
+
 
 
                         ),
                         TaskList(
                           task_title: 'Portfolio Quality',
-                          
+
 
 
                         ),
                         TaskList(
                           task_title: 'Customer Management',
-                         
+
 
 
                         ),

@@ -1,4 +1,5 @@
 
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 
 import '../login.dart';
@@ -9,6 +10,14 @@ import '../services/auth_services.dart';
 
 class SKAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
+  void signOut() async {
+    try {
+      await Amplify.Auth.signOut();
+      print('User signed out successfully');
+    } catch (e) {
+      print('Error signing out: $e');
+    }
+  }
 
   SKAppBar({
     this.height = kToolbarHeight,
@@ -33,7 +42,7 @@ class SKAppBar extends StatelessWidget implements PreferredSizeWidget {
               ));
         }, icon: Icon(Icons.notifications)),
         IconButton(onPressed: (){
-          Authentication.signOut();
+          signOut();
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => Login(

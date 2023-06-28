@@ -40,55 +40,59 @@ class PortfolioUpdateState extends State<PortfolioUpdate> {
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
-          child: Column(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppDropDown(
-              disable: true,
-              label: widget.title,
-              hint: "hint",
-              items: [widget.title],
-              onChanged: (value) {}),
-          SizedBox(
-            height: 10,
-          ),
-          AppDropDown(
-              disable: true,
-              label: widget.subtask,
-              hint: widget.subtask,
-              items: [widget.subtask],
-              onChanged: (value) {}),
-          SizedBox(
-            height: 10,
-          ),
-          if (widget.subtask == 'Visiting unreachable welcome call clients')
-            Visiting(
-              docid: widget.id,
+            SizedBox(height: 10,),
+            AppDropDown(
+                disable: true,
+                label: widget.title,
+                hint: "hint",
+                items: [widget.title],
+                onChanged: (value) {}),
+            SizedBox(
+              height: 10,
             ),
-          if (widget.subtask ==
-              'Work with the Agents with low welcome calls to improve')
-            Agent(
-              docid: widget.id,
-              id: widget.task,
+            AppDropDown(
+                disable: true,
+                label: widget.subtask,
+                hint: widget.subtask,
+                items: [widget.subtask],
+                onChanged: (value) {}),
+            SizedBox(
+              height: 10,
             ),
-          if (widget.title ==
-              'Work with the Agents with low welcome calls to improve')
-            Agent(docid: widget.id, id: widget.id),
-          if (widget.title == 'Change a red zone CSAT area to orange')
-            RedZone(),
-          if (widget.title == 'Attend to Fraud Cases') Fraud(),
-          if (widget.title == 'Visit at-risk accounts')
-            FieldVisit(
-              docid: widget.id,
-              id: widget.task,
-            ),
-          if (widget.title == 'Visits FPD/SPDs')
-            FieldVisit(
-              docid: widget.id,
-              id: widget.task,
-            ),
+            if (widget.subtask == 'Visiting unreachable welcome call clients')
+              Visiting(
+                docid: widget.id,
+              ),
+            if (widget.subtask ==
+                'Work with the Agents with low welcome calls to improve')
+              Agent(
+                docid: widget.task,
+                id: widget.id,
+              ),
+            if (widget.title ==
+                'Work with the Agents with low welcome calls to improve')
+              Agent(docid: widget.id, id: widget.id),
+            if (widget.title == 'Change a red zone CSAT area to orange')
+              RedZone(),
+            if (widget.title == 'Attend to Fraud Cases') Fraud(),
+            if (widget.title == 'Visit at-risk accounts')
+              FieldVisit(
+                docid: widget.id,
+                id: widget.task,
+              ),
+            if (widget.title == 'Visits FPD/SPDs')
+              FieldVisit(
+                docid: widget.id,
+                id: widget.task,
+              ),
         ],
-      )),
+      ),
+          )),
     );
   }
 }

@@ -1,10 +1,13 @@
 // main.dart
 import 'dart:convert';
 
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class PendingTask extends StatefulWidget {
   const PendingTask({Key? key}) : super(key: key);
@@ -149,15 +152,6 @@ List? data = [];
     }
   }
 
-   Future<QuerySnapshot> getFilteredData() async {
-    // Get a reference to the Firestore collection
-    CollectionReference collection = firestore.collection('task');
-    QuerySnapshot alldata = await collection.get();
-
-    // Perform the query and return the snapshot
-
-    return alldata;
-  }
 
 // Use the function to retrieve filtered data
 
@@ -327,14 +321,44 @@ class SinglePending extends StatefulWidget{
   
 }
 class SinglePendingState extends State<SinglePending> {
-  List? data = [];
-  void fetchData() async {
+  Map<String, dynamic>  data = {};
+  String code = '';
+  Future fetchData() async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks/${widget.id}');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
+        print(response.body);
         data = jsonDecode(response.body);
+        code = url.toString();
       });
+      fetchGoal(widget.id);
+      safePrint(data);
+    }else{
+      print('Request failed with status: ${response.statusCode}');
+    }
+  }
+  List? taskgoal = [];
+  var priority;
+  var goal;
+  var description;
+  List<String> _priorities = ['High', 'Medium', 'Low'];
+  Future fetchGoal(id) async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    http.Response response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+
+    });
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['task'] == id)
+          .toList();
+      setState(() {
+        print(response.body);
+        taskgoal = filteredTasks;
+      });
+      safePrint(data);
     }else{
       print('Request failed with status: ${response.statusCode}');
     }
@@ -344,18 +368,282 @@ class SinglePendingState extends State<SinglePending> {
     // TODO: implement initState
     super.initState();
     fetchData();
+    safePrint(widget.id);
+  }
+  _goalUpdate(id,current) async{
+    showDialog(context: context,
+        builder: (BuildContext context) {
+      return SingleChildScrollView(
+        child: AlertDialog(
+          content: Text('Task Update $id'),
+          actions: <Widget>[
+
+            Form(
+              child: Column(
+                children: [
+                  TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Description',
+                        labelText: 'Description',
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          description =  value;
+                        });
+                      }
+                  ),
+                  Text("Current: $current"),
+                  TextField(
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(
+                      hintText: 'Enter Target',
+                      labelText: 'New Target',
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        goal =  value;
+                      });
+                    },
+                  ),
+                  SizedBox(height: 8,),
+                  AppDropDown(
+                      disable: true,
+                      label: "Priority",
+                      items: _priorities,
+                      hint: "Priority",
+                      onChanged: (value){
+                        setState(() {
+                          priority = value;
+                        });
+
+                        print(value);
+                      }),
+                  Center(child: ElevatedButton(onPressed: () async {
+          Map data = {
+            "goals": goal,
+            "task_description": description,
+            "priority": priority,
+          };
+          var body = json.encode(data);
+          var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/$id/update/');
+          http.Response response = await http.post(url, body: body, headers: {
+            "Content-Type": "application/json",
+          });
+          var result_task = jsonDecode(response.body);
+
+
+                  }, child: Text('Update')))
+                ],
+              ),
+            )
+          ],
+        ),
+      );
+        });
+  }
+  _taskStatus(docid)async{
+    bool _approved = false;
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SingleChildScrollView(
+              child: AlertDialog(
+                  content: Text('Do you approve or reject this task?'),
+                  actions: <Widget>[
+                    Column(
+                      children: [
+                        Text(docid.toString()),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+
+                            TextButton(
+                              child: Text('Approve'),
+                              onPressed: ()async{
+                                Map data = {
+                                  'is_approved': 'Approved',
+                                  'task_status': 'Pending'
+                                };
+                                var body = json.encode(data);
+                                var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                                http.Response response = await http.put(url, body: body, headers: {
+                                  "Content-Type": "application/json",
+
+                                });
+                                var result_task = jsonDecode(response.body);
+
+                                print(result_task);
+                                Navigator.pop(context);
+                                Navigator.of(context).pop();
+
+                              },
+                            ),
+                            TextButton(
+                              child: Text('Reject'),
+                              onPressed: () async{
+                                Map data = {
+                                  'is_approved': 'Rejected'
+                                };
+                                var body = json.encode(data);
+                                var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                                http.Response response = await http.put(url, body: body, headers: {
+                                  "Content-Type": "application/json",
+                                });
+                                var result_task = jsonDecode(response.body);
+                                Navigator.pop(context);
+                                Navigator.of(context).pop();
+
+                              },
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+
+
+
+                  ]
+
+              )
+          );
+        }
+    );
+
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: SingleChildScrollView(child: Padding(
+      body: SingleChildScrollView(
+        child: Padding(
         padding: EdgeInsets.all(8),
-        child: Column(
+        child:Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Card(
+                    color: Colors.green.shade50,
+                    elevation: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Title: ${data['task_title']}",
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
 
-            
+                          ),
+                          Text(
+                            "Task: ${data['sub_task']}",
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+
+                          ),
+                          Text(
+                            "Region:${data['task_region']} Area: ${data['task_area']}",
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+
+                          ),
+                          Text(
+                            "Start:${data['task_start_date']}  End:${data['task_end_date']} ",
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+
+                          )
+
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: taskgoal!.length,
+              itemBuilder: (context, index) {
+                var task = taskgoal![index];
+                return GestureDetector(
+                    onTap: () {
+                      _goalUpdate(task['id'],task['previous_goal']);
+                      // Handle tap gesture
+                    },
+                    child:Row(
+                      children: [
+                        // Icon(Icons.,color: AppColor.mycolor,),
+                        // SizedBox(width: 10),
+                        Expanded(
+                          child: Card(
+                            color: Colors.yellow.shade50,
+                            elevation: 5,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Name: ${task['account_number']}",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    ),
+
+                                  ),
+                                  Text(
+                                    "Description: ${task['task_description']}",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    ),
+
+                                  ),
+                                  Text(
+                                    "Priority: ${task['priority']}",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    ),
+
+                                  ),
+                                  Text(
+                                    "current: ${task['previous_goal']}",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    ),
+
+                                  ),
+                                  Text(
+                                    "Goal: ${task['goals']}",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    ),
+
+                                  )
+
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+
+                );
+              },
+            ),
+            ElevatedButton(
+                onPressed: (){
+                  _taskStatus(widget.id);
+                }, child: Text("Approve"))
+
           ],
         ),
       ),),

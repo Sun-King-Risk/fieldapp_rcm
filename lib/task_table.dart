@@ -38,7 +38,7 @@ class MyTaskViewState extends State<MyTaskView> {
   }
   Future<int> TaskCount(id) async{
     QuerySnapshot querySnapshot =
-        await firestore.collection("task").doc(id).collection('action').get();
+    await firestore.collection("task").doc(id).collection('action').get();
     setState(() {
       _data = querySnapshot.docs;
 
@@ -68,7 +68,7 @@ class MyTaskViewState extends State<MyTaskView> {
     }
 
 
-    _TaskList(subtask, subtask);
+    _TaskList(id, subtask);
   }
   void _TaskList(id,subtask){
     showDialog(
@@ -96,16 +96,16 @@ class MyTaskViewState extends State<MyTaskView> {
                         onTap: () {
                           if(widget.title == "Portfolio Quality")
                             Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PortfolioUpdate(
-                                  task: id,
-                                  id: id,
-                                  title: widget.title,
-                                  subtask: subtask,
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PortfolioUpdate(
+                                    task: id,
+                                    id: taskdetail["id"],
+                                    title: widget.title,
+                                    subtask: subtask,
 
-                                ),
-                              ));
+                                  ),
+                                ));
                           if(widget.title == "Collection Drive")
                             Navigator.push(
                                 context,
@@ -157,8 +157,8 @@ class MyTaskViewState extends State<MyTaskView> {
                         },
                         child: Row(
                           children: [
-                           // Icon(Icons.,color: AppColor.mycolor,),
-                           // SizedBox(width: 10),
+                            // Icon(Icons.,color: AppColor.mycolor,),
+                            // SizedBox(width: 10),
                             Expanded(
                               child: Card(
                                 color: Colors.yellow.shade50,
@@ -172,7 +172,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                       Text(
                                         "Name: ${taskdetail["account_number"]}",
                                         style: TextStyle(
-                                            fontSize: 18,
+                                          fontSize: 18,
                                           decoration: TextDecoration.lineThrough,
                                         ),
 
@@ -260,9 +260,9 @@ class MyTaskViewState extends State<MyTaskView> {
     final List<dynamic> jsonData = json.decode(response.body);
     final List<dynamic> filteredTasks = jsonData
         .where((task) => task['task_title'] == title)
-    .where((task) => task['is_approved'] == 'Approved')
-    .where((task) => task['task_status'] == 'Pending')
-    .toList();
+        .where((task) => task['is_approved'] == 'Approved')
+        .where((task) => task['task_status'] == 'Pending')
+        .toList();
 
     setState(() {
       data = filteredTasks;
@@ -431,82 +431,82 @@ class MyTaskViewState extends State<MyTaskView> {
                 ],
               )
           ),
-      const SizedBox(
-        height: 10,
-      ),
+          const SizedBox(
+            height: 10,
+          ),
           Expanded(
               child: ListView.separated(
                   itemCount: data!.length,
-                itemBuilder: (BuildContext context, int index) {
-                  var task = data![index];
-                  return
-                    GestureDetector(
-                      onTap: () {
-                       _getAction(task["id"],task['sub_task']);
-                        //_TaskList(task['id'],task['sub_task']);
-                        print(task["id"]);
+                  itemBuilder: (BuildContext context, int index) {
+                    var task = data![index];
+                    return
+                      GestureDetector(
+                        onTap: () {
+                          _getAction(task["id"],task['sub_task']);
+                          //_TaskList(task['id'],task['sub_task']);
+                          print(task["id"]);
 
-                      },
-                      child: Row(
-                        children: [
-                          Icon(Icons.check_circle_outline),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Card(
-                              elevation: 5,
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Task: ${task['sub_task']} ${task["id"]}",
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(Icons.location_on),
-                                            Text(
-                                              "${task['task_area']}",
-                                              style: TextStyle(fontSize: 14, color: Colors.grey),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.task_outlined),
-                                            Text(
-                                              "2",
-                                              style: TextStyle(fontSize: 14, color: Colors.grey),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.access_time),
-                                            Text(
-                                              "${task['task_end_date']}",
-                                              style: TextStyle(fontSize: 14, color: Colors.grey),
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    )
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.check_circle_outline),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Card(
+                                elevation: 5,
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Task: ${task['sub_task']} ${task["id"]}",
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(Icons.location_on),
+                                              Text(
+                                                "${task['task_area']}",
+                                                style: TextStyle(fontSize: 14, color: Colors.grey),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.task_outlined),
+                                              Text(
+                                                "2",
+                                                style: TextStyle(fontSize: 14, color: Colors.grey),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.access_time),
+                                              Text(
+                                                "${task['task_end_date']}",
+                                                style: TextStyle(fontSize: 14, color: Colors.grey),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      )
 
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                },
-                separatorBuilder: (BuildContext context, int index) { return  Divider();}))
+                          ],
+                        ),
+                      );
+                  },
+                  separatorBuilder: (BuildContext context, int index) { return  Divider();}))
         ],
       ),
     );

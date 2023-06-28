@@ -60,6 +60,9 @@ dependencies:
   firebase_storage: ^11.0.14
   amplify_datastore: ^1.0.0
   aws_s3_private_flutter: ^0.0.3
+  google_maps_flutter: ^2.1.0
+
+
 
 
   flutter:

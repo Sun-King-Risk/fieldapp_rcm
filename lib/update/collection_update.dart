@@ -52,7 +52,7 @@ class _CollectionUpdateState extends State<CollectionUpdate> {
                 onChanged: (value) {}),
             SizedBox(height: 10,),
             if(widget.subtask == 'Field Visits with low-performing Agents in Collection Score')
-              FieldVisit(
+              Agent(
                 docid: widget.id,
                 id: widget.task,
               ),

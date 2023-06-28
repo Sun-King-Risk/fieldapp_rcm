@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class Visiting extends StatefulWidget {
   final docid;
@@ -21,6 +26,84 @@ class _Visiting extends State<Visiting> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   List<String> _data = [];
   List<DocumentSnapshot> _result = [];
+  List? taskgoal = [];
+  Future<void> _getAction(id,subtask) async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    http.Response response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+
+    });
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['task'] == id)
+          .toList();
+      setState(() {
+        taskgoal = filteredTasks;
+        print(taskgoal);
+      });
+
+      // Return the count value
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+
+
+    _YesUpdate(id, subtask);
+  }
+  _YesUpdate(int doc,int id) async {
+
+
+    Map data = {
+
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":45,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    print(response.body);
+
+
+  }
+  _NoUpdate(int doc,int id) async {
+    Map data = {
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":34,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    print('nne');
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+
+  }
   Future<void> _getDocuments() async {
 
     QuerySnapshot querySnapshot =
@@ -82,34 +165,49 @@ class _Visiting extends State<Visiting> {
             height: 10,
           ),
           if (selectedaction == 'No')
-          Text("If it related to frud please rise it through fraud App"),
-          TextFormField(
-              maxLines: 5,
-              decoration: InputDecoration(
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black12, width: 1.0),
-                ),
-                labelText: 'Additional details',
-              )),
-          if (selectedaction == 'Yes')
+            Column(
+              children: [
+                Text("If it related to frud please rise it through fraud App"),
+                TextFormField(
+                    maxLines: 5,
+                    decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black12, width: 1.0),
+                      ),
+                      labelText: 'Additional details',
+                    )),
+                ElevatedButton(onPressed:(){
 
-          SizedBox(
-            height: 10,
-          ),
-          Icon(Icons.camera_alt),
-          SizedBox(
-            height: 10,
-          ),
-          Icon(Icons.location_on),
-          SizedBox(
-            height: 10,
-          ),
-          ElevatedButton(onPressed:(){
-            print("endif");
-          }, child: Text("Dennis"))
+                }, child: Text("Update"))
+
+              ],
+            ),
+
+
+          if (selectedaction == 'Yes')
+            Column(
+              children: [
+                SizedBox(
+                  height: 10,
+                ),
+                Icon(Icons.camera_alt),
+                SizedBox(
+                  height: 10,
+                ),
+                Icon(Icons.location_on),
+                SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton(onPressed:(){
+
+                }, child: Text("Update"))
+              ],
+            ),
+
+
         ],
       ),
     );
@@ -129,6 +227,83 @@ class _Work extends State<Work> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   String _data = '';
   List<DocumentSnapshot> _result = [];
+  List? taskgoal = [];
+  Future<void> _getAction(id,subtask) async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    http.Response response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+
+    });
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['task'] == id)
+          .toList();
+      setState(() {
+        taskgoal = filteredTasks;
+        print(taskgoal);
+      });
+
+      // Return the count value
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+
+
+    _YesUpdate(id, subtask);
+  }
+  _YesUpdate(int doc,int id) async {
+
+
+    Map data = {
+
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    print(response.body);
+
+
+  }
+  _NoUpdate(int doc,int id) async {
+    Map data = {
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    print('nne');
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+
+  }
   Future<void> _getDocuments() async {
     final documentReference = FirebaseFirestore.instance
         .collection('task')
@@ -196,10 +371,22 @@ AppDropDown(
                     ),
                     labelText: 'Additional details',
                   )),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50)
+                ),
+                onPressed:(){
+                  print("demm");
+                  _NoUpdate(23, 23);
+                  /* Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                    builder: (context) =>
+                                    FormScreenUpdate()));*/
+                }, child: Text("Update"), )
             ],
           ),
           if (selectedaction == 'Yes')
-
             Column(
               children: [
                 AppDropDown(
@@ -216,36 +403,37 @@ AppDropDown(
                     border: OutlineInputBorder(),
                     hintText: 'More Feedback',
                   ),
+
                 ),
-              ],
-            ),
-          SizedBox(
-            height: 10,
-          ),
-          Icon(Icons.camera_alt),
-          SizedBox(
-            height: 10,
-          ),
-          Icon(Icons.location_on),
-          SizedBox(
-            height: 10,
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50)
-            ),
-            onPressed:(){
-              //_getDocuments();
-              print("demm");
-              /* Navigator.push(
+                SizedBox(
+                  height: 10,
+                ),
+                Icon(Icons.camera_alt),
+                SizedBox(
+                  height: 10,
+                ),
+                Icon(Icons.location_on),
+                SizedBox(
+                  height: 10,
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      minimumSize: Size(double.infinity, 50)
+                  ),
+                  onPressed:(){
+                    _YesUpdate(32, 23);
+                    print("demm");
+                    /* Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-            }, child: Text("Update"), )
+                  }, child: Text("Update"), )
+              ],
+            ),
+
+
+
         ],
       ),
     );
@@ -391,7 +579,8 @@ class _Audity extends State<Audity>{
               labelText: 'Recommendation',
             )),
         SizedBox(height: 10,),
-        Icon(Icons.attach_file)
+        Icon(Icons.attach_file),
+
       ],
     );
   }
@@ -408,28 +597,54 @@ class _FieldVisit extends State<FieldVisit> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   String _data = '';
   List<DocumentSnapshot> _result = [];
-  _YesUpdate(String doc,String id){
-    print(feedbackController.text);
-    DocumentReference task = firestore.collection("task").doc(doc);
-    DocumentReference subCollectionReference = task.collection('action').doc(id);
-    subCollectionReference.update({
-      "Feedback":feedbackController.text,
-      "Status":"Complete",
-      "Get user":"Yes",
-      "date":DateTime.now()
+  _YesUpdate(String doc,String id) async {
+    Map data = {
+
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
     });
+    print(response.body);
 
   }
-  _NoUpdate(String doc,String id){
-    print(feedbackController.text);
-    DocumentReference task = firestore.collection("task").doc(doc);
-    DocumentReference subCollectionReference = task.collection('action').doc(id);
-    subCollectionReference.update({
-      "Feedback":feedbackController.text,
-      "Status":"Complete",
-      "Get user":"No",
-      "date":DateTime.now()
+  _NoUpdate(String doc,String id) async {
+    Map data = {
+
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
     });
+    print(response.body);
 
   }
   Future<void> _getDocuments() async {
@@ -583,11 +798,89 @@ class _Accuracy extends State<Accuracy>{
   var froud = ["No", "Yes"];
   String? selectedaction;
   String? selectedfroud;
+  List? taskgoal = [];
+
 
   froudAction(String? value) {
     setState(() {
       selectedfroud = value;
     });
+  }
+  Future<void> _getAction(id,subtask) async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    http.Response response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+
+    });
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['task'] == id)
+          .toList();
+      setState(() {
+        taskgoal = filteredTasks;
+        print(taskgoal);
+      });
+
+      // Return the count value
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+
+
+    _YesUpdate(id, subtask);
+  }
+  _YesUpdate(int doc,int id) async {
+
+
+    Map data = {
+
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":34,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    print(response.body);
+
+
+  }
+  _NoUpdate(int doc,int id) async {
+    Map data = {
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":67,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    print('nne');
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+
   }
 
   taskAction(String? value) {
@@ -657,9 +950,42 @@ class _Accuracy extends State<Accuracy>{
                       ),
                       labelText: 'Reason for moving',
                     )),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50)
+                ),
+                onPressed:(){
+                  //_getDocuments();
+                  _YesUpdate(67,34);
+
+                  /* Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                    builder: (context) =>
+                                    FormScreenUpdate()));*/
+                }, child: Text("No"), ),
               SizedBox(height: 10,),
               if(selectedfroud == 'Yes')
-                Text("Please record the case to the froud app"),
+                Column(
+                  children: [
+                    Text("Please record the case to the froud app"),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50)
+                      ),
+                      onPressed:(){
+                        //_getDocuments();
+                        _YesUpdate(32,45);
+
+                        /* Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                    builder: (context) =>
+                                    FormScreenUpdate()));*/
+                      }, child: Text("No"), )
+                  ],
+                )
+
             ],
           ),
           SizedBox(height: 10,),
@@ -688,27 +1014,51 @@ class _Repo extends State<Repo>{
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   String _data = '';
   List<DocumentSnapshot> _result = [];
-  _YesUpdate(String doc,String id){
-    print(feedbackController.text);
-    DocumentReference task = firestore.collection("task").doc(doc);
-    DocumentReference subCollectionReference = task.collection('action').doc(id);
-    subCollectionReference.update({
-      "Feedback":feedbackController.text,
-      "Status":"Complete",
-      "Get user":"Yes",
-      "date":DateTime.now()
+  _YesUpdate(String doc,String id) async {
+    Map data = {
+
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
     });
 
   }
-  _NoUpdate(String doc,String id){
-    print(feedbackController.text);
-    DocumentReference task = firestore.collection("task").doc(doc);
-    DocumentReference subCollectionReference = task.collection('action').doc(id);
-    subCollectionReference.update({
-      "Feedback":feedbackController.text,
-      "Status":"Complete",
-      "Get user":"No",
-      "date":DateTime.now()
+  _NoUpdate(String doc,String id) async {
+    Map data = {
+
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
     });
 
   }
@@ -855,11 +1205,91 @@ class _Repo extends State<Repo>{
 
 }
 class TVcostomers extends StatefulWidget {
+  final docid;
+  final id;
+  TVcostomers({required this.docid,required this.id});
   @override
   State<TVcostomers> createState() => _TVcostomers();
 }
 class _TVcostomers extends State<TVcostomers>{
   String? selectedaction;
+  List? taskgoal = [];
+  Future<void> _getAction(id,subtask) async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    http.Response response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+
+    });
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['task'] == id)
+          .toList();
+      setState(() {
+        taskgoal = filteredTasks;
+        print(taskgoal);
+      });
+
+      // Return the count value
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+
+
+    _YesUpdate(id, subtask);
+  }
+  _YesUpdate(int doc,int id) async {
+
+
+    Map data = {
+
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    print(response.body);
+
+
+  }
+  _NoUpdate(int doc,int id) async {
+    Map data = {
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : ""
+    };
+    print('nne');
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+
+  }
   var taskaction = ["No", "Yes"];
   taskAction(String? value) {
     setState(() {
@@ -891,13 +1321,41 @@ class _TVcostomers extends State<TVcostomers>{
             children: [
               Icon(Icons.camera_alt_rounded),
               Icon(Icons.location_on),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50)
+                ),
+                onPressed:(){
+                  //_getDocuments();
+                  _YesUpdate(widget.id,widget.docid);
+
+                  /* Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                    builder: (context) =>
+                                    FormScreenUpdate()));*/
+                }, child: Text("No"), )
             ],
           ),
         SizedBox(height: 10,),
         if(selectedaction == 'No' )
           Column(
             children: [
-              Text("Please rise a froud case")
+              Text("Please rise a froud case"),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50)
+                ),
+                onPressed:(){
+                  //_getDocuments();
+                  _NoUpdate(widget.id,widget.docid);
+
+                  /* Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                    builder: (context) =>
+                                    FormScreenUpdate()));*/
+                }, child: Text("No"), )
             ],
           ),
 
@@ -974,6 +1432,7 @@ class _TableMeeting extends State<TableMeeting>{
       selectedaction = value;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -1027,16 +1486,28 @@ class _WorkUpdate extends State<WorkUpdate> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   String _data = '';
   List<DocumentSnapshot> _result = [];
-  _YesUpdate(String doc,String id){
-    print(feedbackController.text);
-    DocumentReference task = firestore.collection("task").doc(doc);
-    DocumentReference subCollectionReference = task.collection('action').doc(id);
-    subCollectionReference.update({
-      "Feedback":feedbackController.text,
-      "Status":"Complete",
-      "Get user":"Yes",
-      "date":DateTime.now()
+  _YesUpdate(String doc,String id) async {
+    Map data = {
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : feedbackController.text
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://2d1e-41-216-166-170.ngrok-free.app/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
     });
+    print(feedbackController.text);
 
   }
   _NoUpdate(String doc,String id){
@@ -1204,29 +1675,93 @@ class Agent extends StatefulWidget {
 class _Agent extends State<Agent> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   String _data = '';
+  File? imageFile;
   List<DocumentSnapshot> _result = [];
-  _YesUpdate(String doc,String id){
-    print(feedbackController.text);
-    DocumentReference task = firestore.collection("task").doc(doc);
-    DocumentReference subCollectionReference = task.collection('action').doc(id);
-    subCollectionReference.update({
-      "Feedback":feedbackController.text,
-      "Status":"Complete",
-      "Get user":"Yes",
-      "date":DateTime.now()
+  void getImage() async{
+    final file  = await ImagePicker().pickImage(source: ImageSource.camera);
+    if(file?.path != null){
+      setState(() {
+        imageFile = File(file!.path);
+      });
+    }
+  }
+  List? taskgoal = [];
+  Future<void> _getAction(id,subtask) async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    http.Response response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+
     });
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['task'] == id)
+          .toList();
+      setState(() {
+        taskgoal = filteredTasks;
+        print(taskgoal);
+      });
+
+      // Return the count value
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+
+
+    _YesUpdate(id, subtask);
+  }
+  _YesUpdate(int doc,int id) async {
+
+
+    Map data = {
+
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : feedbackController.text
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    print('nne');
+    print(response.body);
+
 
   }
-  _NoUpdate(String doc,String id){
-    print(feedbackController.text);
-    DocumentReference task = firestore.collection("task").doc(doc);
-    DocumentReference subCollectionReference = task.collection('action').doc(id);
-    subCollectionReference.update({
-      "Feedback":feedbackController.text,
-      "Status":"Complete",
-      "Get user":"No",
-      "date":DateTime.now()
+  _NoUpdate(int doc,int id) async {
+    Map data = {
+      "sub_task":"Visits Tampering Home 400",
+      "taskgoal_id":widget.id,
+      "report_title":"Visits Tampering Home 400",
+      "country": "Tanzania",
+      "report_area": "Mwanza",
+      "report_region": "North",
+      "report_country": "East",
+      "submited_by":"test",
+      "report_agent_found_yes_no" : "Yes",
+      "report_customer_found_fraud_case" :"No",
+      "report_priority" :"Low",
+      "report_status" : "Complete",
+      "report_details" : feedbackController.text
+    };
+    print('nne');
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
     });
+    print(feedbackController.text);
 
   }
   Future<void> _getDocuments() async {
@@ -1271,9 +1806,9 @@ class _Agent extends State<Agent> {
       child: Column(
         children: [
           SizedBox(height: 10,),
-          Text(widget.id),
+          Text(widget.id.toString()),
           SizedBox(height: 10,),
-          Text(widget.docid),
+          Text(widget.docid.toString()),
           SizedBox(height: 10,),
           AppDropDown(
               disable: false,
@@ -1359,7 +1894,23 @@ class _Agent extends State<Agent> {
                   SizedBox(
                     height: 10,
                   ),
-                  Icon(Icons.camera_alt),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      onPressed:()=>getImage(),
+                      icon: const Icon(Icons.camera),
+                      label: const Text("Capture Image"),
+
+                    ),
+                  ),
+                  Container( //show captured image
+                    padding: const EdgeInsets.all(30),
+                    child: imageFile == null?
+                    const Text("No image captured"):
+                    Image.file(File(imageFile!.path), height: 300,),
+                    //display captured image
+                  ),
                   SizedBox(
                     height: 10,
                   ),
@@ -1376,7 +1927,8 @@ class _Agent extends State<Agent> {
                     ),
                     onPressed:(){
                       //_getDocuments();
-                      _YesUpdate(widget.id,widget.docid);
+                      _getAction(widget.id,widget.docid);
+                      print("{doc id}");
                       /* Navigator.push(
                                     context,
                                     MaterialPageRoute(

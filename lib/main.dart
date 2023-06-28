@@ -24,17 +24,18 @@ void main() async{
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 Future<void> _configureAmplify() async {
   try {
     final storage = AmplifyStorageS3();
     final auth = AmplifyAuthCognito();
+
+
     await Amplify.addPlugins([
       auth,
       storage,
-
-    ]);
+  ]);
 
     await Amplify.configure(amplifyconfig);
     safePrint('Successfully configured');
@@ -164,12 +165,409 @@ class _MyAppState extends State<MyApp> {
     late String target;
     List? _myActivities;
     return Authenticator(
+        signUpForm: SignUpForm.custom(
+          fields: [
+            SignUpFormField.email(required: true),
+      SignUpFormField.name(),
+      SignUpFormField.custom(
+          title: 'Gender',
+          attributeKey: CognitoUserAttributeKey.custom('Gender'),
+        required: true,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please select a gender';
+          }
+          return null;
+        },
+
+      ),
+            SignUpFormField.custom(
+              title: 'Bio',
+              attributeKey: CognitoUserAttributeKey.custom("Bi"),
+              required: true,
+
+            ),
+            SignUpFormField.password(),
+            SignUpFormField.passwordConfirmation(),
+
+        ],
+
+        ),
       child: MaterialApp(
         theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
-        builder: Authenticator.builder(),
+        builder: Authenticator.builder(
+        ),
         home:NavPage(),
       ),
     );
   }
+
 }
+
+
+class LoginSignUp extends StatefulWidget {
+  const LoginSignUp({super.key});
+
+  @override
+  State<LoginSignUp> createState() => _LoginSignUpState();
+}
+
+class _LoginSignUpState extends State<LoginSignUp> {
+  @override
+  void initState() {
+    super.initState();
+    _configureAmplify();
+  }
+
+  void _configureAmplify() async {
+    try {
+      await Amplify.addPlugin(AmplifyAuthCognito());
+      await Amplify.configure(amplifyconfig);
+      safePrint('Successfully configured');
+    } on Exception catch (e) {
+      safePrint('Error configuring Amplify: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Authenticator(
+      // `authenticatorBuilder` is used to customize the UI for one or more steps
+      authenticatorBuilder: (BuildContext context, AuthenticatorState state) {
+        switch (state.currentStep) {
+          case AuthenticatorStep.signIn:
+            return CustomScaffold(
+              state: state,
+              // A prebuilt Sign In form from amplify_authenticator
+              body: SignInForm(
+
+              ),
+              // A custom footer with a button to take the user to sign up
+              footer: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Don\'t have an account?'),
+                  TextButton(
+                    onPressed: () => state.changeStep(
+                      AuthenticatorStep.signUp,
+                    ),
+                    child: const Text('Sign Up'),
+                  ),
+                ],
+              ),
+            );
+          case AuthenticatorStep.signUp:
+            return CustomScaffold(
+              state: state,
+              // A prebuilt Sign Up form from amplify_authenticator
+              body: SignUpForm(),
+              // A custom footer with a button to take the user to sign in
+              footer: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Already have an account?'),
+                  TextButton(
+                    onPressed: () => state.changeStep(
+                      AuthenticatorStep.signIn,
+                    ),
+                    child: const Text('Sign In'),
+                  ),
+                ],
+              ),
+            );
+          case AuthenticatorStep.confirmSignUp:
+            return CustomScaffold(
+              state: state,
+              // A prebuilt Confirm Sign Up form from amplify_authenticator
+              body: ConfirmSignUpForm(),
+            );
+          case AuthenticatorStep.resetPassword:
+            return CustomScaffold(
+              state: state,
+              // A prebuilt Reset Password form from amplify_authenticator
+              body: ResetPasswordForm(),
+            );
+          case AuthenticatorStep.confirmResetPassword:
+            return CustomScaffold(
+              state: state,
+              // A prebuilt Confirm Reset Password form from amplify_authenticator
+              body: const ConfirmResetPasswordForm(),
+            );
+          default:
+          // Returning null defaults to the prebuilt authenticator for all other steps
+            return null;
+        }
+      },
+      child: MaterialApp(
+        theme: AppTheme.lightTheme,
+        debugShowCheckedModeBanner: false,
+        builder: Authenticator.builder(),
+        home: NavPage(),
+      ),
+    );
+  }
+}
+
+/// A widget that displays a logo, a body, and an optional footer.
+class CustomScaffold extends StatelessWidget {
+  const CustomScaffold({
+    super.key,
+    required this.state,
+    required this.body,
+    this.footer,
+  });
+
+  final AuthenticatorState state;
+  final Widget body;
+  final Widget? footer;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // App logo
+              Padding(
+                padding: EdgeInsets.only(top: 32),
+                child: Center(child:Image.asset(
+                  'assets/logo/sk.png',
+                )),
+              ),
+              Container(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: body,
+              ),
+            ],
+          ),
+        ),
+      ),
+      persistentFooterButtons: footer != null ? [footer!] : null,
+    );
+  }
+}
+
+
+class LoginSignupApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Login and Sign Up Page',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: LoginSignupPage(),
+    );
+  }
+}
+
+class LoginSignupPage extends StatefulWidget {
+  @override
+  _LoginSignupPageState createState() => _LoginSignupPageState();
+}
+enum AuthMode { Login, Signup }
+class _LoginSignupPageState extends State<LoginSignupPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  late String _email;
+  late String _password;
+  late String _confirmPassword;
+  AuthMode _authMode = AuthMode.Login;
+
+  Future<void> _submitForm() async {
+    print(_authMode);
+    if (_formKey.currentState!.validate()) {
+      if(_authMode == AuthMode.Login){
+        Map data ={
+          "username": _email,
+          "password": _password
+        };
+        var body = json.encode(data);
+        var url = Uri.parse('https://greenlightppanetfraudapp.herokuapp.com/api/signup');
+        http.Response response = await http.post(url, body: body, headers: {
+          "Content-Type": "application/json",
+        });
+        var result_task = jsonDecode(response.body);
+        print(result_task);
+      }else {
+        Map data = {
+          "username": "Dennis224",
+          "pass1": "Dennis2244",
+          "pass2": "Dennis2244",
+          "email": "ayinke@gmial.com",
+          "fname": "Ayinke",
+          "lname": "Oladeji",
+          "country": "Nigeria",
+          "region": "NA",
+          "area": "Amuloko",
+          "role": "RCM"
+        };
+      }
+      // Perform login or sign-up logic here
+      // For simplicity, we'll just print the email and password
+      print('Email: $_email');
+      print('Password: $_password');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Login and Sign Up Page'),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(20.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if(_authMode == AuthMode.Signup)
+                  Column(children: [
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'First Name'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your First Name';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        _email = value;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Last Name'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your Last Name';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        _email = value;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Country'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your Country';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        _email = value;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Zone'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your Zone';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        _email = value;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Region'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your Region';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        _email = value;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Role'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your Role';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        _email = value;
+                      },
+                    ),
+                  ],),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Email'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    _email = value;
+                  },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Password'),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    _password = value;
+                  },
+                ),
+                if (_authMode == AuthMode.Signup)
+
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'Confirm Password'),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter confirm password';
+                      } else if (value != _password) {
+                        return 'Password does not match';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      setState(() {
+                        _confirmPassword = value;
+                      });
+                    },
+                  ),
+                SizedBox(height: 20.0),
+                ElevatedButton(
+                  child: Text(_authMode == AuthMode.Login ? 'Login' : 'Sign Up'),
+                  onPressed: _submitForm,
+                ),
+                TextButton(
+                  child: Text(_authMode == AuthMode.Login ? 'Create Account' : 'Back to Login'),
+                  onPressed: () {
+                    setState(() {
+                      _authMode = _authMode == AuthMode.Login ? AuthMode.Signup : AuthMode.Login;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+

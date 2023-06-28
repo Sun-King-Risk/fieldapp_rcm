@@ -32,43 +32,47 @@ class _PilotUpdateState extends State<PilotUpdate> {
   Widget build(BuildContext context) {
     String? _selectedValue;
     return Scaffold(
+      appBar: AppBar(),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-          SizedBox(height: 10,),
-        AppDropDown(
-            disable: true,
-            label: widget.title,
-            hint: "hint",
-            items: [widget.title],
-            onChanged: (value) {}),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             SizedBox(height: 10,),
-            AppDropDown(
-                disable: true,
-                label: widget.subtask,
-                hint: widget.subtask,
-                items: [widget.subtask],
-                onChanged: (value) {}),
-            if(selectedSubTask == 'Conduct the process audit')
-              Audity(),
-            if(selectedSubTask == 'Conduct a pilot audit')
-              Audity(),
-            if(selectedSubTask == 'Testing the GPS accuracy of units submitted')
-              Accuracy(),
-            if(selectedSubTask == 'Reselling of repossessed units')
-              Fraud(),
-            if(selectedSubTask == 'Repossessing qualified units for Repo and Resale')
-              Repo(
-                docid: widget.id,
-                id: widget.task,
-              ),
-            if(selectedSubTask == 'Increase the Kazi Visit Percentage')
-              Agent(
-                docid: widget.id,
-                id: widget.task,
-              ),
-          ],
+          AppDropDown(
+              disable: true,
+              label: widget.title,
+              hint: "hint",
+              items: [widget.title],
+              onChanged: (value) {}),
+              SizedBox(height: 10,),
+              AppDropDown(
+                  disable: true,
+                  label: widget.subtask,
+                  hint: widget.subtask,
+                  items: [widget.subtask],
+                  onChanged: (value) {}),
+              if(selectedSubTask == 'Conduct the process audit')
+                Audity(),
+              if(widget.subtask == 'Conduct a pilot audit')
+                Audity(),
+              if(widget.subtask == 'Testing the GPS accuracy of units submitted')
+                Accuracy(),
+              if(widget.subtask == 'Reselling of repossessed units')
+                Fraud(),
+              if(widget.subtask == 'Repossessing qualified units for Repo and Resale')
+                Repo(
+                  docid: widget.id,
+                  id: widget.task,
+                ),
+              if(widget.subtask == 'Increase the Kazi Visit Percentage')
+                Agent(
+                  docid: widget.id,
+                  id: widget.task,
+                ),
+            ],
+          ),
         ),
       ),
     );

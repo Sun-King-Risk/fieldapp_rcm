@@ -1038,15 +1038,27 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
   List<String> textFieldValues = [];
   List<String> dropdownValues = [];
   List? data = [];
+  String key= 'Agent';
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    List<String> keys = widget.taskdata![0].keys.toList();
+    if(keys.contains('Agent')){
+      key = 'Agent';
+    }else if(keys.contains('Angaza ID')){
+      key = 'Angaza ID';
+    }else if(keys.contains('Account Number')){
+      key = 'Account Number';
+    }else if(keys.contains('Customer')){
+      key = 'Customer';
+    }else if(keys.contains('Customer Name')){
+      key = 'Customer Name';
+    }
     if(
     widget.subtask == 'Work with the Agents with low welcome calls to improve'
     ){
-
       target = true;
     }else{
       target = false;
@@ -1069,7 +1081,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                 itemCount: widget.taskdata!.length,
                 itemBuilder: (context, index) {
                   Map<String, dynamic> data = widget.taskdata![index];
-                  String agent = data['Agent'];
+                  String agent = data[key];
                   if (!_actions.containsKey(agent)) {
                     _actions[agent] = {'action': '','priority': _priorities[0]};
                   }
@@ -1080,7 +1092,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Customer: ${agent}  - ${widget.taskdata![index]['Area']}',
+                            '$key: ${agent} ',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 8),
@@ -1132,7 +1144,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                 itemBuilder: (context,int index) {
                   Map<String, dynamic> data = widget.taskdata![index];
 
-                 String agent = data['Agent'];
+                 String agent = data[key];
                   if (!_actions.containsKey(agent)) {
                     _actions[agent] = {'action': '', 'priority': _priorities[0]};
                   }
@@ -1147,7 +1159,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Name: $agent',
+                        '$key: $agent',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -1211,6 +1223,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                           actions: _actions!,
                     )));
                 print(   _actions);
+                print(widget.taskdata);
 
 
               },
@@ -1249,9 +1262,25 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
   @override
   void initState() {
     print("test ${widget.customers}");
+    List<String> keys = widget.customers![0].keys.toList();
+    if(keys.contains('Agent')){
+      key = 'Agent';
+    }else if(keys.contains('Angaza ID')){
+      key = 'Angaza ID';
+    }else if(keys.contains('Account Number')){
+      key = 'Account Number';
+    }else if(keys.contains('Customer')){
+      key = 'Customer';
+    }else if(keys.contains('Customer Name')){
+      key = 'Customer Name';
+    }
     // TODO: implement initState
     super.initState();
+    print(keys);
   }
+  String key= '';
+
+
   void _save() async{
     Map data = {
       'task_title': widget.task,
@@ -1337,7 +1366,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widget.customers!.map((customer) {
-                String agentName = customer['Agent'];
+                String agentName = customer[key];
                 String current = customer['%Unreachabled rate within SLA'];
                 Map<String, String>? actions = widget.actions[agentName];
                 //List<String> items = customer.split("-");
@@ -1399,7 +1428,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widget.customers!.map((customer) {
-                String agentName = customer['Agent'];
+                String agentName = customer[key];
                 Map<String, String>? actions = widget.actions[agentName];
                 Map<String, String>? action = widget.actions["Agent"];
                 //List<String> items = customer.split("-");

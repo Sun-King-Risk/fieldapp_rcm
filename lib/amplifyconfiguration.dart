@@ -40,15 +40,15 @@ const amplifyconfig = ''' {
                 "CredentialsProvider": {
                     "CognitoIdentity": {
                         "Default": {
-                            "PoolId": "us-east-1:8f98c83a-5e34-4d23-bf39-4a89ef805ea3",
+                            "PoolId": "us-east-1:342941f3-8b48-4d55-8ca3-ba95fc029f4d",
                             "Region": "us-east-1"
                         }
                     }
                 },
                 "CognitoUserPool": {
                     "Default": {
-                        "PoolId": "us-east-1_R3yxvm32L",
-                        "AppClientId": "4q2n090osfb0hi6314hodltt2h",
+                        "PoolId": "us-east-1_dovrKmRn3",
+                        "AppClientId": "vojft73fplnr1mrjhlgak5j9n",
                         "Region": "us-east-1"
                     }
                 },
@@ -56,23 +56,13 @@ const amplifyconfig = ''' {
                     "Default": {
                         "authenticationFlowType": "USER_SRP_AUTH",
                         "socialProviders": [],
-                        "usernameAttributes": [
-                            "EMAIL"
-                        ],
+                        "usernameAttributes": [],
                         "signupAttributes": [
-                            "EMAIL",
-                            "NAME",
-                            "GENDER",
-                            "PHONE_NUMBER"
+                            "EMAIL"
                         ],
                         "passwordProtectionSettings": {
                             "passwordPolicyMinLength": 8,
-                            "passwordPolicyCharacters": [
-                                "REQUIRES_LOWERCASE",
-                                "REQUIRES_NUMBERS",
-                                "REQUIRES_SYMBOLS",
-                                "REQUIRES_UPPERCASE"
-                            ]
+                            "passwordPolicyCharacters": []
                         },
                         "mfaConfiguration": "OFF",
                         "mfaTypes": [
