@@ -23,6 +23,7 @@ class DashViewState extends State<DashView> {
   bool isLoading = true;
   List<String> area_data= [];
   Future<StorageItem?> listItems(key) async {
+    print(key);
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
       operation = await Amplify.Storage.list(
@@ -73,9 +74,22 @@ class DashViewState extends State<DashView> {
           .where((task) => task['Region'] == 'Central' &&
           task['Country'] =='Tanzania'
       ).toList();
+      filteredTasks.sort((a,b){
+        String scoreA = a[widget.title]== null?"0":a[widget.title];
+        String scoreB = b[widget.title]== null?"0":b[widget.title];
+        double scoreValueA = double.tryParse(scoreA?.replaceAll("%", "") ?? "0") ?? 0;
+        double scoreValueB = double.tryParse(scoreB?.replaceAll("%", "") ?? "0") ?? 0;
+        if(widget.title =="Collection Score"||widget.title =="Repayment Speed Last 182 Days"||widget.title =="Repayment Speed 2"){
+          return scoreValueB.compareTo(scoreValueA);
+        }else{
+          return scoreValueA.compareTo(scoreValueB);
+        }
+
+      });
 
       print('File_region: $filteredTasks');
       setState(() {
+
         data = filteredTasks;
         safePrint('File_data: $area_data');
         isLoading = false;
@@ -121,10 +135,10 @@ class DashViewState extends State<DashView> {
                     height: 80,
                     width: 150,
                     color: Colors.white,
-                    child: Column(
+                    child: isLoading?Center(child: CircularProgressIndicator()):Column(
                       children: [
                         Text(
-                         "0",
+                          data!.first[widget.title]==null?"0":data!.first[widget.title],
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 24,
@@ -133,7 +147,7 @@ class DashViewState extends State<DashView> {
                         SizedBox(
                           height: 10,
                         ),
-                        Text("best performance")
+                        Text("Best performance")
                       ],
                     ),
                   ),
@@ -143,10 +157,11 @@ class DashViewState extends State<DashView> {
                     height: 80,
                     width: 150,
                     color: Colors.white,
-                    child: Column(
+                    child: isLoading?Center(child: CircularProgressIndicator()):Column(
                       children: [
+
                         Text(
-                   "0",
+                    data!.last[widget.title]==null?"0":data!.last[widget.title],
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 24,
@@ -171,7 +186,6 @@ class DashViewState extends State<DashView> {
                   itemCount: data!.length,
                   itemBuilder: (BuildContext context, index) {
                     return ListTile(
-                        leading: const Icon(Icons.list),
                         trailing:
 
                         Text(

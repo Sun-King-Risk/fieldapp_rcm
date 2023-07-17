@@ -9,9 +9,6 @@ class Profile  extends StatefulWidget {
   ProfileState createState() => ProfileState();
 }
 class ProfileState extends State<Profile> {
-  var currentUser = FirebaseAuth.instance.currentUser;
-  final collectionRef = FirebaseFirestore.instance.collection('Users');
-  late final data ='';
   @override
   void initState() {
     super.initState();
@@ -22,29 +19,8 @@ class ProfileState extends State<Profile> {
       appBar: AppBar(),
       body: Column(
         children: [
-          StreamBuilder(
-            stream: collectionRef.where('UID',isEqualTo:currentUser!.uid).get().asStream() ,
-            builder: (context, snapshot){
 
-              if(snapshot.hasData){
-                String? email;
-                for (UserInfo userInfo in currentUser!.providerData) {
-                  email = userInfo.email;
-                }
-                var data = snapshot.data!.docs[0];
-                return Column(
-                  children: [
-                    currentUser!.photoURL != null
-                        ? ClipOval(
-                      child: Material(
-                        color: Colors.blue.withOpacity(0.3),
-                        child: Image.network(
-                          currentUser!.photoURL!,
-                          fit: BoxFit.fitHeight,
-                        ),
-                      ),
-                    )
-                        : ClipOval(
+          ClipOval(
                       child: Material(
                         color:Colors.grey.withOpacity(0.3),
                         child: Padding(
@@ -57,29 +33,17 @@ class ProfileState extends State<Profile> {
                         ),
                       ),
                     ),
-                    Text("${currentUser?.displayName}"),
-                    Text("${email}"),
+                    Text("Dennis Juma"),
+                    Text("dennis@sunking.com"),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        TextButton(onPressed: (){},child: Text('Phone: ${data['Phone Number']}',style: TextStyle(color: Colors.black),)),
-                        TextButton(onPressed: (){},child:Text('Area: ${data['Area']}',style: TextStyle(color: Colors.black))),
+                        TextButton(onPressed: (){},child: Text('+255762628707',style: TextStyle(color: Colors.black),)),
+                        TextButton(onPressed: (){},child:Text('Area: Arusha',style: TextStyle(color: Colors.black))),
 
                       ],
 
                     ),
-
-                  ],
-                );
-              }return Column(
-              children: const [
-                CircularProgressIndicator(),
-                Text("Loading data...")
-              ],
-              );
-            }
-
-          ) ,
 
 
 

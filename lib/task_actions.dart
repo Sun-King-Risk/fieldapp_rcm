@@ -689,10 +689,6 @@ class _FieldVisit extends State<FieldVisit> {
       child: Column(
         children: [
           SizedBox(height: 10,),
-          Text(widget.id),
-          SizedBox(height: 10,),
-          Text(widget.docid),
-          SizedBox(height: 10,),
           AppDropDown(
               disable: false,
               label: "Did you manage to work with the Agent?",
@@ -1103,10 +1099,6 @@ class _Repo extends State<Repo>{
     return Form(
       child: Column(
         children: [
-          SizedBox(height: 10,),
-          Text(widget.id),
-          SizedBox(height: 10,),
-          Text(widget.docid),
           SizedBox(height: 10,),
           AppDropDown(
               disable: false,
@@ -1564,10 +1556,6 @@ class _WorkUpdate extends State<WorkUpdate> {
       child: Column(
         children: [
           SizedBox(height: 10,),
-          Text(widget.id),
-          SizedBox(height: 10,),
-          Text(widget.docid),
-          SizedBox(height: 10,),
           AppDropDown(
               disable: false,
               label: "Did you manage to work with the Agent?",
@@ -1806,10 +1794,6 @@ class _Agent extends State<Agent> {
       child: Column(
         children: [
           SizedBox(height: 10,),
-          Text(widget.id.toString()),
-          SizedBox(height: 10,),
-          Text(widget.docid.toString()),
-          SizedBox(height: 10,),
           AppDropDown(
               disable: false,
               label: "Did you manage to work with the Agent?",
@@ -1873,22 +1857,6 @@ class _Agent extends State<Agent> {
                   ),
                   SizedBox(
                     height: 10,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'what do you achieve in percent',
-                    ),
-                    keyboardType: TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: <TextInputFormatter>[
-                      TextInputFormatter.withFunction((oldValue, newValue) {
-                        final regex = RegExp(r'^\d+\.?\d{0,2}$');
-                        if (regex.hasMatch(newValue.text)) {
-                          return newValue;
-                        }
-                        return oldValue;
-                      })
-                    ],
                   ),
 
                   SizedBox(

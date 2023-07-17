@@ -32,8 +32,10 @@ class _CustomerUpdateState extends State<CustomerUpdate> {
   Widget build(BuildContext context) {
     String? _selectedValue;
     return Scaffold(
+      appBar: AppBar(),
       body: SingleChildScrollView(
-        child: Column(
+        child:
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10,),
@@ -50,6 +52,7 @@ class _CustomerUpdateState extends State<CustomerUpdate> {
                 hint: widget.subtask,
                 items: [widget.subtask],
                 onChanged: (value) {}),
+            Audity(),
             if(selectedSubTask == 'Visiting of issues raised')
               Audity(),
             if(selectedSubTask == 'Repossession of customers needing repossession')

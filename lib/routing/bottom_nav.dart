@@ -120,7 +120,6 @@ class NavPagePageState extends State<NavPage> {
  }
   int _selectedIndex = 0;
   final List<Widget> _tabs = <Widget>[
-
       Home(),
       Task(),
     /*AreaDashboard(),
@@ -164,11 +163,11 @@ class NavPagePageState extends State<NavPage> {
                 ),*/
                 GButton(
                   icon: Icons.task,
-                  text: 'task',
+                  text: 'Dashboard',
                 ),
                   GButton(
                   icon: Icons.phone,
-                  text: 'Customer',
+                  text: 'Task',
                 ),
               ],
               onTabChange: (index){

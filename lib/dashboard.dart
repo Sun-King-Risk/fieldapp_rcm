@@ -5,6 +5,7 @@ import 'package:fieldapp_rcm/dash_view.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'utils/themes/theme.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -13,15 +14,58 @@ import 'package:http/http.dart' as http;
 
 
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  List<String> attributeList = [];
+  String name ="";
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserAttributes();
+  }
+  void getUserAttributes() async {
+    try {
+      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
+      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
+      List<String> attributesList = [];
+      for (AuthUserAttribute attribute in attributes) {
+        print(attribute.value);
+
+        if(attribute.userAttributeKey.key.contains("custom")){
+          var valueKey = attribute.userAttributeKey.key.split(":");
+          attributesList.add('"${valueKey[1]}":"${attribute.value}"');
+          print(valueKey[1]);
+        }else{
+          attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
+        }
+
+      }
+      setState(() {
+        attributeList = attributesList;
+        name = attributeList[3].split(":")[1];
+      });
+      name = attributeList[3].split(":")[1];
+      if (kDebugMode) {
+        print(attributeList.toList());
+        print(attributeList[3].split(":")[1]);
+      }
+      // Process the user attributes
+
+    } catch (e) {
+      print('Error retrieving user attributes: $e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     //AuthUser user = Amplify.Auth.getCurrentUser() as AuthUser;
     //String loginId = user.username;
     //var loginId = Amplify.Auth.fetchUserAttributes();
-
-    var currentUser = FirebaseAuth.instance.currentUser;
 
     return SingleChildScrollView(
       child: Container(
@@ -30,9 +74,7 @@ class Home extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            Text("Dennis Juma",style: TextStyle(fontSize: 10),),
-            Text("sd",style: TextStyle(fontSize: 10),),
+            Text(name,style: TextStyle(fontSize: 10),),
 //summary
             SizedBox(height: 5,),
             Container(
@@ -44,48 +86,51 @@ class Home extends StatelessWidget {
                     label: 'Dashboard',
                     txtcolor: Colors.black87,
                   ),
+
                   KpiTittle(
                     kpicolor: Colors.black87,
-                    label: 'Portfolio Quality / Collection Drive',
+                    label: 'Portfolio Quality',
                     txtcolor: AppColor.mycolor,
                   ),
+                  Row(
+                    children: [
+                      RowData(
+                        value: 'Collection Score',
+                        label: 'CSAT Rate',
+                      ),
+                      RowData(
+                        value: 'Disabled Rate',
+                        label: 'Fraud SLA',
+                      ),
+                      RowData(
+                        value: 'Repayment Speed 2',
+                        label: 'Welcome Call Rate',
+                      ),
 
-                  //Portfolio Quality
 
-                  Row(children: [
-                    RowData(
-                      value: 'Collection Score',
-                      label: 'Score',
-                    ),
-                    RowData(
-                      value: 'Repayment Speed 2',
-                      label: 'Repayment Speed',
-                    ),
-                    RowData(
-                      value: 'At Risk Rate',
-                      label: 'At Risk Rate',
-                    ),
-                  ]),
+
+                    ],
+                  ),
                   const Divider(
                     height: 10,
                     thickness: 0,
                     color: Colors.black,
                   ),
                   const SizedBox(height: 5),
-
                   Row(
                     children: [
+
                       RowData(
-                        value: 'Disabled Rate',
-                        label: 'Disabe Rate',
+                        value: 'At Risk Rate',
+                        label: 'At Risk Rate',
                       ),
                       RowData(
-                        value: 'Count Replacements',
-                        label: 'FSE Revamp',
+                        value: 'At Risk Rate 60',
+                        label: 'FPD',
                       ),
                       RowData(
-                        value: 'Count Replacements',
-                        label: 'Audity',
+                        value: 'Detached Rate',
+                        label: 'SPD',
                       ),
                     ],
                   ),
@@ -94,7 +139,98 @@ class Home extends StatelessWidget {
                     thickness: 0,
                     color: Colors.black,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
+                  KpiTittle(
+                    kpicolor: Colors.black87,
+                    label: 'Pilot / Process Management',
+                    txtcolor: AppColor.mycolor,
+                  ),
+                  Row(
+                    children: [
+                      RowData(
+                        value: 'Count Replacements',
+                        label: 'Audit Reports/Survey',
+                      ),
+                      RowData(
+                        value: 'Count Replacements',
+                        label: 'FSE Revamp',
+                      ),
+                      RowData(
+                        value: 'Count Replacements',
+                        label: 'Repo & Resale',
+                      ),
+                    ],
+                  ),
+                  const Divider(
+                    height: 10,
+                    thickness: 0,
+                    color: Colors.black,
+                  ),
+                  const SizedBox(height: 5),
+                  KpiTittle(
+                    kpicolor: Colors.black87,
+                    label:' Collection Drive',
+                    txtcolor: AppColor.mycolor,
+                  ),
+                  Row(
+                    children: [
+                      RowData(
+                        value: 'Disabled Rate',
+                        label: 'Disabe Rate',
+                      ),
+                      RowData(
+                        value: 'Collection Score',
+                        label: 'Disable Rate > 180',
+                      ),
+                      RowData(
+                        value: 'At Risk Rate 60',
+                        label: 'Disable Rate < 180',
+                      ),
+                      RowData(
+                        value: 'Repayment Speed 2',
+                        label: 'Repayment Speed 2',
+                      ),
+
+
+                    ],
+                  ),
+                  const Divider(
+                    height: 10,
+                    thickness: 0,
+                    color: Colors.black,
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      RowData(
+                        value: 'Collection Score',
+                        label: 'Collection Score',
+                      ),
+                      RowData(
+                        value: 'Detached Rate',
+                        label: 'Repossession Rate',
+                      ),
+                      RowData(
+                        value: 'At Risk Rate',
+                        label: 'Agent Restriction',
+                      ),
+                      RowData(
+                        value: 'Repayment Speed Last 182 Days',
+                        label: 'Kazi Completion',
+                      ),
+
+
+
+
+
+                  ],
+                  ),
+                  const Divider(
+                    height: 10,
+                    thickness: 0,
+                    color: Colors.black,
+                  ),
+                  const SizedBox(height: 5),
                   KpiTittle(
                     kpicolor:Colors.black87,
                     label: 'Customer Management',
@@ -102,10 +238,6 @@ class Home extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      RowData(
-                        value: 'Count Replacements',
-                        label: 'Fraud Case SLA',
-                      ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'CC Escalation',
@@ -125,50 +257,32 @@ class Home extends StatelessWidget {
                     thickness: 0,
                     color: Colors.black,
                   ),
-                  const SizedBox(height: 10),
-                  KpiTittle(
-                    kpicolor: Colors.black87,
-                    label: 'Pilot / Process Management',
-                    txtcolor: AppColor.mycolor,
-                  ),
-                  Row(
-                    children: [
-                      RowData(
-                        value: 'Count Replacements',
-                        label: 'Agent Restriction',
-                      ),
-                      RowData(
-                        value: 'Count Replacements',
-                        label: 'Audit Reports',
-                      ),
-                      RowData(
-                        value: 'Detached Rate',
-                        label: 'Repossession Rate',
-                      ),
-                    ],
-                  ),
-                  const Divider(
-                    height: 10,
-                    thickness: 0,
-                    color: Colors.black,
-                  ),
+                  const SizedBox(height: 5),
+
                   KpiTittle(
                     kpicolor: Colors.black87,
                     label: 'Team Management',
                     txtcolor: AppColor.mycolor,
                   ),
-                  Row(
-                    children: [
-                      RowData(
-                        value: 'Count Replacements',
-                        label: 'Replacements',
-                      ),
-                      RowData(
-                        value: 'Count Replacements',
-                        label: 'Replacement SLA',
-                      ),
-                    ],
+
+
+                  Row(children: [
+                    RowData(
+                      value: 'Collection Score',
+                      label: '',
+                    ),
+                    RowData(
+                      value: 'Repayment Speed 2',
+                      label: '',
+                    ),
+                  ]),
+
+                  const Divider(
+                    height: 10,
+                    thickness: 0,
+                    color: Colors.black,
                   ),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
@@ -201,6 +315,7 @@ class _RowDataState extends State<RowData> {
   List? data = [];
   bool isLoading = true;
   List<String> region= [];
+
   Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
@@ -219,8 +334,6 @@ class _RowDataState extends State<RowData> {
         resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
         StorageItem latestFile = resultList.first;
         RegionTask(latestFile.key);
-        print(latestFile.key);
-        print("Key: $key");
 
         return resultList.first;
 
@@ -242,7 +355,6 @@ class _RowDataState extends State<RowData> {
   }
   Future<void> RegionTask(key) async {
     List<String> uniqueRegion = [];
-    print("object: $key");
 
     try {
       StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
@@ -254,7 +366,6 @@ class _RowDataState extends State<RowData> {
       final List<dynamic> filteredTasks = jsonData
           .where((task) => task['Region'] == 'Central' && task['Country'] =='Tanzania' )
           .toList();
-      print('File_team: $jsonData');
       for (var item in filteredTasks) {
         //String region = item['Region'];
         //region?.add(region);
@@ -267,7 +378,7 @@ class _RowDataState extends State<RowData> {
       setState(() {
         data = filteredTasks;
         region = uniqueRegion.toSet().toList();
-        safePrint('File_team: $jsonData');
+
         isLoading = false;
       });
     } on StorageException catch (e) {
@@ -285,7 +396,7 @@ class _RowDataState extends State<RowData> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DashView(widget.value,widget.value),
+                builder: (context) => DashView(widget.value,data![0][widget.value]),
               ));
 
         },
@@ -295,7 +406,7 @@ class _RowDataState extends State<RowData> {
           child: Container(
             height: 60,
             width: 50,
-            child: Column(
+            child: isLoading?Center(child: CircularProgressIndicator()):Column(
               children: [
                 Text(data![0][widget.value], style: TextStyle(fontSize: 20,)),
                 Text(widget.label, style: TextStyle(fontSize: 9))

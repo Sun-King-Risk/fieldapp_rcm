@@ -16,25 +16,9 @@ class UserNotification extends StatefulWidget {
 }
 
 class _UserNotificationState extends State<UserNotification> {
-
-  var currentUser = FirebaseAuth.instance.currentUser!.uid;
-  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  String messageTitle = "Empty";
-  String notificationAlert = "alert";
-  Future<void> updateUserToken(String userId) async {
-    // Get the user's FCM token
-    String? token = await FirebaseMessaging.instance.getToken();
-
-    // Update the user's document with their FCM token
-    await FirebaseFirestore.instance.collection('Users').doc(userId).update({
-      'fcmToken': token
-    });
-    print("Dennis $token");
-  }
   @override
   void initState() {
     // TODO: implement initState
-    updateUserToken(currentUser);
     super.initState();
 
   }
@@ -47,7 +31,7 @@ class _UserNotificationState extends State<UserNotification> {
 
       ),
       body: ListView.builder(
-          itemCount: 1,
+          itemCount: 3,
           itemBuilder: (BuildContext context, int index) {
             return ListTile(
                 leading: const Icon(Icons.list),
@@ -55,7 +39,7 @@ class _UserNotificationState extends State<UserNotification> {
                   "notificationAlert",
                   style: TextStyle(color: Colors.green, fontSize: 15),
                 ),
-                title: Text("$messageTitle"));
+                title: Text("messageTitle"));
           }),
 
     );

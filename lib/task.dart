@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:fieldapp_rcm/new_design.dart';
+import 'package:fieldapp_rcm/report.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/task_table.dart';
 import 'package:http/http.dart' as http;
@@ -53,7 +54,7 @@ class Task extends StatelessWidget {
 
     return Scaffold(
       body: DefaultTabController(
-        length: 3,
+        length: 4,
         child: Column(
           children: <Widget>[
             Container(
@@ -63,6 +64,7 @@ class Task extends StatelessWidget {
                 Tab(text: "My Task",),
                 Tab(text: "Team Task"),
                 Tab(text: "Pending/Request"),
+                Tab(text: "Report",),
               ]),
             ),
             Expanded(
@@ -108,7 +110,7 @@ class Task extends StatelessWidget {
                         ),
 
                         TaskList(
-                          task_title: 'Collection Drive',
+                          task_title: 'Portfolio Quality',
 
 
                         ),
@@ -119,19 +121,19 @@ class Task extends StatelessWidget {
 
                         ),
                         TaskList(
-                          task_title: 'Pilot Management',
-
-
-
-                        ),
-                        TaskList(
-                          task_title: 'Portfolio Quality',
+                          task_title: 'Collection Drive',
 
 
 
                         ),
                         TaskList(
                           task_title: 'Customer Management',
+
+
+
+                        ),
+                        TaskList(
+                          task_title: 'Team Management',
 
 
 
@@ -146,6 +148,10 @@ class Task extends StatelessWidget {
                   Container(
 
                     child:PendingTask(),
+                  ),
+                  Container(
+
+                    child:Report(),
                   ),
                 ]),
               ),

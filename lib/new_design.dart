@@ -153,7 +153,7 @@ class _SubTaskRadioState extends State<SubTaskRadio> {
     'Change a red zone CSAT area to orange',
     'Attend to Fraud Cases',
     'Visit at-risk accounts',
-    'Visits FPD/SPDs',
+    'Visits FPD SPDs',
     'Other'
   ];
   final List<String> customer = [
@@ -861,7 +861,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(keys.toString()),
+            //Text(keys.toString()),
             TextField(
               onChanged: (value) {
                 setState(() {
@@ -1003,10 +1003,20 @@ class _PortfolioTableState extends State<PortfolioTable> {
                 );
 
               }else if(taskDataList!.length>5){
-                print("exeed select");
+                print("exceed select");
+                final snackBar = SnackBar(
+                  content: Text('Exceeded task selection limit!'),
+                  duration: Duration(seconds: 3),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
               }
               else{
                 print("No task selected");
+                final snackBar = SnackBar(
+                  content: Text('No task selected!'),
+                  duration: Duration(seconds: 3),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
               }
             }, child: Text("Next"))
@@ -1057,7 +1067,9 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
       key = 'Customer Name';
     }
     if(
-    widget.subtask == 'Work with the Agents with low welcome calls to improve'
+    widget.subtask == 'Work with the Agents with low welcome calls to improve'||
+        widget.subtask=='Increase the Kazi Visit Percentage' ||
+    widget.subtask == 'Field Visits with low-performing Agents in Collection Score'
     ){
       target = true;
     }else{
@@ -1082,6 +1094,8 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                 itemBuilder: (context, index) {
                   Map<String, dynamic> data = widget.taskdata![index];
                   String agent = data[key];
+                  String agentRate = data.values.last;
+
                   if (!_actions.containsKey(agent)) {
                     _actions[agent] = {'action': '','priority': _priorities[0]};
                   }
@@ -1092,14 +1106,14 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '$key: ${agent} ',
+                            '$key: ${agent} - $agentRate ',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 8),
                           TextField(
                             decoration: InputDecoration(
                               hintText: 'Enter action plan',
-                              labelText: 'Action Plan',
+                              labelText: 'Enter action plan',
                             ),
                             onChanged: (value) {
                               setState(() {
@@ -1162,15 +1176,6 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                         '$key: $agent',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text(
-
-                        'Name: ${data['%Unrechabled rate within SLA:']}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),Text(
-
-                        'Name: ${data}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
                       SizedBox(height: 8),
                       TextField(
                         decoration: InputDecoration(
@@ -1195,8 +1200,6 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                             setState(() {
                               _actions[agent]!['priority'] = value;
                             });
-
-                            print(value);
                           })
 
                     ],
@@ -1223,7 +1226,6 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                           actions: _actions!,
                     )));
                 print(   _actions);
-                print(widget.taskdata);
 
 
               },
@@ -1274,24 +1276,59 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
     }else if(keys.contains('Customer Name')){
       key = 'Customer Name';
     }
+
+    if(keys.contains('Success Rate')){
+      rate = 'Success Rate';
+    }
+    else if(keys.contains('%Unreachabled rate within SLA')){
+      rate = '%Unreachabled rate within SLA';
+    }else if(keys.contains('Collection Score')){
+      rate = 'Success Rate';
+    }
+
     // TODO: implement initState
     super.initState();
     print(keys);
+    print(rate);
   }
   String key= '';
+  String rate = '';
 
+  void _saveNo() async{
+    Map data = {
+      'task_title': widget.task,
+      'sub_task': widget.subTask,
+      'task_region': widget.region,
+      'task_area':widget.area,
+      "task_start_date": "2023-07-12",
+      "timestamp": 1683282979,
+      "task_end_date": "2023-07-20",
+      "submited_by":"Test User",
+      'is_approved': 'Pending',
+      'task_status':'Pending'
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/create');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    var result_task = jsonDecode(response.body);
+    print(result_task);
+    taskActionNo(result_task["id"]);
 
+  }
   void _save() async{
     Map data = {
       'task_title': widget.task,
       'sub_task': widget.subTask,
       'task_region': widget.region,
       'task_area':widget.area,
-      "task_start_date": "2023-05-05",
+      "task_start_date": "2023-07-12",
       "timestamp": 1683282979,
-      "task_end_date": "2023-05-10",
+      "task_end_date": "2023-07-20",
       "submited_by":"Test User",
-      'is_approved': 'Pending'
+      'is_approved': 'Pending',
+     'task_status':'Pending'
     };
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/create');
@@ -1304,24 +1341,77 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
 
   }
   void taskAction(id) async {
-
     for (final entry in widget.actions.entries) {
-      Map data =   {
-        "task": id,
-        "account_number":entry.key,
-        "goals": 0,
-        "task_description": entry.value['action'],
-        "priority": entry.value['priority'],
-        "task_status": "pending"
-      };
-      var body = json.encode(data);
-      var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
-      http.Response response = await http.post(url, body: body, headers: {
-        "Content-Type": "application/json",
-      });
-      print(response.body);
+      String agentName = entry.key;
+      Map<String, dynamic>? agentDetails = widget.customers!.firstWhere(
+            (agent) => agent['Agent'] == agentName
+      );
+      if (agentDetails != null) {
+        String current = agentDetails[rate];
+        String? percvalue = current.substring(0,current.length - 1);
+        double total = double.parse(entry.value['target']!)+double.parse(percvalue!);
+        Map data =   {
+          "task": id,
+          "account_number":entry.key,
+          "goals": total,
+          "task_description": entry.value['action'],
+          "priority": entry.value['priority'],
+          "task_status": "pending",
+          "previous_goal":double.parse(percvalue!)
+        };
+        var body = json.encode(data);
+        var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
+        http.Response response = await http.post(url, body: body, headers: {
+          "Content-Type": "application/json",
+        });
+        print(response.body);
 
+
+      }
     }
+    final snackBar = SnackBar(
+      content: Text('Task Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+
+
+
+
+
+  }
+  void taskActionNo(id) async {
+    for (final entry in widget.actions.entries) {
+      String taskName = entry.key;
+      Map<String, dynamic>? taskDetails = widget.customers!.firstWhere(
+              (task) => task[key] == taskName
+      );
+      if (taskDetails != null) {
+        Map data =   {
+          "task": id,
+          "account_number":entry.key,
+          "goals": 0,
+          "task_description": entry.value['action'],
+          "priority": entry.value['priority'],
+          "task_status": "pending",
+          "previous_goal":0
+        };
+        var body = json.encode(data);
+        var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
+        http.Response response = await http.post(url, body: body, headers: {
+          "Content-Type": "application/json",
+        });
+        print(response.body);
+
+
+      }
+    }
+    final snackBar = SnackBar(
+      content: Text('Task Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
 
 
@@ -1359,7 +1449,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             ),
             SizedBox(height: 16),
             Text(
-              'Task Action: ${widget.customers![0]["%Unreachabled rate within SLA"]}',
+              'Task Action:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
@@ -1367,7 +1457,8 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widget.customers!.map((customer) {
                 String agentName = customer[key];
-                String current = customer['%Unreachabled rate within SLA'];
+
+                String current = customer[rate];
                 Map<String, String>? actions = widget.actions[agentName];
                 //List<String> items = customer.split("-");
                 String? percvalue = current.substring(0,current.length - 1);
@@ -1375,7 +1466,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Name: ${agentName}'),
+                    Text('Name: ${agentName} '),
                     SizedBox(height: 8),
                     Text("Priority: ${actions!['priority']}"),
                     Text("Action Plan: ${actions!['action']}"),
@@ -1390,7 +1481,8 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             ),
             ElevatedButton(onPressed:
                 (){
-              _save();
+
+              _save( );
             }, child: Text("Submit"))
           ],
         ),
@@ -1448,7 +1540,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
             ),
             ElevatedButton(onPressed:
                 (){
-                _save();
+                _saveNo();
                  //taskAction(112);
               print(widget.actions);
               print(widget.customers);

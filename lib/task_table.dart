@@ -76,7 +76,7 @@ class MyTaskViewState extends State<MyTaskView> {
       builder: (BuildContext context) {
         return SingleChildScrollView(
           child: AlertDialog(
-            title: Text('Task Details $id'),
+            title: Text('Task Details '),
             content: Column(
               children: [
                 TextField(
@@ -197,9 +197,11 @@ class MyTaskViewState extends State<MyTaskView> {
                                         animation: true,
                                         animationDuration: 1000,
                                         lineHeight: 15.0,
-                                        percent:0.5,
+                                        percent:double.parse(taskdetail["previous_goal"]==null?"0":taskdetail["previous_goal"])/
+                                            double.parse(taskdetail["goals"]==null?"0":taskdetail["goals"]),
                                         progressColor: Colors.green,
-                                        center: Text('${(0.5*100).toStringAsFixed(0)}%'),
+                                        center: Text('${((double.parse(taskdetail["previous_goal"]==null?"0":taskdetail["previous_goal"])/
+                                            double.parse(taskdetail["goals"]==null?"0":taskdetail["goals"]))*100).toStringAsFixed(0)}%'),
                                       )
 
                                     ],
@@ -294,8 +296,8 @@ class MyTaskViewState extends State<MyTaskView> {
           Container(
             height: 200,
 
-            padding:EdgeInsets.only(left: 15,right: 25,bottom: 5,top: 5),
-            margin: EdgeInsets.only(left: 20,right: 25,bottom: 0,top: 5),
+            padding:EdgeInsets.only(left: 10,right: 10,bottom: 5,top: 5),
+            margin: EdgeInsets.only(left: 10,right: 10,bottom: 0,top: 5),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.white,
@@ -390,7 +392,7 @@ class MyTaskViewState extends State<MyTaskView> {
           ),
           SizedBox(height: 20,),
           Container(
-              padding:EdgeInsets.only(left: 30, right: 30, bottom: 5, top: 5),
+              padding:EdgeInsets.only(left: 10,right: 10,bottom: 5,top: 5),
               margin: EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
               height: 30,
               child: Row(
@@ -449,13 +451,12 @@ class MyTaskViewState extends State<MyTaskView> {
                         },
                         child: Row(
                           children: [
-                            Icon(Icons.check_circle_outline),
                             SizedBox(width: 10),
                             Expanded(
                               child: Card(
                                 elevation: 5,
                                 child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                                  padding:EdgeInsets.only(left: 5,right: 5,bottom: 5,top: 5),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [

@@ -28,10 +28,7 @@ class NavPage extends StatefulWidget{
 
 }
 class NavPagePageState extends State<NavPage> {
-  late String role;
-  final String keyFilePath = 'google_fcm.json';
-  final String projectId = 'fieldapp-a7447';
-  final fileName = 'google_fcm.json';
+
 
 
   @override
@@ -42,42 +39,7 @@ class NavPagePageState extends State<NavPage> {
   @override
   void initState(){
     super.initState();
-    // reguest permission
-    //requestPermission();
-    //get token and save to firestore
   }
-  Future<void> sendFCMNotification(String deviceToken, String title, String body) async {
-    final String serverKey = 'AAAAya62xSc:APA91bGUjqUqPuBqFbrUPgknT3BEnYmQs1b2iRuzdJcS5etSbMgDvDjQocvCmMSnlcRwdrKxHTwfsPSlU0tbtTqiH5ZIkAoiZZmkeNIRTkMCvDJRTsEd_-adCFji2utZHAPgGKhO3byd'; // Replace with your server key
-    final String url = 'https://fcm.googleapis.com/fcm/send';
-    final Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'key=$serverKey',
-    };
-    final Map<String, dynamic> data = {
-      'notification': {
-        title: 'Your request has been approved',
-        body: 'You can now proceed with your task',
-      },
-      'priority':'high',
-      'to':deviceToken
-    };
-    final String encodedData = json.encode(data);
-
-    final http.Response response = await http.post(
-      Uri.parse(url),
-      headers: headers,
-      body: encodedData,
-    );
-
-    if (response.statusCode == 200) {
-      print('Notification sent successfully.');
-    } else {
-      print('Error sending notification.');
-      print('HTTP status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    }
-  }
-
   int _selectedIndex = 0;
   final List<Widget> _tabs = <Widget>[
 
@@ -123,12 +85,12 @@ class NavPagePageState extends State<NavPage> {
                   text: 'Home',
                 ),*/
                 GButton(
-                  icon: Icons.task,
-                  text: 'task',
+                  icon: Icons.home,
+                  text: 'Home',
                 ),
                 GButton(
-                  icon: Icons.phone,
-                  text: 'Customer',
+                  icon: Icons.task,
+                  text: 'Task',
                 ),
               ],
               onTabChange: (index){
