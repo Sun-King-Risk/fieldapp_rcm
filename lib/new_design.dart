@@ -2,16 +2,10 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
-import 'package:fieldapp_rcm/task/collection.dart';
-import 'package:fieldapp_rcm/task/customer.dart';
-import 'package:fieldapp_rcm/task/pilot_process.dart';
-import 'package:fieldapp_rcm/task/portfolio.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-import 'http_online.dart';
 class StepFormNew extends StatefulWidget{
   @override
   _StepFormNewState createState() => _StepFormNewState();
@@ -265,7 +259,7 @@ class _SubTaskRadioState extends State<SubTaskRadio> {
                    )
                  ],
 
-               );;
+               );
              case 'Collection Drive':
                return Column(
                  children: [
@@ -386,12 +380,11 @@ class RegionRadio extends StatefulWidget{
   _RegionRadioState createState() => _RegionRadioState();
 }
 
-
 class _RegionRadioState extends State<RegionRadio> {
   List? data = [];
   List<String> region= [];
   initState() {
-
+    getUserAttributes();
     listItems(widget.subtask.replaceAll(' ', '_'));
     super.initState();
     //getFileProperties();
@@ -399,6 +392,43 @@ class _RegionRadioState extends State<RegionRadio> {
   }
   String selectedRegion = '';
   bool isLoading = true;
+  List<String> attributeList = [];
+  String name ="";
+  String singleRegion = '';
+  String country ='';
+  void getUserAttributes() async {
+    try {
+      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
+      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
+      List<String> attributesList = [];
+      for (AuthUserAttribute attribute in attributes) {
+        print(attribute.value);
+
+        if(attribute.userAttributeKey.key.contains("custom")){
+          var valueKey = attribute.userAttributeKey.key.split(":");
+          attributesList.add('${valueKey[1]}:${attribute.value}');
+          print(valueKey[1]);
+        }else{
+          attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
+        }
+
+      }
+      setState(() {
+        attributeList = attributesList;
+        singleRegion = attributeList[7].split(":")[1];
+        country = attributeList[4].split(":")[1];
+      });
+      name = attributeList[3].split(":")[1];
+      if (kDebugMode) {
+        print(attributeList.toList());
+        print(attributeList[3].split(":")[1]);
+      }
+      // Process the user attributes
+
+    } catch (e) {
+      print('Error retrieving user attributes: $e');
+    }
+  }
   Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
@@ -427,12 +457,6 @@ class _RegionRadioState extends State<RegionRadio> {
         return null;
       }
 
-      for (StorageItem item in resultList) {
-        print('Key: ${item.key}');
-        print('Last Modified: ${item.lastModified}');
-        // Access other properties as needed
-      }
-
       safePrint('Got items: ${resultList.length}');
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
@@ -450,7 +474,13 @@ class _RegionRadioState extends State<RegionRadio> {
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
       print('File_team: $jsonData');
-      for (var item in jsonData) {
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['Region'] == singleRegion &&
+          task['Country'] == country
+      ).toList();
+      print(filteredTasks.length);
+
+      for (var item in filteredTasks) {
         //String region = item['Region'];
         //region?.add(region);
         if(item['Region'] == null){
@@ -460,9 +490,8 @@ class _RegionRadioState extends State<RegionRadio> {
 
       }
       setState(() {
-        data = jsonData;
+        data = filteredTasks;
         region = uniqueRegion.toSet().toList();
-        safePrint('File_team: $jsonData');
         isLoading = false;
       });
     } on StorageException catch (e) {
@@ -484,6 +513,7 @@ class _RegionRadioState extends State<RegionRadio> {
         ):SingleChildScrollView(
           child: Column(
             children: [
+              region.length==0?Center(child:Text("No Task under ${widget.subtask}")):
                ListView.builder(
                   shrinkWrap: true,
                   itemCount: region.length,
@@ -539,11 +569,10 @@ class _AreaRadioState extends State<AreaRadio> {
     //agentList.toList();
   }
   List? dataList = [];
+  List<String> keys = [];
   List<String> area =[];
   Future<void> Area() async {
-
     List<String> uniqueArea = [];
-
     final jsonData = widget.taskdata?.where((item) => item['Region'] == widget.region).toList();
     for (var areaList in jsonData!) {
       String area = areaList['Area'];
@@ -618,6 +647,9 @@ class TaskTable extends StatefulWidget {
   _TaskTableState createState() => _TaskTableState();
 }
 class _TaskTableState extends State<TaskTable> {
+
+
+
   initState() {
 
     print(widget.task);
@@ -831,6 +863,7 @@ class PortfolioTable extends StatefulWidget {
 }
 
 class _PortfolioTableState extends State<PortfolioTable> {
+
   List<Map<String, dynamic>> taskDataList = []; // List to store selected items
   int currentPage = 1;
   int itemsPerPage = 10;
@@ -838,11 +871,18 @@ class _PortfolioTableState extends State<PortfolioTable> {
   String searchQuery = '';
   int _sortColumnIndex = 2;
   bool _sortAscending = true;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    taskData = widget.taskdata?.where((item) => item['Region'] == widget.region && item['Area']== widget.area).toList();
+    print(widget.area);
+  }
+
 
 
   @override
   Widget build(BuildContext context) {
-   taskData =  widget.taskdata;
     // Calculate the start and end indices for the current page
     int startIndex = (currentPage - 1) * itemsPerPage;
     int endIndex = startIndex + itemsPerPage;
@@ -853,8 +893,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
     // Get the items for the current page
     List currentPageItems =
     taskData!.sublist(startIndex, endIndex);
-   List<String> keys = widget.taskdata!.isNotEmpty ? widget.taskdata![0].keys.toList() : [];
-
+   List<String> keys = taskData!.isNotEmpty ?taskData![0].keys.toList() : [];
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
@@ -899,7 +938,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
                               _sortAscending = true;
                               _sortColumnIndex = columnIndex;
                             }
-                            widget.taskdata!.sort((a, b) {
+                            taskData!.sort((a, b) {
                               var aValue = a[keys[columnIndex]].toString();
                               var bValue = b[keys[columnIndex]].toString();
                               return _sortAscending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
@@ -910,7 +949,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
                   DataColumn(label: Text('Select')),
                 ],
                 rows: [
-                  for (final item in widget.taskdata!)
+                  for (final item in taskData!)
                     DataRow(
                       cells: [
                         for (int cellIndex = 0; cellIndex < keys.length; cellIndex++)
@@ -1261,8 +1300,50 @@ class PreviewScreenNew extends StatefulWidget {
   State<PreviewScreenNew> createState() => _PreviewScreenNewState();
 }
 class _PreviewScreenNewState extends State<PreviewScreenNew> {
+  List<String> attributeList = [];
+  String name ="";
+  String region = '';
+  String country ='';
+  String role = '';
+  void getUserAttributes() async {
+    try {
+      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
+      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
+      List<String> attributesList = [];
+      for (AuthUserAttribute attribute in attributes) {
+        print(attribute.value);
+
+        if(attribute.userAttributeKey.key.contains("custom")){
+          var valueKey = attribute.userAttributeKey.key.split(":");
+          attributesList.add('${valueKey[1]}:${attribute.value}');
+          print(valueKey[1]);
+        }else{
+          attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
+        }
+
+      }
+      setState(() {
+        attributeList = attributesList;
+        role = attributeList[5].split(":")[1];
+        name = attributeList[3].split(":")[1];
+        region = attributeList[7].split(":")[1];
+        country = attributeList[4].split(":")[1];
+      });
+      name = attributeList[3].split(":")[1];
+      if (kDebugMode) {
+        print(attributeList.toList());
+        print(attributeList[3].split(":")[1]);
+      }
+      // Process the user attributes
+
+    } catch (e) {
+      print('Error retrieving user attributes: $e');
+    }
+  }
   @override
+
   void initState() {
+
     print("test ${widget.customers}");
     List<String> keys = widget.customers![0].keys.toList();
     if(keys.contains('Agent')){
@@ -1290,6 +1371,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
     super.initState();
     print(keys);
     print(rate);
+    getUserAttributes();
   }
   String key= '';
   String rate = '';
@@ -1303,7 +1385,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
       "task_start_date": "2023-07-12",
       "timestamp": 1683282979,
       "task_end_date": "2023-07-20",
-      "submited_by":"Test User",
+      "submited_by":name,
       'is_approved': 'Pending',
       'task_status':'Pending'
     };

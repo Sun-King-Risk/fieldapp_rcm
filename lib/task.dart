@@ -2,25 +2,30 @@
 
 import 'dart:convert';
 
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:fieldapp_rcm/new_design.dart';
 import 'package:fieldapp_rcm/report.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/task_table.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'location.dart';
+import 'multform.dart';
 import 'pending_task.dart';
 import 'team_task.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 class TaskData {
-  Future<int> countTask(String taskTitle) async {
+
+  Future<int> countTask(String taskTitle,String name) async {
     final url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
       final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['task_title'] == taskTitle)
+          .where((task) => task['task_title'] == taskTitle && task['submited_by']== name)
           .toList();
       return filteredTasks.length;
 
@@ -30,14 +35,15 @@ class TaskData {
     }
   }
 
-  Future<int> countByStatus(String taskTitle, String status) async {
+  Future<int> countByStatus(String taskTitle, String status,String name) async {
     final url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['task_title'] == taskTitle).where((task) => task['task_status'] == status)
+          .where((task) => task['task_title'] == taskTitle &&
+          task['submited_by']==name && task['task_status'] == status)
           .toList();
 
       // Process jsonData to count tasks with the given status
@@ -48,9 +54,60 @@ class TaskData {
   }
 }
 
-class Task extends StatelessWidget {
+class Task extends StatefulWidget {
+  @override
+  State<Task> createState() => _TaskState();
+}
+
+class _TaskState extends State<Task> {
+  List<String> attributeList = [];
+  String name ="";
+  String role ='';
+  String singleRegion = '';
+  String country ='';
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserAttributes();
+  }
+  void getUserAttributes() async {
+    try {
+      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
+      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
+      List<String> attributesList = [];
+      for (AuthUserAttribute attribute in attributes) {
+        print(attribute.value);
+
+        if(attribute.userAttributeKey.key.contains("custom")){
+          var valueKey = attribute.userAttributeKey.key.split(":");
+          attributesList.add('${valueKey[1]}:${attribute.value}');
+          print(valueKey[1]);
+        }else{
+          attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
+        }
+
+      }
+      setState(() {
+        attributeList = attributesList;
+        singleRegion = attributeList[7].split(":")[1];
+        country = attributeList[4].split(":")[1];
+        role = attributeList[5].split(":")[1];
+      });
+      name = attributeList[3].split(":")[1];
+      if (kDebugMode) {
+        print(attributeList.toList());
+        print(attributeList[3].split(":")[1]);
+      }
+      // Process the user attributes
+
+    } catch (e) {
+      print('Error retrieving user attributes: $e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
+
 
     return Scaffold(
       body: DefaultTabController(
@@ -60,7 +117,6 @@ class Task extends StatelessWidget {
             Container(
               constraints: BoxConstraints.expand(height: 40),
               child: TabBar(tabs: [
-
                 Tab(text: "My Task",),
                 Tab(text: "Team Task"),
                 Tab(text: "Pending/Request"),
@@ -76,6 +132,7 @@ class Task extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+
                         ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               minimumSize: Size.fromHeight(40), // fromHeight use double.infinity as width and 40 is the height
@@ -96,7 +153,7 @@ class Task extends StatelessWidget {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => TaskRadio(),
+                                      builder: (context) => MyTaskNew(),
                                     ));
                             },
                             child: Text("Add New Task")),
@@ -111,29 +168,34 @@ class Task extends StatelessWidget {
 
                         TaskList(
                           task_title: 'Portfolio Quality',
+                          name: name,
 
 
                         ),
                         TaskList(
                           task_title: 'Pilot/Process Management',
+                          name: name,
 
 
 
                         ),
                         TaskList(
                           task_title: 'Collection Drive',
+                          name: name,
 
 
 
                         ),
                         TaskList(
                           task_title: 'Customer Management',
+                          name: name,
 
 
 
                         ),
                         TaskList(
                           task_title: 'Team Management',
+                          name: name,
 
 
 
@@ -167,8 +229,10 @@ class Task extends StatelessWidget {
 class TaskList extends StatefulWidget {
 
   final String task_title;
+  final String name;
   const TaskList({Key? key,
     required this.task_title,
+    required this.name
 
   })
       : super(key: key);
@@ -228,7 +292,7 @@ class _TaskListState extends State<TaskList> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 FutureBuilder<int>(
-                  future: taskData.countTask(widget.task_title),
+                  future: taskData.countTask(widget.task_title,widget.name),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
@@ -245,7 +309,7 @@ class _TaskListState extends State<TaskList> {
                   },
                 ),
                 FutureBuilder<int>(
-                  future: taskData.countByStatus(widget.task_title, 'Completed'),
+                  future: taskData.countByStatus(widget.task_title, 'Completed',widget.name),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
@@ -262,7 +326,7 @@ class _TaskListState extends State<TaskList> {
                   },
                 ),
                 FutureBuilder<int>(
-                  future: taskData.countByStatus(widget.task_title, 'Pending'),
+                  future: taskData.countByStatus(widget.task_title, 'Pending',widget.name),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();

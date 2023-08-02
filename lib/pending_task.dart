@@ -5,6 +5,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -16,43 +17,7 @@ class PendingTask extends StatefulWidget {
   PendingTaskState createState() => PendingTaskState();
 }
 class PendingTaskState extends State<PendingTask> {
-  Future<void> sendFCMNotification(String deviceToken, String title, String body) async {
-    final String serverKey = 'AAAAya62xSc:APA91bGUjqUqPuBqFbrUPgknT3BEnYmQs1b2iRuzdJcS5etSbMgDvDjQocvCmMSnlcRwdrKxHTwfsPSlU0tbtTqiH5ZIkAoiZZmkeNIRTkMCvDJRTsEd_-adCFji2utZHAPgGKhO3byd'; // Replace with your server key
-    final String url = 'https://fcm.googleapis.com/fcm/send';
-    final Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'key=$serverKey',
-    };
-    final Map<String, dynamic> data = {
-      'notification': {
-        title: 'Your request has been approved',
-        body: 'You can now proceed with your task',
-      },
-      'priority':'high',
-      'to':deviceToken
-    };
-    final String encodedData = json.encode(data);
-
-    final http.Response response = await http.post(
-      Uri.parse(url),
-      headers: headers,
-      body: encodedData,
-    );
-
-    if (response.statusCode == 200) {
-      print('Notification sent successfully.');
-    } else {
-      print('Error sending notification.');
-      print('HTTP status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    }
-  }
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-
-
-
-  bool isDescending = false;
+   bool isDescending = false;
 _taskStatus(docid)async{
   bool _approved = false;
   showDialog(
@@ -122,14 +87,16 @@ _taskStatus(docid)async{
 
 
   // This list holds the data for the list view
-  List<Map<String, dynamic>> _foundUsers = [];
+  List<Map<String, dynamic>> _filtertask = [];
 List? data = [];
   List? singledata = [];
   @override
   initState() {
     // at the beginning, all users are shown
     super.initState();
+    getUserAttributes();
     fetchData();
+
 
   }
 
@@ -137,14 +104,56 @@ List? data = [];
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
 
   }
+  List<String> attributeList = [];
+  String name ="";
+  String region = '';
+   String userRegion = '';
+  String country ='';
+   String zone ='';
+  String role = '';
+   void getUserAttributes() async {
+     try {
+       AuthUser currentUser = await Amplify.Auth.getCurrentUser();
+       List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
+       List<String> attributesList = [];
+       for (AuthUserAttribute attribute in attributes) {
+         print(attribute.value);
 
+         if(attribute.userAttributeKey.key.contains("custom")){
+           var valueKey = attribute.userAttributeKey.key.split(":");
+           attributesList.add('${valueKey[1]}:${attribute.value}');
+           print(valueKey[1]);
+         }else{
+           attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
+         }
+
+       }
+       setState(() {
+         attributeList = attributesList;
+       });
+       name = attributeList[3].split(":")[1];
+       userRegion = attributeList[7].split(":")[1];
+       country = attributeList[4].split(":")[1];
+       role = attributeList[5].split(":")[1];
+       zone = attributeList[1].split(":")[1];
+       if (kDebugMode) {
+         print(attributeList.toList());
+         print(attributeList[3].split(":")[1]);
+         print( zone);
+       }
+       // Process the user attributes
+
+     } catch (e) {
+       print('Error retrieving user attributes: $e');
+     }
+   }
   void fetchData() async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
-        data = jsonDecode(response.body).where((approval){
-          return approval['is_approved'] == 'Pending';
+        data = jsonDecode(response.body).where((task){
+           task['is_approved'] == 'Pending' && task['submited_by']== name;
         }).toList();
       });
     }else{
@@ -158,11 +167,9 @@ List? data = [];
   // This function is called whenever the text field changes
   void _searchFilter(String enteredKeyword) {
     List<Map<String, dynamic>> results = [];
-
-
     // Refresh the UI
     setState(() {
-      _foundUsers = results;
+      _filtertask = results;
     });
   }
   void _statusFilter(String _status) {
@@ -245,8 +252,9 @@ List? data = [];
             const SizedBox(
               height: 20,
             ),
+    //Text(data.toString()),
     Expanded(
-      child: ListView.separated(
+      child: data!.length==0?Center(child: Text("No new request task"),):ListView.separated(
         itemCount: data!.length, // Replace with your actual item count
         separatorBuilder: (BuildContext context, int index) {
           return Divider(
@@ -341,6 +349,7 @@ class SinglePendingState extends State<SinglePending> {
   List? taskgoal = [];
   var priority;
   var goal;
+  var task_id;
   var description;
   List<String> _priorities = ['High', 'Medium', 'Low'];
   Future fetchGoal(id) async {
@@ -356,6 +365,7 @@ class SinglePendingState extends State<SinglePending> {
           .toList();
       setState(() {
         print(response.body);
+        task_id = filteredTasks[0]['id'];
         taskgoal = filteredTasks;
       });
       safePrint(data);
@@ -363,6 +373,25 @@ class SinglePendingState extends State<SinglePending> {
       print('Request failed with status: ${response.statusCode}');
     }
   }
+  Future<void> TaskUpdate(id)async {
+    var task = Uri.parse('https://www.sun-kingfieldapp.com/api/$id/taskgoals');
+    var goalUrl = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    Map data = {
+      "goals": goal==null?taskgoal![0]['goals']:goal,
+      "account_number":taskgoal![0]['account_number'],
+      "task_description": description==null?taskgoal![0]['task_description']:description,
+      "priority": priority==null?taskgoal![0]['priority']:priority,
+      "task":taskgoal![0]['task']
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/$task_id/update/');
+    http.Response response = await http.put(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    Navigator.pop(context);
+    var result_task = jsonDecode(response.body);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -381,6 +410,7 @@ class SinglePendingState extends State<SinglePending> {
             Form(
               child: Column(
                 children: [
+                  Text(taskgoal.toString()),
                   TextField(
                       decoration: InputDecoration(
                         hintText: 'Description',
@@ -418,18 +448,9 @@ class SinglePendingState extends State<SinglePending> {
 
                         print(value);
                       }),
-                  Center(child: ElevatedButton(onPressed: () async {
-          Map data = {
-            "goals": goal,
-            "task_description": description,
-            "priority": priority,
-          };
-          var body = json.encode(data);
-          var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/$id/update/');
-          http.Response response = await http.post(url, body: body, headers: {
-            "Content-Type": "application/json",
-          });
-          var result_task = jsonDecode(response.body);
+                  Center(child: ElevatedButton(onPressed: () {
+                    TaskUpdate(widget.id);
+
 
 
                   }, child: Text('Update')))

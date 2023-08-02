@@ -6,7 +6,6 @@ import 'package:fieldapp_rcm/area/customer_vist.dart';
 import 'package:fieldapp_rcm/services/calls_detail.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fieldapp_rcm/services/user_detail.dart';
-import 'package:call_log/call_log.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -103,17 +102,6 @@ class PendingCallsState extends State<PendingCalls> {
 
   void callLogs(String docid, String feedback, String angaza) async {
     String _docid = docid;
-
-    Iterable<CallLogEntry> entries = await CallLog.get();
-    fnumberupdate = entries.elementAt(0).formattedNumber;
-    cmnumberupdate = entries.elementAt(0).cachedMatchedNumber;
-    number1update = entries.elementAt(0).number;
-    name1update = entries.elementAt(0).name;
-    calltypeupdate = entries.elementAt(0).callType;
-    timedateupdate = entries.elementAt(0).timestamp;
-    duration1update = entries.elementAt(0).duration;
-    accidupdate = entries.elementAt(0).phoneAccountId;
-    simnameupdate = entries.elementAt(0).simDisplayName;
 
     if (duration1update >= 30) {
       CollectionReference newCalling = firestore.collection("new_calling");

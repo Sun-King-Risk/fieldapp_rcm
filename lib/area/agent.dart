@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:fieldapp_rcm/area/customer_vist.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fieldapp_rcm/services/user_detail.dart';
-import 'package:call_log/call_log.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -69,15 +68,6 @@ class AgentTaskState extends State<AgentTask> {
 
   String _searchQuery = '';
   List<DocumentSnapshot> _data = [];
-  Future<void> _getDocuments() async {
-    QuerySnapshot querySnapshot = await firestore
-        .collection("new_calling")
-        .where("Area", isEqualTo: await UserDetail().getUserArea())
-        .where('Status', isNotEqualTo: 'Complete').get();
-    setState(() {
-      _data = querySnapshot.docs;
-    });
-  }
 
   Future<void> _getFilterdata(String Task) async {
     QuerySnapshot querySnapshot = await firestore
@@ -100,17 +90,6 @@ class AgentTaskState extends State<AgentTask> {
 
   void callLogs(String docid, String feedback, String angaza) async {
     String _docid = docid;
-
-    Iterable<CallLogEntry> entries = await CallLog.get();
-    fnumberupdate = entries.elementAt(0).formattedNumber;
-    cmnumberupdate = entries.elementAt(0).cachedMatchedNumber;
-    number1update = entries.elementAt(0).number;
-    name1update = entries.elementAt(0).name;
-    calltypeupdate = entries.elementAt(0).callType;
-    timedateupdate = entries.elementAt(0).timestamp;
-    duration1update = entries.elementAt(0).duration;
-    accidupdate = entries.elementAt(0).phoneAccountId;
-    simnameupdate = entries.elementAt(0).simDisplayName;
 
     if (duration1update >= 30) {
       CollectionReference newCalling = firestore.collection("new_calling");
@@ -321,7 +300,6 @@ class AgentTaskState extends State<AgentTask> {
   initState() {
     // at the beginning, all users are shown
     userArea();
-    _getDocuments();
     super.initState();
   }
 
@@ -347,7 +325,6 @@ class AgentTaskState extends State<AgentTask> {
               onSelected: (value) {
                 switch (value) {
                   case 'All':
-                    _getDocuments();
                     print(value);
                     break;
                   case 'Call':
