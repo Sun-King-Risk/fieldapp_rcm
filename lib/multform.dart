@@ -635,24 +635,26 @@ Future<void> TableData() async{
                 children: [
                   isLoadingArea?Center(
                     child: CircularProgressIndicator(),
-                  ):areadata!.length==0?Center(child:Text("No Task under ${SelectedSubtask}")):ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: areadata?.length,
-                      itemBuilder: (context, index) {
-                        return RadioListTile(
-                            title: Text(areadata?[index]),
-                            value:areadata?[index],
-                            groupValue: selectedArea,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedArea = value.toString();
-                                print(selectedArea);
+                  ):areadata!.length==0?Center(child:Text("No Task under ${SelectedSubtask}")):SingleChildScrollView(
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: areadata?.length,
+                        itemBuilder: (context, index) {
+                          return RadioListTile(
+                              title: Text(areadata?[index]),
+                              value:areadata?[index],
+                              groupValue: selectedArea,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedArea = value.toString();
+                                  print(selectedArea);
 
-                              });
-                            }
-                        );
-                      }
+                                });
+                              }
+                          );
+                        }
 
+                    ),
                   ),
 
                   Row(
