@@ -93,11 +93,11 @@ class SingleTaskState extends State<SingleTask> {
                   child: Column(
                     children: [
                       if(widget.title == "Portfolio Quality")
-                        PilotUpdate(subtask: null, task: null, id: null, title: null,),
+                        PilotUpdate(subtask: null,taskGoalId: null,  id: null, title: null,),
                       if(widget.title== "Pilot Management")
-                        PilotUpdate(subtask: null, task: null, id: null, title: null,),
+                        PilotUpdate(subtask: null, taskGoalId: null, id: null, title: null,),
                       if(widget.title == "Collection Drive")
-                        PilotUpdate(subtask: null, task: null, id: null, title: null,),
+                        PilotUpdate(subtask: null,taskGoalId: null,  id: null, title: null,),
                       SizedBox(height: 10,),
 
                     ],

@@ -179,12 +179,6 @@ class _MyTaskNewState extends State<MyTaskNew> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
     Navigator.pop(context);
-
-
-
-
-
-
   }
   List<Map<String, dynamic>> selectedItems = [];
   String key= 'Agent';
@@ -1111,7 +1105,7 @@ Future<void> TableData() async{
                         });
                       }, child: Text("Back")),
                       ElevatedButton(onPressed: (){
-                        print("object");
+                        print(target);
                         target?_save():_saveNo();
                       }, child: Text("Submit"))
                     ],

@@ -229,7 +229,10 @@ class ReportState extends State<Report> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SinglePending(id:task["taskgoal_id"]),
+                          builder: (context) => SingleReport(
+                              id:task["id"],
+                            sub_task: task["report_title"],
+                          ),
                         ));
 
                   },
@@ -252,6 +255,10 @@ class ReportState extends State<Report> {
                                     crossAxisAlignment:CrossAxisAlignment.start,
                                     children: [
                                       Text("Report : ${task!['report_title']}"),
+                                      Text("Sub task : ${task!['sub_task']}"),
+                                      Text("submited_by : ${task!['submited_by']}"),
+                                      Text("submited_by : ${task!['id']}")
+
                                     ],
                                   )
                               ),
@@ -274,8 +281,9 @@ class ReportState extends State<Report> {
 class SingleReport extends StatefulWidget{
 
   final id;
+  final sub_task;
   @override
-  const SingleReport({Key? key,required this.id}) : super(key: key);
+  const SingleReport({Key? key,required this.id,required this.sub_task}) : super(key: key);
 
   @override
   SingleReportState createState() => SingleReportState();
@@ -285,7 +293,7 @@ class SingleReportState extends State<SingleReport> {
   Map<String, dynamic>  data = {};
   String code = '';
   Future fetchData() async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks/${widget.id}');
+    var url = Uri.parse('https://9949-102-88-37-146.ngrok-free.app/api/report/${widget.id}');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
@@ -494,7 +502,7 @@ class SingleReportState extends State<SingleReport> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Title: ${data['task_title']}",
+                              "Reprot Title: ${data['report_title']}",
                               style: TextStyle(
                                 fontSize: 15,
                               ),
@@ -508,14 +516,28 @@ class SingleReportState extends State<SingleReport> {
 
                             ),
                             Text(
-                              "Region:${data['task_region']} Area: ${data['task_area']}",
+                              "Region:${data['report_region']} Area: ${data['report_area']}",
                               style: TextStyle(
                                 fontSize: 15,
                               ),
 
                             ),
                             Text(
-                              "Start:${data['task_start_date']}  End:${data['task_end_date']} ",
+                              "Report Detail :${data['report_details']}",
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
+
+                            ),
+                            Text(
+                              "Report Status :${data['report_status']}",
+                              style: TextStyle(
+                                fontSize: 15,
+                              ),
+
+                            ),
+                            Text(
+                              "Report Priority :${data['report_priority']}",
                               style: TextStyle(
                                 fontSize: 15,
                               ),
@@ -529,77 +551,1290 @@ class SingleReportState extends State<SingleReport> {
                   ),
                 ],
               ),
+              if(widget.sub_task=='Visiting unreachable welcome call clients' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Costomer Found: ${data['report_customer_found_yes_no']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "is fraud case: ${data['report_customer_found_fraud_case']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+                              ),
+                                Text(
+                                  "Amount collected: ${data['report_amount_collected']}",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                  ),
+
+                              ),
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Work with the Agents with low welcome calls to improve' || widget.sub_task=='Increase the Kazi Visit Percentage'
+              || widget.sub_task=='Field Visits with low-performing Agents in Collection Score'||
+                  widget.sub_task=='Work with restricted Agents')
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "is agent: ${data['report_agent_found_yes_no']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "issue found: ${data['report_agent_found_yes_issues']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Angaza ID:${data[' report_agent_angaza_Id']} Challenge: ${data['report_agent_found_no_chs']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Change a red zone CSAT area to orange' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Issue: ${data['report_issue_to_be_reolved_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Resolution: ${data['report_resolution_to_be_reolved_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Attend to Fraud Cases' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Customer Visited: ${data['report_customer_count_visited']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Coustomer found: ${data['report_customer_found_yes_no']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "Fraud Case: ${data['report_customer_found_fraud_case']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "Account Number: ${data['report_customer_account_number']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Visit at-risk accounts' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Customer Visited: ${data['report_customer_count_visited']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Coustomer found: ${data['report_customer_found_yes_no']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "Fraud Case: ${data['report_customer_found_fraud_case']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "Account Number: ${data['report_customer_account_number']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Visits FPD SPDs' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Customer Visited: ${data['report_customer_count_visited']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Coustomer found: ${data['report_customer_found_yes_no']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "Fraud Case: ${data['report_customer_found_fraud_case']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "Account Number: ${data['report_customer_account_number']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Visiting of issues raised' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Customer Visited: ${data['report_customer_count_visited']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Coustomer found: ${data['report_customer_found_yes_no']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "Fraud Case: ${data['report_customer_found_fraud_case']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "Account Number: ${data['report_customer_account_number']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Repossession of customers needing repossession' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Look at the number of replacements pending at the shops' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Look at the number of repossession pending at the shops' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Conduct the process audit'||widget.sub_task=='Conduct a pilot audit' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Report Audity: ${data['report_audit_report']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "takeaways: ${data['report_key_takeaways']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "recommendation: ${data['report_recommendation']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "Account Number: ${data['report_customer_account_number']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Testing the GPS accuracy of units submitted' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Coordinate found: ${data['report_coordinate_lamp_found_yes_no']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Reason for moving: ${data['report_coordinate_lamp_found_yes_no_reasons_for_moving']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "takeaways: ${data['report_key_takeaways']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "recommendation: ${data['report_recommendation']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+                              Text(
+                                "Account Number: ${data['report_customer_account_number']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+
+                              ),
+
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Reselling of repossessed units' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Previous Angaza ID: ${data['report_previous_customer_angaza_ID']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "New Custoemr name: ${data['report_new_customer_customer_name']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Unit is Complete: ${data['report_repo_unit_is_complete']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "2 weeks payment: ${data[' report_repo_customer_2_weeks_pay']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Aware condition: ${data['report_repo_customer_aware_cond']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Agent: ${data[' report_repo_reselling_agent']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Repossessing qualified units for Repo and Resale' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Customer Found: ${data['report_customer_found_yes_no']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Is Fraud Case: ${data['report_customer_found_fraud_case']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task =='Repossession of accounts above 180' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Visits Tampering Home 400' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Agent Found: ${data['report_agent_found_yes_no']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Fraud case: ${data['report_customer_found_fraud_case']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Work with restricted Agents' )
+              if(widget.sub_task=='Calling of special book' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Sending SMS to clients' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Table Meeting/ Collection Sensitization Training' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Assist a team member to improve the completion rate' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Raise a reminder to a team member' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Raise a new task to a team member' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if(widget.sub_task=='Inform the team member of your next visit to his area, and planning needed' )
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Colors.green.shade50,
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Reprot Title: ${data['report_title']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Task: ${data['sub_task']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Region:${data['report_region']} Area: ${data['report_area']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              ),
+                              Text(
+                                "Report Detail :${data['report_details']}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                ),
+
+                              )
+
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: taskgoal!.length,
-                itemBuilder: (context, index) {
-                  var task = taskgoal![index];
-                  return GestureDetector(
-                      onTap: () {
-                        _goalUpdate(task['id'],task['previous_goal']);
-                        // Handle tap gesture
-                      },
-                      child:Row(
-                        children: [
-                          // Icon(Icons.,color: AppColor.mycolor,),
-                          // SizedBox(width: 10),
-                          Expanded(
-                            child: Card(
-                              color: Colors.yellow.shade50,
-                              elevation: 5,
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Name: ${task['account_number']}",
-                                      style: TextStyle(
-                                        fontSize: 15,
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: taskgoal!.length,
+                  itemBuilder: (context, index) {
+                    var task = taskgoal![index];
+                    return GestureDetector(
+                        onTap: () {
+                          _goalUpdate(task['id'],task['previous_goal']);
+                          // Handle tap gesture
+                        },
+                        child:Row(
+                          children: [
+
+                            Expanded(
+                              child: Card(
+                                color: Colors.yellow.shade50,
+                                elevation: 5,
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(10.0, 10, 0, 10),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Name: ${task['account_number']}",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                        ),
+
                                       ),
+                                      Text(
+                                        "Description: ${task['task_description']}",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                        ),
 
-                                    ),
-                                    Text(
-                                      "Description: ${task['task_description']}",
-                                      style: TextStyle(
-                                        fontSize: 15,
                                       ),
+                                      Text(
+                                        "Priority: ${task['priority']}",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                        ),
 
-                                    ),
-                                    Text(
-                                      "Priority: ${task['priority']}",
-                                      style: TextStyle(
-                                        fontSize: 15,
                                       ),
+                                      Text(
+                                        "current: ${task['previous_goal']}",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                        ),
 
-                                    ),
-                                    Text(
-                                      "current: ${task['previous_goal']}",
-                                      style: TextStyle(
-                                        fontSize: 15,
                                       ),
+                                      Text(
+                                        "Goal: ${task['goals']}",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                        ),
 
-                                    ),
-                                    Text(
-                                      "Goal: ${task['goals']}",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                      ),
+                                      )
 
-                                    )
-
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
+                          ],
+                        )
 
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
               ElevatedButton(
                   onPressed: (){
                     _taskStatus(widget.id);

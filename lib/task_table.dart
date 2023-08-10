@@ -76,7 +76,7 @@ class MyTaskViewState extends State<MyTaskView> {
       builder: (BuildContext context) {
         return SingleChildScrollView(
           child: AlertDialog(
-            title: Text('Task Details '),
+            title: Text('Task Details'),
             content: Column(
               children: [
                 TextField(
@@ -99,8 +99,8 @@ class MyTaskViewState extends State<MyTaskView> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => PortfolioUpdate(
-                                    task: id,
-                                    id: taskdetail["id"],
+                                    taskGoalId: taskdetail["id"],
+                                    id: id,
                                     title: widget.title,
                                     subtask: subtask,
 
@@ -111,7 +111,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => CollectionUpdate(
-                                    task: id,
+                                    taskGoalId: taskdetail["id"],
                                     id: id,
                                     title: widget.title,
                                     subtask: subtask,
@@ -123,7 +123,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => PilotUpdate(
-                                    task: id,
+                                    taskGoalId: taskdetail["id"],
                                     id: id,
                                     title: widget.title,
                                     subtask: subtask,
@@ -135,7 +135,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => CustomerUpdate(
-                                    task: id,
+                                    taskGoalId: taskdetail["id"],
                                     id: id,
                                     title: widget.title,
                                     subtask: subtask,
@@ -147,7 +147,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => TeamUpdate(
-                                    task: id,
+                                    taskGoalId: taskdetail["id"],
                                     id: id,
                                     title: widget.title,
                                     subtask: subtask,
@@ -170,14 +170,14 @@ class MyTaskViewState extends State<MyTaskView> {
                                     children: [
                                       decoration?
                                       Text(
-                                        "Name: ${taskdetail["account_number"]}",
+                                        "Dennis: ${taskdetail["account_number"]} ${taskdetail["id"]}  $id",
                                         style: TextStyle(
                                           fontSize: 18,
                                           decoration: TextDecoration.lineThrough,
                                         ),
 
                                       ):Text(
-                                        "Name: ${taskdetail["account_number"]}",
+                                        "Name: ${taskdetail["account_number"]} ${taskdetail["id"]}  $id",
                                         style: TextStyle(
                                             fontSize: 18),
 
@@ -193,7 +193,6 @@ class MyTaskViewState extends State<MyTaskView> {
                                       SizedBox(height: 5),
 
                                       LinearPercentIndicator(
-
                                         animation: true,
                                         animationDuration: 1000,
                                         lineHeight: 15.0,
@@ -446,7 +445,6 @@ class MyTaskViewState extends State<MyTaskView> {
                         onTap: () {
                           _getAction(task["id"],task['sub_task']);
                           //_TaskList(task['id'],task['sub_task']);
-                          print(task["id"]);
 
                         },
                         child: Row(
@@ -461,7 +459,7 @@ class MyTaskViewState extends State<MyTaskView> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Task: ${task['sub_task']} ${task["id"]}",
+                                        "Task: ${task['sub_task']}",
                                         style: TextStyle(fontSize: 18),
                                       ),
                                       SizedBox(height: 5),

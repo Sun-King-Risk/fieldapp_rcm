@@ -95,15 +95,12 @@ List? data = [];
     // at the beginning, all users are shown
     super.initState();
     getUserAttributes();
-    fetchData();
+    print("nee $name");
 
 
   }
 
-  void singleTask(){
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
 
-  }
   List<String> attributeList = [];
   String name ="";
   String region = '';
@@ -136,10 +133,8 @@ List? data = [];
        country = attributeList[4].split(":")[1];
        role = attributeList[5].split(":")[1];
        zone = attributeList[1].split(":")[1];
+       fetchData();
        if (kDebugMode) {
-         print(attributeList.toList());
-         print(attributeList[3].split(":")[1]);
-         print( zone);
        }
        // Process the user attributes
 
@@ -150,10 +145,12 @@ List? data = [];
   void fetchData() async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
     var response = await http.get(url);
+    print("Sdsf $name");
     if (response.statusCode == 200) {
       setState(() {
+        print(response.body);
         data = jsonDecode(response.body).where((task){
-           task['is_approved'] == 'Pending' && task['submited_by']== name;
+           task['is_approved'] == 'Pending';
         }).toList();
       });
     }else{
