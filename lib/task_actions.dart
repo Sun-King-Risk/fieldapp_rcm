@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:fieldapp_rcm/routing/bottom_nav.dart';
+import 'package:fieldapp_rcm/task.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -144,7 +146,12 @@ class _Visiting extends State<Visiting> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(response.body);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
 
   }
@@ -219,6 +226,12 @@ class _Visiting extends State<Visiting> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
 
@@ -451,6 +464,17 @@ class _Work extends State<Work> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
     print(response.body);
 
 
@@ -525,6 +549,18 @@ class _Work extends State<Work> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
+    print(response.body);
 
   }
   @override
@@ -960,7 +996,17 @@ class _FieldVisit extends State<FieldVisit> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(response.body);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
   _NoUpdate(String doc,String id) async {
@@ -1033,7 +1079,18 @@ class _FieldVisit extends State<FieldVisit> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(response.body);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
+
 
   }
 
@@ -1257,7 +1314,12 @@ class _Accuracy extends State<Accuracy>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(response.body);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
 
 
   }
@@ -1283,6 +1345,11 @@ class _Accuracy extends State<Accuracy>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
   }
 
@@ -1506,6 +1573,12 @@ class _Repo extends State<Repo>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
   _NoUpdate(String doc,String id) async {
@@ -1578,6 +1651,17 @@ class _Repo extends State<Repo>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
   @override
@@ -1688,7 +1772,6 @@ class _Repo extends State<Repo>{
                     onPressed:(){
                       _YesUpdate(widget.submited_by,widget.report_area);
                       if (kDebugMode) {
-                        print("DOing $widget.id");
                         print(widget.sub);
                       }
 
@@ -1743,6 +1826,7 @@ class _TVcostomers extends State<TVcostomers>{
       "Content-Type": "application/json",
 
     });
+
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
       final List<dynamic> filteredTasks = jsonData
@@ -1833,6 +1917,17 @@ class _TVcostomers extends State<TVcostomers>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
     print(response.body);
 
 
@@ -1908,6 +2003,17 @@ class _TVcostomers extends State<TVcostomers>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
   var taskaction = ["No", "Yes"];
@@ -2173,9 +2279,7 @@ class WorkUpdate extends StatefulWidget {
   State<WorkUpdate> createState() => _WorkUpdate();
 }
 class _WorkUpdate extends State<WorkUpdate> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  String _data = '';
-  List<DocumentSnapshot> _result = [];
+
   _YesUpdate(String doc,String id) async {
     Map data = {
       "report_title":widget.report_title,
@@ -2246,7 +2350,18 @@ class _WorkUpdate extends State<WorkUpdate> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(feedbackController.text);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
+
 
   }
   _NoUpdate(String doc,String id) async {
@@ -2319,7 +2434,17 @@ class _WorkUpdate extends State<WorkUpdate> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(feedbackController.text);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
 
@@ -2398,7 +2523,7 @@ class _WorkUpdate extends State<WorkUpdate> {
                       disable: false,
                       label: 'Select user',
                       hint: 'Select a user',
-                      items: [_data],
+                      items: ["_data"],
                       onChanged: (value){
 
                       }),
@@ -2583,8 +2708,17 @@ class _Agent extends State<Agent> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print('nne');
-    print(response.body);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
 
   }
@@ -2659,8 +2793,17 @@ class _Agent extends State<Agent> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(feedbackController.text);
-
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
   }
   @override
   void initState() {

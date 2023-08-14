@@ -1,20 +1,23 @@
+
 import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fieldapp_rcm/update/collection_update.dart';
 import 'package:fieldapp_rcm/update/customer_update.dart';
 import 'package:fieldapp_rcm/update/pilot_update.dart';
 import 'package:fieldapp_rcm/update/portfolio_update.dart';
-import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/update/team_update.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:percent_indicator/percent_indicator.dart';
-import 'dart:core';
 import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
+
+import 'models/task_detail.dart';
 
 class MyTaskView extends StatefulWidget {
-  MyTaskView({Key? key, required this.endPoint,required this.title}) : super(key: key);
+  MyTaskView({Key? key, required this.endPoint,required this.title,required this.name}) : super(key: key);
   final title;
   final endPoint;
+  final name;
   @override
   MyTaskViewState createState() => MyTaskViewState();
 }
@@ -22,6 +25,8 @@ class MyTaskViewState extends State<MyTaskView> {
   List<DocumentSnapshot> _data = [];
   List<DocumentSnapshot> _action = [];
   bool decoration = false;
+  var complete = 0;
+  var total = 0;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   List? data = [];
@@ -30,7 +35,9 @@ class MyTaskViewState extends State<MyTaskView> {
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
-        data = jsonDecode(response.body);
+        var jsonData = jsonDecode(response.body);
+        data = jsonData.where((task)=>
+        task['is_approved'] == 'Pending' && task['submited_by'] == widget.name).toList();
       });
     }else{
       print('Request failed with status: ${response.statusCode}');
@@ -259,11 +266,10 @@ class MyTaskViewState extends State<MyTaskView> {
     final response = await http.get(Uri.parse(apiUrl,),headers:{
       "Content-Type": "application/json",});
     final List<dynamic> jsonData = json.decode(response.body);
-    final List<dynamic> filteredTasks = jsonData
-        .where((task) => task['task_title'] == title)
-        .where((task) => task['is_approved'] == 'Approved')
-        .where((task) => task['task_status'] == 'Pending')
-        .toList();
+    final List<dynamic> filteredTasks = jsonData.where((task)=>
+    task['is_approved'] == 'Approved' &&
+        task['submited_by'] == widget.name &&
+        task['task_title'] == title && task['task_status'] == 'Pending').toList();
 
     setState(() {
       data = filteredTasks;
@@ -274,13 +280,15 @@ class MyTaskViewState extends State<MyTaskView> {
   }
   @override
   void initState(){
+    //complete = TaskData().countByStatus(widget.title, "Complete", widget.name) as int;
+    //total = TaskData().countTask(widget.title, widget.name) as int;
     getData(widget.title);
     _statusFilter("All");
     _searchFilter(widget.title);
   }
 
 
-
+  final TaskData taskData = TaskData();
   @override
   Widget build(BuildContext context) {
     var _key=GlobalKey();
@@ -332,19 +340,19 @@ class MyTaskViewState extends State<MyTaskView> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     StreamBuilder(
-                      stream: TaskData().CountByStatus(widget.title,'Complete').asStream(),
+                      stream: taskData.countByStatus(widget.title,'Complete',widget.name).asStream(),
                       builder: (context, snapshot){
                         return  Text(snapshot.data.toString()+" Complete",style: TextStyle(color: Colors.orange));
                       },
                     ),
                     StreamBuilder(
-                      stream: TaskData().CountByStatus(widget.title,'Pending').asStream(),
+                      stream: taskData.countByStatus(widget.title,'Pending',widget.name).asStream(),
                       builder: (context, snapshot){
                         return  Text(snapshot.data.toString()+" Pending",style: TextStyle(color: Colors.red));
                       },
                     ),
                     StreamBuilder(
-                      stream: TaskData().CountTask(widget.title).asStream(),
+                      stream: taskData.countTask(widget.title,widget.name).asStream(),
                       builder: (context, snapshot){
                         return  Text(snapshot.data.toString()+" Total",style: TextStyle(color: Colors.green));
                       },
@@ -364,21 +372,21 @@ class MyTaskViewState extends State<MyTaskView> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     FutureBuilder(
-                      future: TaskData().CountPriority(widget.title,'high'),
+                      future: taskData.countByPriority(widget.title,'high',widget.name),
                       builder: (context, snapshot){
                         return  Text(snapshot.data.toString()+" High",style: TextStyle(color: Colors.green));
                       },
                     ),
                     FutureBuilder(
-                      future: TaskData().CountPriority(widget.title,'normal'),
+                      future: taskData.countByPriority(widget.title,'normal',widget.name),
                       builder: (context, snapshot){
                         return  Text(snapshot.data.toString()+" Normal",style: TextStyle(color: Colors.orange));
                       },
                     ),
                     FutureBuilder(
-                      future: TaskData().CountPriority(widget.title,'low'),
+                      future: taskData.countByPriority(widget.title,'low',widget.name),
                       builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Low",style: TextStyle(color: Colors.red));
+                        return  Text(snapshot.data.toString()+" Low",style: TextStyle(color: Colors.orange));
                       },
                     ),
 

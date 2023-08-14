@@ -149,9 +149,9 @@ List? data = [];
     if (response.statusCode == 200) {
       setState(() {
         print(response.body);
-        data = jsonDecode(response.body).where((task){
-           task['is_approved'] == 'Pending';
-        }).toList();
+        var jsonData = jsonDecode(response.body);
+        data = jsonData.where((task)=>
+           task['is_approved'] == 'Pending' && task['submited_by'] == name).toList();
       });
     }else{
       print('Request failed with status: ${response.statusCode}');

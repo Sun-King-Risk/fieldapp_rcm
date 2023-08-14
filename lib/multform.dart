@@ -19,13 +19,20 @@ class _MyTaskNewState extends State<MyTaskNew> {
   String selectedRegion = '';
   bool target =true;
   String rate = '';
+  int _currentPage = 0;
+  int _pageSize = 2;
+  List getPageData() {
+    final startIndex = _currentPage * _pageSize;
+    final endIndex = startIndex + _pageSize;
+
+    return taskData!.sublist(startIndex, endIndex);
+  }
   Map<String, String> selectedValues = {};
   List<String> _priorities = ['High', 'Medium', 'Low'];
   Map<String, Map<String, String>> _actions = {};
   List<String> textFieldValues = [];
   List<String> dropdownValues = [];
   bool isLoading = true;
-  int currentPage = 1;
   bool isLoadingArea = true;
   List<String> attributeList = [];
   String name ="";
@@ -103,6 +110,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
     });
     var result_task = jsonDecode(response.body);
     print(result_task);
+    print(result_task["id"]);
     taskAction(result_task["id"]);
 
   }
@@ -112,6 +120,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
       Map<String, dynamic>? agentDetails = taskData!.firstWhere(
               (agent) => agent['Agent'] == agentName
       );
+
       if (agentDetails != null) {
         String current = agentDetails[rate];
         String? percvalue = current.substring(0,current.length - 1);
@@ -140,6 +149,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
       duration: Duration(seconds: 3),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pop(context);
 
 
 
@@ -189,7 +199,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
   List<Map<String, dynamic>> taskDataList = [];
 Future<void> TableData() async{
   setState(() {
-    taskData =  data?.where((item) => item['Region'] == singleRegion && item['Area']== selectedArea).toList();;
+    taskData =  data?.where((item) => item['Region'] == singleRegion && item['Area']== selectedArea).toList();
     keys = taskData!.isNotEmpty ?taskData![0].keys.toList() : [];
     //key
     if(keys.contains('Agent')){
@@ -395,289 +405,301 @@ Future<void> TableData() async{
       appBar: AppBar(
         title: Text('Add Task'),
       ),
-      body: SingleChildScrollView(
+      body: Container(
         child: Column(
           children: [
             if(_taskMode == TaskMode.Task)
-              Column(children: [
-                ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: Taskoptions.length,
-                    itemBuilder: (context, index) {
-                      return RadioListTile(
-                          title: Text(Taskoptions[index]),
-                          value: Taskoptions[index],
-                          groupValue: selectedOption,
-                          onChanged: (value) {
-                            setState(() {
-                              selectedOption = value.toString();
-                              print(selectedOption);
-                              _taskMode = TaskMode.SubTask;
+              Expanded(
+                child: Column(children: [
+                  ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: Taskoptions.length,
+                      itemBuilder: (context, index) {
+                        return RadioListTile(
+                            title: Text(Taskoptions[index]),
+                            value: Taskoptions[index],
+                            groupValue: selectedOption,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedOption = value.toString();
+                                print(selectedOption);
+                                _taskMode = TaskMode.SubTask;
 
-                            });
-                          }
-                      );
-                    }
-                )
-              ],),
-            if(_taskMode == TaskMode.SubTask)
-              Column(
-                children: [
-                  Builder(
-                    builder: (BuildContext context) {
-                      switch(selectedOption){
-                        case 'Portfolio Quality':
-                          return Column(
-                            children: [
-                              ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: portfolio.length,
-                                  itemBuilder: (context, index) {
-                                    return RadioListTile(
-                                        title: Text(portfolio[index]),
-                                        value: portfolio[index],
-                                        groupValue: SelectedSubtask,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            SelectedSubtask = value.toString();
-                                            print(SelectedSubtask);
-
-                                          });
-                                        }
-                                    );
-                                  }
-                              )
-                            ],
-
-                          );
-                        case 'Team Management':
-                          return Column(
-                            children: [
-                              ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: team.length,
-                                  itemBuilder: (context, index) {
-                                    return RadioListTile(
-                                        title: Text(team[index]),
-                                        value: team[index],
-                                        groupValue: SelectedSubtask,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            SelectedSubtask = value.toString();
-                                            print(SelectedSubtask);
-
-                                          });
-                                        }
-                                    );
-                                  }
-                              )
-                            ],
-
-                          );
-                        case 'Collection Drive':
-                          return Column(
-                            children: [
-                              ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: collection.length,
-                                  itemBuilder: (context, index) {
-                                    return RadioListTile(
-                                        title: Text(collection[index]),
-                                        value: collection[index],
-                                        groupValue: SelectedSubtask,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            SelectedSubtask = value.toString();
-                                            print(SelectedSubtask);
-
-                                          });
-                                        }
-                                    );
-                                  }
-                              )
-                            ],
-
-                          );
-                        case 'Pilot/Process Management':
-                          return Column(
-                            children: [
-                              ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: pilot.length,
-                                  itemBuilder: (context, index) {
-                                    return RadioListTile(
-                                        title: Text(pilot[index]),
-                                        value: pilot[index],
-                                        groupValue: SelectedSubtask,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            SelectedSubtask = value.toString();
-                                            print(SelectedSubtask);
-
-                                          });
-                                        }
-                                    );
-                                  }
-                              )
-                            ],
-
-                          );
-                        case 'Customer Management':
-                          return Column(
-                            children: [
-                              ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: customer.length,
-                                  itemBuilder: (context, index) {
-                                    return RadioListTile(
-                                        title: Text(customer[index]),
-                                        value: customer[index],
-                                        groupValue: SelectedSubtask,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            SelectedSubtask = value.toString();
-                                            print(SelectedSubtask);
-
-                                          });
-                                        }
-                                    );
-                                  }
-                              )
-                            ],
-
-                          );
-                        default:
-                          return Container(
-                            child: Text('No option selected'),
-                          );
-
-
+                              });
+                            }
+                        );
                       }
-                    },),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(onPressed: (){
-
-                        setState(() {
-                          _taskMode = TaskMode.Task;
-                        });
-                      }, child: Text("Back")),
-                      ElevatedButton(onPressed: (){
-                        setState(() {
-                          getUserAttributes();
-                          listItems(SelectedSubtask.replaceAll(' ', '_'));
-                          _taskMode = TaskMode.Region;
-                        });
-                      }, child: Text("Next"))
-                    ],
                   )
-                ],
+                ],),
+              ),
+            if(_taskMode == TaskMode.SubTask)
+              Expanded(
+                child: Column(
+                  children: [
+                    Builder(
+                      builder: (BuildContext context) {
+                        switch(selectedOption){
+                          case 'Portfolio Quality':
+                            return Column(
+                              children: [
+                                ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: portfolio.length,
+                                    itemBuilder: (context, index) {
+                                      return RadioListTile(
+                                          title: Text(portfolio[index]),
+                                          value: portfolio[index],
+                                          groupValue: SelectedSubtask,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              SelectedSubtask = value.toString();
+                                              print(SelectedSubtask);
+
+                                            });
+                                          }
+                                      );
+                                    }
+                                )
+                              ],
+
+                            );
+                          case 'Team Management':
+                            return Column(
+                              children: [
+                                ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: team.length,
+                                    itemBuilder: (context, index) {
+                                      return RadioListTile(
+                                          title: Text(team[index]),
+                                          value: team[index],
+                                          groupValue: SelectedSubtask,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              SelectedSubtask = value.toString();
+                                              print(SelectedSubtask);
+
+                                            });
+                                          }
+                                      );
+                                    }
+                                )
+                              ],
+
+                            );
+                          case 'Collection Drive':
+                            return Column(
+                              children: [
+                                ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: collection.length,
+                                    itemBuilder: (context, index) {
+                                      return RadioListTile(
+                                          title: Text(collection[index]),
+                                          value: collection[index],
+                                          groupValue: SelectedSubtask,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              SelectedSubtask = value.toString();
+                                              print(SelectedSubtask);
+
+                                            });
+                                          }
+                                      );
+                                    }
+                                )
+                              ],
+
+                            );
+                          case 'Pilot/Process Management':
+                            return Column(
+                              children: [
+                                ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: pilot.length,
+                                    itemBuilder: (context, index) {
+                                      return RadioListTile(
+                                          title: Text(pilot[index]),
+                                          value: pilot[index],
+                                          groupValue: SelectedSubtask,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              SelectedSubtask = value.toString();
+                                              print(SelectedSubtask);
+
+                                            });
+                                          }
+                                      );
+                                    }
+                                )
+                              ],
+
+                            );
+                          case 'Customer Management':
+                            return Column(
+                              children: [
+                                ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: customer.length,
+                                    itemBuilder: (context, index) {
+                                      return RadioListTile(
+                                          title: Text(customer[index]),
+                                          value: customer[index],
+                                          groupValue: SelectedSubtask,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              SelectedSubtask = value.toString();
+                                              print(SelectedSubtask);
+
+                                            });
+                                          }
+                                      );
+                                    }
+                                )
+                              ],
+
+                            );
+                          default:
+                            return Container(
+                              child: Text('No option selected'),
+                            );
+
+
+                        }
+                      },),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(onPressed: (){
+
+                          setState(() {
+                            _taskMode = TaskMode.Task;
+                          });
+                        }, child: Text("Back")),
+                        ElevatedButton(onPressed: (){
+                          setState(() {
+                            getUserAttributes();
+                            listItems(SelectedSubtask.replaceAll(' ', '_'));
+                            _taskMode = TaskMode.Region;
+                          });
+                        }, child: Text("Next"))
+                      ],
+                    )
+                  ],
+                ),
               ),
             if(_taskMode == TaskMode.Region)
-              Column(
-                children: [
-                  isLoading?Center(
-                    child: Column(
-                      children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    isLoading?Center(
+                      child: Column(
+                        children: [
 
-                        CircularProgressIndicator(),
-                        Text(' Please wait...')
+                          CircularProgressIndicator(),
+                          Text(' Please wait...')
+                        ],
+                      ),
+                    ):Container(
+                      child: region.length==0?Center(child:Text("No Task under ${SelectedSubtask}")):
+                      ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: region.length,
+                          itemBuilder: (context, index) {
+                            return RadioListTile(
+                                title: Text(region[index]),
+                                value: region[index],
+                                groupValue: selectedRegion,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedRegion = value.toString();
+                                    print(selectedRegion);
+                                  });
+                                }
+                            );
+                          }
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(onPressed: (){
+                          setState(() {
+                            isLoading = true;
+                            _taskMode = TaskMode.SubTask;
+                          });
+                        }, child: Text("Back")),
+                        ElevatedButton(onPressed: (){
+                          setState(() {
+                            _taskMode = TaskMode.Area;
+                            Area();
+                          });
+                        }, child: Text("Next"))
                       ],
-                    ),
-                  ):Container(
-                    child: region.length==0?Center(child:Text("No Task under ${SelectedSubtask}")):
-                    ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: region.length,
-                        itemBuilder: (context, index) {
-                          return RadioListTile(
-                              title: Text(region[index]),
-                              value: region[index],
-                              groupValue: selectedRegion,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedRegion = value.toString();
-                                  print(selectedRegion);
-                                });
-                              }
-                          );
-                        }
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(onPressed: (){
-                        setState(() {
-                          isLoading = true;
-                          _taskMode = TaskMode.SubTask;
-                        });
-                      }, child: Text("Back")),
-                      ElevatedButton(onPressed: (){
-                        setState(() {
-                          _taskMode = TaskMode.Area;
-                          Area();
-                        });
-                      }, child: Text("Next"))
-                    ],
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             if(_taskMode == TaskMode.Area)
-              Column(
-                children: [
-                  isLoadingArea?Center(
-                    child: CircularProgressIndicator(),
-                  ):areadata!.length==0?Center(child:Text("No Task under ${SelectedSubtask}")):SingleChildScrollView(
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: areadata?.length,
-                        itemBuilder: (context, index) {
-                          return RadioListTile(
-                              title: Text(areadata?[index]),
-                              value:areadata?[index],
-                              groupValue: selectedArea,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedArea = value.toString();
-                                  print(selectedArea);
+              Expanded(
+                child: Column(
+                  children: [
+                    isLoadingArea?Center(
+                      child: CircularProgressIndicator(),
+                    ):areadata!.length==0?Center(child:Text("No Task under ${SelectedSubtask}")):
+                    Expanded(
+                      child: ListTileTheme(
+                        contentPadding: EdgeInsets.symmetric(vertical: 0.0,),
+                        child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: areadata?.length,
+                            itemBuilder: (context, index) {
+                              return RadioListTile(
+                                  title: Text(areadata?[index]),
+                                  value:areadata?[index],
+                                  groupValue: selectedArea,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedArea = value.toString();
+                                      print(selectedArea);
 
-                                });
-                              }
-                          );
-                        }
+                                    });
+                                  }
+                              );
+                            }
 
+                        ),
+                      ),
                     ),
-                  ),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(onPressed: (){
-                        setState(() {
-                          _taskMode = TaskMode.Region;
-                        });
-                      }, child: Text("Back")),
-                      ElevatedButton(onPressed: (){
-                        setState(() {
-                          TableData();
-                          _taskMode = TaskMode.TableTask;
-                          print(isLoadingTable);
-                        });
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(onPressed: (){
+                          setState(() {
+                            _taskMode = TaskMode.Region;
+                          });
+                        }, child: Text("Back")),
+                        ElevatedButton(onPressed: (){
+                          setState(() {
+                            TableData();
+                            _taskMode = TaskMode.TableTask;
+                          });
 
-                      }, child: Text("Next"))
-                    ],
-                  )
-                ],
+                        }, child: Text("Next"))
+                      ],
+                    )
+                  ],
+                ),
               ),
             if(_taskMode == TaskMode.TableTask)
-              Column(
-                children: [
-                  isLoadingTable?Center(
-                    child: CircularProgressIndicator(),
-                  ):
-                  Column(
+              Expanded(
+                child: isLoadingTable?Center(
+                  child: CircularProgressIndicator(),
+                ):
+                SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       TextField(
@@ -728,7 +750,7 @@ Future<void> TableData() async{
                             DataColumn(label: Text('Select')),
                           ],
                           rows: [
-                            for (final item in taskData!)
+                            for (final item in getPageData())
                               DataRow(
                                 cells: [
                                   for (int cellIndex = 0; cellIndex < keys.length; cellIndex++)
@@ -783,64 +805,136 @@ Future<void> TableData() async{
                         children: [
                           IconButton(
                             icon: Icon(Icons.chevron_left),
-                            onPressed: currentPage > 1
+                            onPressed: _currentPage > 1
                                 ? () {
                               setState(() {
-                                currentPage--;
+                                _currentPage--;
                               });
                             }
                                 : null,
                           ),
-                          Text('Page $currentPage'),
+                          Text('Page $_currentPage'),
                           IconButton(
                             icon: Icon(Icons.chevron_right),
                             onPressed:(){},
                           ),
                         ],
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          ElevatedButton(onPressed: (){
+                            setState(() {
+                              _taskMode = TaskMode.Area;
+                              taskDataList = [];
+                            });
+                          }, child: Text("Back")),
+                          ElevatedButton(onPressed: (){
+                            if(taskDataList!.length<=5&&taskDataList!.length>=1){
+                              setState(() {
+                                _taskMode = TaskMode.ActionPlan;
+
+                              });
+
+                            }else if(taskDataList!.length>5){
+                              final snackBar = SnackBar(
+                                content: Text('Exceeded task selection limit!'),
+                                duration: Duration(seconds: 2),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                            }
+                            else{
+                              print("No task selected");
+                              final snackBar = SnackBar(
+                                content: Text('No task selected!'),
+                                duration: Duration(seconds: 2),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                            }
+                          }, child: Text("Next"))
+                        ],
+                      )
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(onPressed: (){
-                        setState(() {
-                          _taskMode = TaskMode.Area;
-                          taskDataList =[];
-                        });
-                      }, child: Text("Back")),
-                      ElevatedButton(onPressed: (){
-                        if(taskDataList!.length<=5&&taskDataList!.length>=1){
-                          setState(() {
-                            _taskMode = TaskMode.ActionPlan;
-
-                          });
-
-                        }else if(taskDataList!.length>5){
-                          final snackBar = SnackBar(
-                            content: Text('Exceeded task selection limit!'),
-                            duration: Duration(seconds: 2),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        }
-                        else{
-                          print("No task selected");
-                          final snackBar = SnackBar(
-                            content: Text('No task selected!'),
-                            duration: Duration(seconds: 2),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                        }
-                      }, child: Text("Next"))
-                    ],
-                  )
-                ],
+                ),
               ),
             if(_taskMode == TaskMode.ActionPlan)
-                  Column(
-                    children: [
-                      if (target) SizedBox(
+              Expanded(
+                child: Column(
+                  children: [
+                    if (target) SizedBox(
+                      height: 600,
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: taskDataList!.length,
+                          itemBuilder: (context, index) {
+                            Map<String, dynamic> data = taskDataList![index];
+                            String agent = data[key];
+                            String agentRate = data[rate];
+                            if (!_actions.containsKey(agent)) {
+                              _actions[agent] = {'action': '', 'priority': _priorities[0]};
+                            };
+                            String datanew = taskDataList![index].toString();
+                            return Card(
+                                child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '$key: ${agent} - $agentRate ',
+                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                          SizedBox(height: 8),
+                                          TextField(
+                                            decoration: InputDecoration(
+                                              hintText: 'Enter action plan',
+                                              labelText: 'Action Plan',
+                                            ),
+                                            onChanged: (value) {
+                                              print(value);
+                                              setState(() {
+                                                _actions[agent]!['action'] = value;
+                                              });
+                                            },
+                                            maxLines: 3,
+                                          ),
+                                          SizedBox(height: 8),
+                                          TextField(
+                                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                            decoration: InputDecoration(
+                                              hintText: 'Enter Target',
+                                              labelText: 'Target',
+                                            ),
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _actions[agent]!['target'] = value;
+                                              });
+                                            },
+                                          ),
+                                          SizedBox(height: 8),
+                                          AppDropDown(
+                                              disable: true,
+                                              label: "Priority",
+                                              items: _priorities,
+                                              hint: "Priority",
+                                              onChanged: (value){
+                                                setState(() {
+                                                  _actions[agent]!['priority'] = value;
+                                                });
+                                              })
+
+                                        ]
+
+                                    )
+                                )
+                            );
+
+                          }),
+                    ) else
+
+                      SizedBox(
                         height: 600,
                         child: ListView.builder(
                             shrinkWrap: true,
@@ -848,7 +942,6 @@ Future<void> TableData() async{
                             itemBuilder: (context, index) {
                               Map<String, dynamic> data = taskDataList![index];
                               String agent = data[key];
-                              String agentRate = data[rate];
                               if (!_actions.containsKey(agent)) {
                                 _actions[agent] = {'action': '', 'priority': _priorities[0]};
                               };
@@ -860,7 +953,7 @@ Future<void> TableData() async{
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              '$key: ${agent} - $agentRate ',
+                                              '$key: $agent',
                                               style: TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                             SizedBox(height: 8),
@@ -878,19 +971,6 @@ Future<void> TableData() async{
                                               maxLines: 3,
                                             ),
                                             SizedBox(height: 8),
-                                            TextField(
-                                              keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                              decoration: InputDecoration(
-                                                hintText: 'Enter Target',
-                                                labelText: 'Target',
-                                              ),
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _actions[agent]!['target'] = value;
-                                                });
-                                              },
-                                            ),
-                                            SizedBox(height: 8),
                                             AppDropDown(
                                                 disable: true,
                                                 label: "Priority",
@@ -902,6 +982,7 @@ Future<void> TableData() async{
                                                   });
                                                 })
 
+
                                           ]
 
                                       )
@@ -909,208 +990,153 @@ Future<void> TableData() async{
                               );
 
                             }),
-                      ) else
-
-                          SizedBox(
-                            height: 600,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-    itemCount: taskDataList!.length,
-    itemBuilder: (context, index) {
-        Map<String, dynamic> data = taskDataList![index];
-        String agent = data[key];
-        if (!_actions.containsKey(agent)) {
-        _actions[agent] = {'action': '', 'priority': _priorities[0]};
-        };
-        String datanew = taskDataList![index].toString();
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-        child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-                      '$key: $agent',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-                      TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Enter action plan',
-                              labelText: 'Action Plan',
-                            ),
-                        onChanged: (value) {
-                            print(value);
-                            setState(() {
-                              _actions[agent]!['action'] = value;
-                            });
-                        },
-                        maxLines: 3,
                       ),
-            SizedBox(height: 8),
-            AppDropDown(
-                        disable: true,
-                        label: "Priority",
-                        items: _priorities,
-                        hint: "Priority",
-                        onChanged: (value){
-                            setState(() {
-                              _actions[agent]!['priority'] = value;
-                            });
-                        })
-
-
-          ]
-
-        )
-          )
-        );
-
-    }),
-                          ),
 
 
 
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          ElevatedButton(onPressed: (){
-                            setState(() {
-                              _taskMode = TaskMode.TableTask;
-                            });
-                          }, child: Text("Back")),
-                          ElevatedButton(onPressed: (){
-                            setState(() {
-                              _taskMode = TaskMode.Preview;
-                            });
-                          }, child: Text("Next"))
-                        ],
-                      )
-                    ],
-                  ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(onPressed: (){
+                          setState(() {
+                            _taskMode = TaskMode.TableTask;
+                          });
+                        }, child: Text("Back")),
+                        ElevatedButton(onPressed: (){
+                          setState(() {
+                            _taskMode = TaskMode.Preview;
+                          });
+                        }, child: Text("Next"))
+                      ],
+                    )
+                  ],
+                ),
+              ),
             if(_taskMode == TaskMode.Preview)
-              Column(
-                children: [
-                  Text("Preveiw"),
-                  target?Column(
-                    children: [
-                      Text(
-                        'Region: ${singleRegion}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Area: ${selectedArea}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Task: ${selectedOption}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Sub Task: ${SelectedSubtask}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Task Action:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      SizedBox(height: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: taskDataList!.map((task) {
-                          String taskName = task[key];
-                          String current = task[rate];
-                          Map<String, String>? actions = _actions[taskName];
-                          String? percvalue = current.substring(0,current.length - 1);
-                          double total = double.parse(actions!['target']!)+double.parse(percvalue!);
+              Expanded(
+                child: Column(
+                  children: [
+                    Text("Preveiw"),
+                    target?Column(
+                      children: [
+                        Text(
+                          'Region: ${singleRegion}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Area: ${selectedArea}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Task: ${selectedOption}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Sub Task: ${SelectedSubtask}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Task Action:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        SizedBox(height: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: taskDataList!.map((task) {
+                            String taskName = task[key];
+                            String current = task[rate];
+                            Map<String, String>? actions = _actions[taskName];
+                            String? percvalue = current.substring(0,current.length - 1);
+                            double total = double.parse(actions!['target']!)+double.parse(percvalue!);
 
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Name: $taskName '),
-                              SizedBox(height: 8),
-                              Text("Priority: ${actions!['priority']}"),
-                              Text("Action Plan: ${actions!['action']}"),
-                              Text('Current: $percvalue'),
-                              Text('Target: ${actions!['target']}'),
-                              Text('Goal: $total'),
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Name: $taskName '),
+                                SizedBox(height: 8),
+                                Text("Priority: ${actions!['priority']}"),
+                                Text("Action Plan: ${actions!['action']}"),
+                                Text('Current: $percvalue'),
+                                Text('Target: ${actions!['target']}'),
+                                Text('Goal: $total'),
 
-                              SizedBox(height: 8),
-                            ],
-                          );
-                        }).toList(),)
-                    ],
-                  ):Column(
+                                SizedBox(height: 8),
+                              ],
+                            );
+                          }).toList(),)
+                      ],
+                    ):Column(
 
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
 
-                      Text(
-                        'Region: ${singleRegion}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'Area: ${selectedArea}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Task: ${selectedOption}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Sub Task: ${SelectedSubtask}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Task Action:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-    children: taskDataList!.map((task) {
-    String taskName = task[key];
-    Map<String, String>? actions = _actions[taskName];
-    return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-    Text('Name: ${taskName} '),
-    SizedBox(height: 8),
-    Text("Priority: ${actions!['priority']}"),
-    Text("Action Plan: ${actions!['action']}"),
+                        Text(
+                          'Region: ${singleRegion}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          'Area: ${selectedArea}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Task: ${selectedOption}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Sub Task: ${SelectedSubtask}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Task Action:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: taskDataList!.map((task) {
+                            String taskName = task[key];
+                            Map<String, String>? actions = _actions[taskName];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Name: ${taskName} '),
+                                SizedBox(height: 8),
+                                Text("Priority: ${actions!['priority']}"),
+                                Text("Action Plan: ${actions!['action']}"),
 
-    SizedBox(height: 8),
-    ],
-    );
-    }).toList(),)
+                                SizedBox(height: 8),
+                              ],
+                            );
+                          }).toList(),)
 
 
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(onPressed: (){
-                        setState(() {
-                          _taskMode = TaskMode.ActionPlan;
-                        });
-                      }, child: Text("Back")),
-                      ElevatedButton(onPressed: (){
-                        print(target);
-                        target?_save():_saveNo();
-                      }, child: Text("Submit"))
-                    ],
-                  )
-                ],
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(onPressed: (){
+                          setState(() {
+                            _taskMode = TaskMode.ActionPlan;
+                          });
+                        }, child: Text("Back")),
+                        ElevatedButton(onPressed: (){
+                          print(target);
+                          target?_save():_saveNo();
+                        }, child: Text("Submit"))
+                      ],
+                    )
+                  ],
+                ),
               ),
           ],
         ),

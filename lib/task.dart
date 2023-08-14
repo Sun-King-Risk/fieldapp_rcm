@@ -284,6 +284,7 @@ class _TaskListState extends State<TaskList> {
               builder: (context) => MyTaskView(
                 endPoint: 'tasks',
                 title: widget.task_title,
+                name: widget.name,
               ),
             ));
       },
