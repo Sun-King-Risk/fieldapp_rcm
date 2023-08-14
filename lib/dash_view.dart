@@ -14,7 +14,9 @@ class DashView extends StatefulWidget {
   @override
   final title;
   final value;
-  DashView(this.title, this.value);
+  final country;
+  final region;
+  DashView(this.title, this.value,this.country,this.region);
   DashViewState createState() => DashViewState();
 }
 
@@ -23,7 +25,6 @@ class DashViewState extends State<DashView> {
   bool isLoading = true;
   List<String> area_data= [];
   Future<StorageItem?> listItems(key) async {
-    print(key);
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
       operation = await Amplify.Storage.list(
@@ -71,9 +72,10 @@ class DashViewState extends State<DashView> {
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
       final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['Region'] == 'Central' &&
-          task['Country'] =='Tanzania'
+          .where((task) => task['Region'] == widget.region &&
+          task['Country'] == widget.country
       ).toList();
+      print("${widget.country} $filteredTasks");
       filteredTasks.sort((a,b){
         String scoreA = a[widget.title]== null?"0":a[widget.title];
         String scoreB = b[widget.title]== null?"0":b[widget.title];
@@ -89,7 +91,6 @@ class DashViewState extends State<DashView> {
 
       print('File_region: $filteredTasks');
       setState(() {
-
         data = filteredTasks;
         safePrint('File_data: $area_data');
         isLoading = false;
@@ -104,6 +105,7 @@ class DashViewState extends State<DashView> {
     // TODO: implement initState
     super.initState();
     listItems("dashboard");
+    print("dennis");
   }
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,8 +137,10 @@ class DashViewState extends State<DashView> {
                     height: 80,
                     width: 150,
                     color: Colors.white,
-                    child: isLoading?Center(child: CircularProgressIndicator()):Column(
+                    child: isLoading?Center(child: CircularProgressIndicator()):
+                    Column(
                       children: [
+
                         Text(
                           data!.first[widget.title]==null?"0":data!.first[widget.title],
                           style: TextStyle(

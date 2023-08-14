@@ -4,19 +4,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../widget/drop_down.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class PortfolioUpdate extends StatefulWidget {
   PortfolioUpdate(
       {Key? key,
       required this.subtask,
-      required this.task,
       required this.id,
+        required this.taskGoalId,
       required this.title})
       : super(key: key);
   final title;
   final id;
-  final task;
   final subtask;
+  final taskGoalId;
 
   @override
   PortfolioUpdateState createState() => new PortfolioUpdateState();
@@ -24,16 +26,27 @@ class PortfolioUpdate extends StatefulWidget {
 
 class PortfolioUpdateState extends State<PortfolioUpdate> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  Future<void> _getDocuments() async {
-    final querySnapshot =
-        await firestore.collection("task").doc(widget.task).get();
-    final data = querySnapshot.data();
-    print(data?['Area']);
-  }
+
   @override
   void initState() {
-    _getDocuments();
+    // TODO: implement initState
     super.initState();
+    fetchData();
+  }
+  List? data = [];
+  void fetchData() async {
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks/${widget.id}');
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      setState(() {
+        print(jsonDecode(response.body));
+        Map<String, dynamic> jsonData = jsonDecode(response.body);
+        data = [jsonData];
+        print(data?[0]["task_title"]);
+      });
+    }else{
+      print('Request failed with status: ${response.statusCode}');
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -66,29 +79,94 @@ class PortfolioUpdateState extends State<PortfolioUpdate> {
             ),
             if (widget.subtask == 'Visiting unreachable welcome call clients')
               Visiting(
-                docid: widget.id,
+                sub: widget.subtask,
+                id: widget.id,
+                report_area: data?[0]["task_area"],
+                report_region: data?[0]["region"],
+                report_country: data?[0]["task_country"],
+                sub_task: data?[0]["sub_task"],
+                submited_by: data?[0]["submited_by"],
+                report_title: data?[0]["task_title"],
+                report_priority: "Normal",
+                report_details: "None",
               ),
             if (widget.subtask ==
                 'Work with the Agents with low welcome calls to improve')
               Agent(
-                docid: widget.task,
+                sub: widget.subtask,
                 id: widget.id,
+                report_area: data?[0]["task_area"],
+                report_region: data?[0]["region"],
+                report_country: data?[0]["task_country"],
+                sub_task: data?[0]["sub_task"],
+                submited_by: data?[0]["submited_by"],
+                report_title: data?[0]["task_title"],
+                report_priority: "Normal",
+                report_details: "None",
               ),
             if (widget.title ==
                 'Work with the Agents with low welcome calls to improve')
-              Agent(docid: widget.id, id: widget.id),
+              Agent(
+                sub: widget.subtask,
+                id: widget.id,
+                report_area: data?[0]["task_area"],
+                report_region: data?[0]["region"],
+                report_country: data?[0]["task_country"],
+                sub_task: data?[0]["sub_task"],
+                submited_by: data?[0]["submited_by"],
+                report_title: data?[0]["task_title"],
+                report_priority: "Normal",
+                report_details: "None",),
             if (widget.title == 'Change a red zone CSAT area to orange')
-              RedZone(),
-            if (widget.title == 'Attend to Fraud Cases') Fraud(),
+              RedZone(
+                sub: widget.subtask,
+                id: widget.id,
+                report_area: data?[0]["task_area"],
+                report_region: data?[0]["region"],
+                report_country: data?[0]["task_country"],
+                sub_task: data?[0]["sub_task"],
+                submited_by: data?[0]["submited_by"],
+                report_title: data?[0]["task_title"],
+                report_priority: "Normal",
+                report_details: "None",
+              ),
+            if (widget.title == 'Attend to Fraud Cases') Fraud(
+              sub: widget.subtask,
+              id: widget.id,
+              report_area: data?[0]["task_area"],
+              report_region: data?[0]["region"],
+              report_country: data?[0]["task_country"],
+              sub_task: data?[0]["sub_task"],
+              submited_by: data?[0]["submited_by"],
+              report_title: data?[0]["task_title"],
+              report_priority: "Normal",
+              report_details: "None",
+            ),
             if (widget.title == 'Visit at-risk accounts')
               FieldVisit(
-                docid: widget.id,
-                id: widget.task,
+                sub: widget.subtask,
+                id: widget.id,
+                report_area: data?[0]["task_area"],
+                report_region: data?[0]["region"],
+                report_country: data?[0]["task_country"],
+                sub_task: data?[0]["sub_task"],
+                submited_by: data?[0]["submited_by"],
+                report_title: data?[0]["task_title"],
+                report_priority: "Normal",
+                report_details: "None",
               ),
             if (widget.title == 'Visits FPD/SPDs')
               FieldVisit(
-                docid: widget.id,
-                id: widget.task,
+                sub: widget.subtask,
+                id: widget.id,
+                report_area: data?[0]["task_area"],
+                report_region: data?[0]["region"],
+                report_country: data?[0]["task_country"],
+                sub_task: data?[0]["sub_task"],
+                submited_by: data?[0]["submited_by"],
+                report_title: data?[0]["task_title"],
+                report_priority: "Normal",
+                report_details: "None",
               ),
         ],
       ),

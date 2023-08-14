@@ -1,13 +1,10 @@
 import 'dart:convert';
-
-import 'package:call_log/call_log.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-
 import '../widget/drop_down.dart';
 import 'customer_vist.dart';
 
@@ -35,18 +32,6 @@ class CProfileState extends State<CProfile> {
   String? Area;
   void callLogs(String docid,String feedback,String angaza) async {
     String _docid = docid;
-
-    Iterable<CallLogEntry> entries = await CallLog.get();
-    fnumberupdate = entries.elementAt(0).formattedNumber;
-    cmnumberupdate = entries.elementAt(0).cachedMatchedNumber;
-    number1update = entries.elementAt(0).number;
-    name1update = entries.elementAt(0).name;
-    calltypeupdate = entries.elementAt(0).callType;
-    timedateupdate = entries.elementAt(0).timestamp;
-    duration1update = entries.elementAt(0).duration;
-    accidupdate = entries.elementAt(0).phoneAccountId;
-    simnameupdate = entries.elementAt(0).simDisplayName;
-
 
     if (duration1update >= 30) {
       CollectionReference newCalling = firestore.collection("new_calling");

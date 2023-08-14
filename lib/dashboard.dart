@@ -23,6 +23,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<String> attributeList = [];
   String name ="";
+  String region = '';
+  String country ='';
+  String role = '';
   @override
   void initState() {
     // TODO: implement initState
@@ -39,7 +42,7 @@ class _HomeState extends State<Home> {
 
         if(attribute.userAttributeKey.key.contains("custom")){
           var valueKey = attribute.userAttributeKey.key.split(":");
-          attributesList.add('"${valueKey[1]}":"${attribute.value}"');
+          attributesList.add('${valueKey[1]}:${attribute.value}');
           print(valueKey[1]);
         }else{
           attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
@@ -48,7 +51,10 @@ class _HomeState extends State<Home> {
       }
       setState(() {
         attributeList = attributesList;
+        role = attributeList[5].split(":")[1];
         name = attributeList[3].split(":")[1];
+        region = attributeList[7].split(":")[1];
+        country = attributeList[4].split(":")[1];
       });
       name = attributeList[3].split(":")[1];
       if (kDebugMode) {
@@ -97,14 +103,20 @@ class _HomeState extends State<Home> {
                       RowData(
                         value: 'Collection Score',
                         label: 'CSAT Rate',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Disabled Rate',
                         label: 'Fraud SLA',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Repayment Speed 2',
                         label: 'Welcome Call Rate',
+                        region: region,
+                        country: country,
                       ),
 
 
@@ -123,14 +135,20 @@ class _HomeState extends State<Home> {
                       RowData(
                         value: 'At Risk Rate',
                         label: 'At Risk Rate',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'At Risk Rate 60',
                         label: 'FPD',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Detached Rate',
                         label: 'SPD',
+                        region: region,
+                        country: country,
                       ),
                     ],
                   ),
@@ -150,14 +168,20 @@ class _HomeState extends State<Home> {
                       RowData(
                         value: 'Count Replacements',
                         label: 'Audit Reports/Survey',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'FSE Revamp',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'Repo & Resale',
+                        region: region,
+                        country: country,
                       ),
                     ],
                   ),
@@ -177,18 +201,26 @@ class _HomeState extends State<Home> {
                       RowData(
                         value: 'Disabled Rate',
                         label: 'Disabe Rate',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Collection Score',
                         label: 'Disable Rate > 180',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'At Risk Rate 60',
                         label: 'Disable Rate < 180',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Repayment Speed 2',
                         label: 'Repayment Speed 2',
+                        region: region,
+                        country: country,
                       ),
 
 
@@ -205,18 +237,26 @@ class _HomeState extends State<Home> {
                       RowData(
                         value: 'Collection Score',
                         label: 'Collection Score',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Detached Rate',
                         label: 'Repossession Rate',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'At Risk Rate',
                         label: 'Agent Restriction',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Repayment Speed Last 182 Days',
                         label: 'Kazi Completion',
+                        region: region,
+                        country: country,
                       ),
 
 
@@ -241,14 +281,20 @@ class _HomeState extends State<Home> {
                       RowData(
                         value: 'Count Replacements',
                         label: 'CC Escalation',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'Replacement SLA',
+                        region: region,
+                        country: country,
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'Change of Details',
+                        region: region,
+                        country: country,
                       ),
                     ],
                   ),
@@ -270,10 +316,14 @@ class _HomeState extends State<Home> {
                     RowData(
                       value: 'Collection Score',
                       label: '',
+                      region: region,
+                      country: country,
                     ),
                     RowData(
                       value: 'Repayment Speed 2',
                       label: '',
+                      region: region,
+                      country: country,
                     ),
                   ]),
 
@@ -297,8 +347,15 @@ class RowData extends StatefulWidget {
 
   final value;
   final String label;
+  final String country;
+  final String region;
 
-  const RowData({Key? key, required this.value, required this.label})
+
+  const RowData({Key? key,
+    required this.value,
+    required this.label,
+    required this.country,
+    required this.region})
       : super(key: key);
 
   @override
@@ -314,6 +371,7 @@ class _RowDataState extends State<RowData> {
   }
   List? data = [];
   bool isLoading = true;
+  bool nodata = true;
   List<String> region= [];
 
   Future<StorageItem?> listItems(key) async {
@@ -364,22 +422,15 @@ class _RowDataState extends State<RowData> {
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
       final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['Region'] == 'Central' && task['Country'] =='Tanzania' )
+          .where((task) => task['Region'] == widget.region && task['Country'] == widget.country )
           .toList();
-      for (var item in filteredTasks) {
-        //String region = item['Region'];
-        //region?.add(region);
-        if(item['Region'] == null){
-        }else{
-          uniqueRegion.add(item['Region']);
-        }
-
-      }
       setState(() {
-        data = filteredTasks;
-        region = uniqueRegion.toSet().toList();
 
-        isLoading = false;
+          data = filteredTasks;
+          region = uniqueRegion.toSet().toList();
+          nodata = false;
+          isLoading = false;
+
       });
     } on StorageException catch (e) {
       safePrint('Could not retrieve properties: ${e.message}');
@@ -393,10 +444,20 @@ class _RowDataState extends State<RowData> {
     return Expanded(
       child:  InkWell(
         onTap: () {
+            print(widget.value);
+          print(data![0][widget.value]);
+          print(data);
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => DashView(widget.value,data![0][widget.value]),
+                builder: (context) => DashView(
+
+                    widget.value,
+                    data![0][widget.value],
+                  widget.country,
+                    widget.region,
+                    ),
+
               ));
 
         },

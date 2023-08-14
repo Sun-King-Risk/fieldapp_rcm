@@ -1,9 +1,12 @@
 import 'dart:convert';
 
+import 'package:fieldapp_rcm/routing/bottom_nav.dart';
+import 'package:fieldapp_rcm/task.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -11,8 +14,30 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class Visiting extends StatefulWidget {
-  final docid;
-  Visiting({required this.docid});
+  final sub;
+  final id;
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+
+  Visiting({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<Visiting> createState() => _Visiting();
 }
@@ -20,10 +45,8 @@ class Visiting extends StatefulWidget {
 class _Visiting extends State<Visiting> {
   @override
   void initState() {
-    _getDocuments();
     super.initState();
   }
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
   List<String> _data = [];
   List<DocumentSnapshot> _result = [];
   List? taskgoal = [];
@@ -55,66 +78,163 @@ class _Visiting extends State<Visiting> {
 
 
     Map data = {
-
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":45,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(response.body);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
 
   }
   _NoUpdate(int doc,int id) async {
     Map data = {
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":34,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     print('nne');
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
-  Future<void> _getDocuments() async {
 
-    QuerySnapshot querySnapshot =
-    await firestore.collection("task").doc(widget.docid).collection('action').get();
-    setState(() {
-      _result = querySnapshot.docs;
-      _data = _result.map((doc) => doc['Customer'].toString()).toSet().toList();
-      print(_data.length);
-
-    });
-  }
 
   String? selectedSubTask;
   String? selectedaction;
@@ -216,15 +336,35 @@ class _Visiting extends State<Visiting> {
 
 //Work With agent
 class Work extends StatefulWidget {
-  final docid;
+  final sub;
   final id;
-  Work({required this.docid,required this.id});
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+  Work({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<Work> createState() => _Work();
 }
 
 class _Work extends State<Work> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   String _data = '';
   List<DocumentSnapshot> _result = [];
   List? taskgoal = [];
@@ -256,75 +396,175 @@ class _Work extends State<Work> {
 
 
     Map data = {
-
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
     print(response.body);
 
 
   }
   _NoUpdate(int doc,int id) async {
     Map data = {
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
-    print('nne');
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
+    print(response.body);
 
-  }
-  Future<void> _getDocuments() async {
-    final documentReference = FirebaseFirestore.instance
-        .collection('task')
-        .doc(widget.id)
-        .collection('action')
-        .doc(widget.docid);
-    final documentSnapshot = await documentReference.get();
-
-
-    /*QuerySnapshot querySnapshot =
-    await firestore.collection("task").doc(widget.id).collection('action').doc(widget.docid).get();*/
-    setState(() {
-      //_result = querySnapshot.docs;
-      _data =documentSnapshot['Customer'];
-      print(_data);
-
-    });
   }
   @override
   void initState() {
-    _getDocuments();
     super.initState();
   }
   String? selectedSubTask;
@@ -442,6 +682,29 @@ AppDropDown(
 
 //Change a red zone CSAT area to orange
 class RedZone extends StatefulWidget {
+  final sub;
+  final id;
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+  RedZone({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<RedZone> createState() => _RedZone();
 }
@@ -500,6 +763,29 @@ class _RedZone extends State<RedZone> {
 
 //Attend to Fraud Cases
 class Fraud extends StatefulWidget {
+  final sub;
+  final id;
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+  Fraud({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<Fraud> createState() => _Fraud();
 }
@@ -543,6 +829,29 @@ class _Fraud extends State<Fraud> {
 }
 
 class Audity extends StatefulWidget {
+  final sub;
+  final id;
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+  Audity({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<Audity> createState() => _Audity();
 }
@@ -587,9 +896,29 @@ class _Audity extends State<Audity>{
 
 }
 class FieldVisit extends StatefulWidget {
-  final docid;
+  final sub;
   final id;
-  FieldVisit({required this.docid,required this.id});
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+  FieldVisit({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<FieldVisit> createState() => _FieldVisit();
 }
@@ -599,72 +928,174 @@ class _FieldVisit extends State<FieldVisit> {
   List<DocumentSnapshot> _result = [];
   _YesUpdate(String doc,String id) async {
     Map data = {
-
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(response.body);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
   _NoUpdate(String doc,String id) async {
     Map data = {
-
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(response.body);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
+
 
   }
-  Future<void> _getDocuments() async {
-    final documentReference = FirebaseFirestore.instance
-        .collection('task')
-        .doc(widget.id)
-        .collection('action')
-        .doc(widget.docid);
-    final documentSnapshot = await documentReference.get();
 
-    setState(() {
-      //_result = querySnapshot.docs;
-      _data =documentSnapshot['Customer'];
-      print(_data);
-
-    });
-  }
   @override
   void initState() {
-    _getDocuments();
     super.initState();
   }
   String? selectedSubTask;
@@ -720,7 +1151,7 @@ class _FieldVisit extends State<FieldVisit> {
                   ),
                   onPressed:(){
                     //_getDocuments();
-                    _NoUpdate(widget.id,widget.docid);
+                    _NoUpdate(widget.id,widget.sub);
 
                     /* Navigator.push(
                                     context,
@@ -771,7 +1202,7 @@ class _FieldVisit extends State<FieldVisit> {
                     ),
                     onPressed:(){
                       //_getDocuments();
-                      _YesUpdate(widget.id,widget.docid);
+                      _YesUpdate(widget.id,widget.sub);
                       /* Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -786,6 +1217,29 @@ class _FieldVisit extends State<FieldVisit> {
 }
 
 class Accuracy extends StatefulWidget {
+  final sub;
+  final id;
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+  Accuracy({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<Accuracy> createState() => _Accuracy();
 }
@@ -829,28 +1283,43 @@ class _Accuracy extends State<Accuracy>{
   _YesUpdate(int doc,int id) async {
 
 
-    Map data = {
-
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":34,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
+    Map data = { "report_title": "Visits Tampering Home 400",
+      "taskgoal_id": doc, "sub_task": "Visits Tampering Home 400",
+      "report_details": "test",
+      "report_area": "Mwanza", "report_region":
+      "North", "report_country": "('East',)",
+      "report_gps_coordinate_latitude": null, "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": null, "report_customer_found_fraud_case": "No",
+      "report_priority": "Low", "report_status": "Complete",
+      "report_amount_collected": null, "report_customer_account_number": null,
+      "report_customer_count_visited": null, "report_agent_target": null,
+      "report_agent_found_yes_no": "Yes", "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null, "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null, "report_count_agent_visited": null, "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null, "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null, "report_visited_fraud_amount": null, "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null, "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null, "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null, "report_previous_customer_angaza_ID": null, "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null, "report_previous_customer_phone_number": null, "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null, "report_new_customer_phone_number": null, "report_repo_location": null, "report_repo_product": null,
+      "report_repo_reselling_agent": null, "report_repo_unit_is_complete": null, "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null, "report_calling_criteria": null, "report_who_calling": null,
+      "report_calling_reason_for_assigning": null, "report_calling_call_count": null, "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null, "report_table_meetings_AOC": null, "team_assist_completion_rate": false, "team_raise_reminder": false,
+      "team_raise_warning": false, "team_raise_new_task": false, "team_inform_next_visit": false, "team_who": null, "team_when": null,
+      "headline": null, "submited_by": "('test',)", "timestamp": "2023-06-26T06:04:50.663Z"};
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(response.body);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
 
 
   }
@@ -876,6 +1345,11 @@ class _Accuracy extends State<Accuracy>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
   }
 
@@ -1000,82 +1474,198 @@ class _Accuracy extends State<Accuracy>{
 }
 
 class Repo extends StatefulWidget {
-  final docid;
+  final sub;
   final id;
-  Repo({required this.docid,required this.id});
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+  Repo({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<Repo> createState() => _Repo();
 }
 class _Repo extends State<Repo>{
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  String _data = '';
-  List<DocumentSnapshot> _result = [];
   _YesUpdate(String doc,String id) async {
-    Map data = {
 
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
+    Map data = {
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
+    print(data);
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
   _NoUpdate(String doc,String id) async {
     Map data = {
-
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
-  }
-  Future<void> _getDocuments() async {
-    final documentReference = FirebaseFirestore.instance
-        .collection('task')
-        .doc(widget.id)
-        .collection('action')
-        .doc(widget.docid);
-    final documentSnapshot = await documentReference.get();
-
-    setState(() {
-      //_result = querySnapshot.docs;
-      _data =documentSnapshot['Customer'];
-      print(_data);
-
-    });
   }
   @override
   void initState() {
-    _getDocuments();
     super.initState();
   }
   String? selectedSubTask;
@@ -1131,7 +1721,7 @@ class _Repo extends State<Repo>{
                   ),
                   onPressed:(){
                     //_getDocuments();
-                    _NoUpdate(widget.id,widget.docid);
+                    _NoUpdate(widget.id,widget.sub);
 
                     /* Navigator.push(
                                     context,
@@ -1149,7 +1739,6 @@ class _Repo extends State<Repo>{
                       disable: false,
                       label: 'Select user',
                       hint: 'Select a user',
-                      items: [_data],
                       onChanged: (value){
 
                       }),
@@ -1181,8 +1770,13 @@ class _Repo extends State<Repo>{
                         minimumSize: Size(double.infinity, 50)
                     ),
                     onPressed:(){
+                      _YesUpdate(widget.submited_by,widget.report_area);
+                      if (kDebugMode) {
+                        print(widget.sub);
+                      }
+
                       //_getDocuments();
-                      _YesUpdate(widget.id,widget.docid);
+                      //_YesUpdate(widget.id,widget.docid);
                       /* Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -1197,9 +1791,29 @@ class _Repo extends State<Repo>{
 
 }
 class TVcostomers extends StatefulWidget {
-  final docid;
+  final sub;
   final id;
-  TVcostomers({required this.docid,required this.id});
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+  TVcostomers({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<TVcostomers> createState() => _TVcostomers();
 }
@@ -1212,6 +1826,7 @@ class _TVcostomers extends State<TVcostomers>{
       "Content-Type": "application/json",
 
     });
+
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
       final List<dynamic> filteredTasks = jsonData
@@ -1234,52 +1849,171 @@ class _TVcostomers extends State<TVcostomers>{
 
 
     Map data = {
-
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
     print(response.body);
 
 
   }
   _NoUpdate(int doc,int id) async {
     Map data = {
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : ""
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     print('nne');
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
   var taskaction = ["No", "Yes"];
@@ -1319,7 +2053,7 @@ class _TVcostomers extends State<TVcostomers>{
                 ),
                 onPressed:(){
                   //_getDocuments();
-                  _YesUpdate(widget.id,widget.docid);
+                  _YesUpdate(widget.id,widget.sub);
 
                   /* Navigator.push(
                                     context,
@@ -1340,7 +2074,7 @@ class _TVcostomers extends State<TVcostomers>{
                 ),
                 onPressed:(){
                   //_getDocuments();
-                  _NoUpdate(widget.id,widget.docid);
+                  _NoUpdate(widget.id,widget.sub);
 
                   /* Navigator.push(
                                     context,
@@ -1359,6 +2093,31 @@ class _TVcostomers extends State<TVcostomers>{
 }
 
 class Campaign extends StatefulWidget {
+  Campaign(
+      {
+        required this.sub,
+        required this.id,
+        required this.report_area,
+        required this.report_region,
+        required this.report_country,
+        required this.sub_task,
+        required this.submited_by,
+        required this.report_title,
+        required this.report_priority,
+        required this.report_details,
+
+      }
+      );
+  final sub;
+  final id;
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
   @override
   State<Campaign> createState() => _Campaign();
 }
@@ -1413,6 +2172,31 @@ class _Campaign extends State<Campaign>{
 }
 
 class TableMeeting extends StatefulWidget {
+  TableMeeting(
+      {
+        required this.sub,
+        required this.id,
+        required this.report_area,
+        required this.report_region,
+        required this.report_country,
+        required this.sub_task,
+        required this.submited_by,
+        required this.report_title,
+        required this.report_priority,
+        required this.report_details,
+
+      }
+      );
+  final sub;
+  final id;
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
   @override
   State<TableMeeting> createState() => _TableMeeting();
 }
@@ -1468,70 +2252,204 @@ class _TableMeeting extends State<TableMeeting>{
 }
 
 class WorkUpdate extends StatefulWidget {
-  final docid;
+  final sub;
   final id;
-  WorkUpdate({required this.docid,required this.id});
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+  WorkUpdate({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<WorkUpdate> createState() => _WorkUpdate();
 }
 class _WorkUpdate extends State<WorkUpdate> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  String _data = '';
-  List<DocumentSnapshot> _result = [];
+
   _YesUpdate(String doc,String id) async {
     Map data = {
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : feedbackController.text
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     var body = json.encode(data);
     var url = Uri.parse('https://2d1e-41-216-166-170.ngrok-free.app/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(feedbackController.text);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
+
 
   }
-  _NoUpdate(String doc,String id){
-    print(feedbackController.text);
-    DocumentReference task = firestore.collection("task").doc(doc);
-    DocumentReference subCollectionReference = task.collection('action').doc(id);
-    subCollectionReference.update({
-      "Feedback":feedbackController.text,
-      "Status":"Complete",
-      "Get user":"No",
-      "date":DateTime.now()
+  _NoUpdate(String doc,String id) async {
+    Map data = {
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
+    var body = json.encode(data);
+    var url = Uri.parse('https://2d1e-41-216-166-170.ngrok-free.app/api/report-create/');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
     });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
   }
-  Future<void> _getDocuments() async {
-    final documentReference = FirebaseFirestore.instance
-        .collection('task')
-        .doc(widget.id)
-        .collection('action')
-        .doc(widget.docid);
-    final documentSnapshot = await documentReference.get();
 
-    setState(() {
-      //_result = querySnapshot.docs;
-      _data =documentSnapshot['Customer'];
-      print(_data);
-
-    });
-  }
   @override
   void initState() {
-    _getDocuments();
     super.initState();
   }
   String? selectedSubTask;
@@ -1587,7 +2505,7 @@ class _WorkUpdate extends State<WorkUpdate> {
                   ),
                   onPressed:(){
                     //_getDocuments();
-                    _NoUpdate(widget.id,widget.docid);
+                    _NoUpdate(widget.id,widget.sub_task);
 
                     /* Navigator.push(
                                     context,
@@ -1605,7 +2523,7 @@ class _WorkUpdate extends State<WorkUpdate> {
                       disable: false,
                       label: 'Select user',
                       hint: 'Select a user',
-                      items: [_data],
+                      items: ["_data"],
                       onChanged: (value){
 
                       }),
@@ -1638,7 +2556,7 @@ class _WorkUpdate extends State<WorkUpdate> {
                     ),
                     onPressed:(){
                       //_getDocuments();
-                      _YesUpdate(widget.id,widget.docid);
+                      _YesUpdate(widget.id,widget.sub_task);
                       /* Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -1654,9 +2572,29 @@ class _WorkUpdate extends State<WorkUpdate> {
 
 
 class Agent extends StatefulWidget {
-  final docid;
+  final sub;
   final id;
-  Agent({required this.docid,required this.id});
+  final report_area;
+  final report_region;
+  final report_country;
+  final sub_task;
+  final submited_by;
+  final report_title;
+  final report_priority;
+  final report_details;
+  Agent({
+    required this.sub,
+    required this.id,
+    required this.report_area,
+    required this.report_region,
+    required this.report_country,
+    required this.sub_task,
+    required this.submited_by,
+    required this.report_title,
+    required this.report_priority,
+    required this.report_details,
+
+  });
   @override
   State<Agent> createState() => _Agent();
 }
@@ -1702,74 +2640,174 @@ class _Agent extends State<Agent> {
 
 
     Map data = {
-
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : feedbackController.text
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print('nne');
-    print(response.body);
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
 
 
   }
   _NoUpdate(int doc,int id) async {
     Map data = {
-      "sub_task":"Visits Tampering Home 400",
-      "taskgoal_id":widget.id,
-      "report_title":"Visits Tampering Home 400",
-      "country": "Tanzania",
-      "report_area": "Mwanza",
-      "report_region": "North",
-      "report_country": "East",
-      "submited_by":"test",
-      "report_agent_found_yes_no" : "Yes",
-      "report_customer_found_fraud_case" :"No",
-      "report_priority" :"Low",
-      "report_status" : "Complete",
-      "report_details" : feedbackController.text
-    };
+      "report_title":widget.report_title,
+      "taskgoal_id": 23,
+      "sub_task":widget.sub_task,
+      "report_details": widget.report_details,
+      "report_area": widget.report_area,
+      "report_region": widget.report_region,
+      "report_country": widget.report_region,
+      "report_gps_coordinate_latitude": null,
+      "report_gps_coordinate_longitude": null,
+      "report_customer_found_yes_no": selectedaction,
+      "report_customer_found_fraud_case": selectedaction,
+      "report_priority": "Low",
+      "report_status": "Complete",
+      "report_amount_collected": null,
+      "report_customer_account_number": null,
+      "report_customer_count_visited": null,
+      "report_agent_target": null,
+      "report_agent_found_yes_no": selectedaction,
+      "report_agent_angaza_Id": null,
+      "report_agent_found_yes_issues": null,
+      "report_agent_found_yes_issues_call_with_cls": null,
+      "report_agent_found_no_chs": null,
+      "report_count_agent_visited": null,
+      "report_issue_to_be_reolved_area": null,
+      "report_resolution_to_be_reolved_area": null,
+      "report_count_fraud_visits": null,
+      "report_feedback_fraud_visits": null,
+      "report_visited_fraud_amount": null,
+      "report_process_list": null,
+      "report_audit_report": null, "report_key_takeaways": null,
+      "report_recommendation": null, "report_pilots": null,
+      "report_coordinate_lamp_found_yes_no": null,
+      "report_coordinate_lamp_found_yes_no_reasons_for_moving": null,
+      "report_role_submitting": null,
+      "report_previous_customer_angaza_ID": null,
+      "report_previous_customer_account_number": null,
+      "report_previous_customer_customer_name": null,
+      "report_previous_customer_phone_number": null,
+      "report_new_customer_account_number": null,
+      "report_new_customer_customer_name": null,
+      "report_new_customer_phone_number": null,
+      "report_repo_location": null,
+      "report_repo_product": null,
+      "report_repo_reselling_agent": null,
+      "report_repo_unit_is_complete": null,
+      "report_repo_customer_2_weeks_pay": null,
+      "report_repo_customer_aware_cond": null,
+      "report_calling_criteria": null,
+      "report_who_calling": null,
+      "report_calling_reason_for_assigning": null,
+      "report_calling_call_count": null,
+      "report_calling_amount_after_5_days": null,
+      "report_table_meetings_done": null,
+      "report_table_meetings_AOC": null,
+      "team_assist_completion_rate": false,
+      "team_raise_reminder": false,
+      "team_raise_warning": false,
+      "team_raise_new_task": false,
+      "team_inform_next_visit": false,
+      "team_who": null,
+      "team_when": null,
+      "headline": null,
+      "submited_by": widget.submited_by,};
     print('nne');
     var body = json.encode(data);
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    print(feedbackController.text);
-
-  }
-  Future<void> _getDocuments() async {
-    final documentReference = FirebaseFirestore.instance
-        .collection('task')
-        .doc(widget.id)
-        .collection('action')
-        .doc(widget.docid);
-    final documentSnapshot = await documentReference.get();
-
-    setState(() {
-      //_result = querySnapshot.docs;
-      _data =documentSnapshot['Customer'];
-      print(_data);
-
-    });
+    final snackBar = SnackBar(
+      content: Text('Report Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) => NavPage(),
+      ),
+    );
   }
   @override
   void initState() {
-    _getDocuments();
+
     super.initState();
   }
   String? selectedSubTask;
@@ -1825,7 +2863,7 @@ class _Agent extends State<Agent> {
                   ),
                   onPressed:(){
                     //_getDocuments();
-                    _NoUpdate(widget.id,widget.docid);
+                    _NoUpdate(widget.id,widget.sub);
 
                     /* Navigator.push(
                                     context,
@@ -1895,7 +2933,7 @@ class _Agent extends State<Agent> {
                     ),
                     onPressed:(){
                       //_getDocuments();
-                      _getAction(widget.id,widget.docid);
+                      _getAction(widget.id,widget.sub);
                       print("{doc id}");
                       /* Navigator.push(
                                     context,

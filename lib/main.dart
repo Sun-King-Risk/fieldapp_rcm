@@ -5,8 +5,10 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:fieldapp_rcm/aws_bucket.dart';
 import 'package:fieldapp_rcm/step_form.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
+import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fieldapp_rcm/routing/nav_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:googleapis/servicecontrol/v2.dart';
 import 'package:http/http.dart' as http;
@@ -16,15 +18,17 @@ import 'package:aws_s3_private_flutter/export.dart';
 import 'add_task.dart';
 import 'amplifyconfiguration.dart';
 import 'firebase_options.dart';
+import 'multform.dart';
 import 'new_design.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await _configureAmplify();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await _configureAmplify();
 
-
-  runApp(MyApp());
+  runApp(
+      MyApp()
+      );
 }
 Future<void> _configureAmplify() async {
   try {
@@ -38,7 +42,6 @@ Future<void> _configureAmplify() async {
   ]);
 
     await Amplify.configure(amplifyconfig);
-    safePrint('Successfully configured');
   } on Exception catch (e) {
     safePrint('Error configuring Amplify: $e');
   }
@@ -56,16 +59,31 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     getUserAttributes();
+    listItems();
   }
   void getUserAttributes() async {
     try {
       AuthUser currentUser = await Amplify.Auth.getCurrentUser();
-      AuthUser userAttributes =
-      await Amplify.Auth.getCurrentUser();
+      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
+      List<String> attributeList = [];
+      for (AuthUserAttribute attribute in attributes) {
+        print(attribute.value);
 
+        if(attribute.userAttributeKey.key.contains("custom")){
+         var valueKey = attribute.userAttributeKey.key.split(":");
+         attributeList.add('"${valueKey[1]}":"${attribute.value}"');
+         print(valueKey[1]);
+        }else{
+          attributeList.add('${attribute.userAttributeKey.key}:${attribute.value}');
+        }
+
+      }
+      if (kDebugMode) {
+        print(attributeList.toList());
+        print(attributeList[3].split(":")[1]);
+      }
       // Process the user attributes
 
-        print('$userAttributes');
     } catch (e) {
       print('Error retrieving user attributes: $e');
     }
@@ -168,25 +186,61 @@ class _MyAppState extends State<MyApp> {
         signUpForm: SignUpForm.custom(
           fields: [
             SignUpFormField.email(required: true),
-      SignUpFormField.name(),
+
+      SignUpFormField.name(required: true),
       SignUpFormField.custom(
-          title: 'Gender',
-          attributeKey: CognitoUserAttributeKey.custom('Gender'),
+          title: 'Country',
+          attributeKey: CognitoUserAttributeKey.custom('Country'),
         required: true,
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Please select a gender';
+            return 'Please select a Country';
           }
           return null;
         },
 
       ),
             SignUpFormField.custom(
-              title: 'Bio',
-              attributeKey: CognitoUserAttributeKey.custom("Bi"),
+              title: 'Zone',
+              attributeKey: CognitoUserAttributeKey.custom('Zone'),
               required: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a Zone';
+                }
+                return null;
+              },
 
             ),
+            SignUpFormField.custom(
+              title: 'Region',
+              attributeKey: CognitoUserAttributeKey.custom('Region'),
+              required: true,
+
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a Region';
+                }
+                return null;
+              },
+
+
+            ),
+            SignUpFormField.custom(
+              title: 'Role',
+              attributeKey: const CognitoUserAttributeKey.custom('Role'),
+              required: true,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a Region';
+                }
+                return null;
+              },
+
+
+
+            ),
+
             SignUpFormField.password(),
             SignUpFormField.passwordConfirmation(),
 
@@ -217,18 +271,83 @@ class _LoginSignUpState extends State<LoginSignUp> {
   @override
   void initState() {
     super.initState();
+    listItems("country");
     _configureAmplify();
   }
-
-  void _configureAmplify() async {
+  Future<StorageItem?> listItems(key) async {
     try {
-      await Amplify.addPlugin(AmplifyAuthCognito());
-      await Amplify.configure(amplifyconfig);
-      safePrint('Successfully configured');
-    } on Exception catch (e) {
-      safePrint('Error configuring Amplify: $e');
+      StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
+      operation = await Amplify.Storage.list(
+        options: const StorageListOptions(
+          accessLevel: StorageAccessLevel.guest,
+          pluginOptions: S3ListPluginOptions.listAll(),
+        ),
+      );
+
+      Future<StorageListResult<StorageItem>> result = operation.result;
+      List<StorageItem> resultList = (await operation.result).items;
+      resultList = resultList.where((file) => file.key.contains(key)).toList();
+      if (resultList.isNotEmpty) {
+        // Sort the files by the last modified timestamp in descending order
+        resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
+        StorageItem latestFile = resultList.first;
+        RegionTask(latestFile.key);
+        print(latestFile.key);
+        print("Key: $key");
+
+        return resultList.first;
+
+      } else {
+        print('No files found in the S3 bucket with key containing "$key".');
+        return null;
+      }
+
+      for (StorageItem item in resultList) {
+        print('Key: ${item.key}');
+        print('Last Modified: ${item.lastModified}');
+        // Access other properties as needed
+      }
+
+      safePrint('Got items: ${resultList.length}');
+    } on StorageException catch (e) {
+      safePrint('Error listing items: $e');
     }
   }
+  Future<void> RegionTask(key) async {
+    List<String> uniqueRegion = [];
+    print("object: $key");
+
+    try {
+      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
+          key: key)
+          .result;
+
+      final response = await http.get(urlResult.url);
+      final jsonData = jsonDecode(response.body);
+      print('File_team: $jsonData');
+      for (var item in jsonData) {
+        //String region = item['Region'];
+        //region?.add(region);
+        if(item['Region'] == null){
+        }else{
+          uniqueRegion.add(item['Region']);
+        }
+
+      }
+      setState(() {
+        data = jsonData;
+        region = uniqueRegion.toSet().toList();
+        safePrint('File_team: $jsonData');
+        isLoading = false;
+      });
+    } on StorageException catch (e) {
+      safePrint('Could not retrieve properties: ${e.message}');
+      rethrow;
+    }
+  }
+  bool isLoading = true;
+  List? data = [];
+  List<String> region= [];
 
   @override
   Widget build(BuildContext context) {
@@ -241,7 +360,6 @@ class _LoginSignUpState extends State<LoginSignUp> {
               state: state,
               // A prebuilt Sign In form from amplify_authenticator
               body: SignInForm(
-
               ),
               // A custom footer with a button to take the user to sign up
               footer: Row(
@@ -261,7 +379,19 @@ class _LoginSignUpState extends State<LoginSignUp> {
             return CustomScaffold(
               state: state,
               // A prebuilt Sign Up form from amplify_authenticator
-              body: SignUpForm(),
+              body: Container(
+                  child: AppDropDown(
+                    disable: false,
+                    label: 'Country',
+                    hint: 'COuntry',
+                    items: region,
+                    onChanged: (value ) {
+                      setState(() {
+
+                      });
+                    },),
+
+              ),
               // A custom footer with a button to take the user to sign in
               footer: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

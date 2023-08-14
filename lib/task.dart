@@ -1,26 +1,28 @@
-
-
 import 'dart:convert';
 
-import 'package:fieldapp_rcm/new_design.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:fieldapp_rcm/report.dart';
-import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/task_table.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'location.dart';
+import 'multform.dart';
 import 'pending_task.dart';
 import 'team_task.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 class TaskData {
-  Future<int> countTask(String taskTitle) async {
+  Future<int> countTask(String taskTitle, String name) async {
     final url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
       final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['task_title'] == taskTitle)
+          .where((task) =>
+              task['task_title'] == taskTitle && task['submited_by'] == name)
           .toList();
       return filteredTasks.length;
 
@@ -30,14 +32,18 @@ class TaskData {
     }
   }
 
-  Future<int> countByStatus(String taskTitle, String status) async {
+  Future<int> countByStatus(
+      String taskTitle, String status, String name) async {
     final url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
       final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['task_title'] == taskTitle).where((task) => task['task_status'] == status)
+          .where((task) =>
+              task['task_title'] == taskTitle &&
+              task['submited_by'] == name &&
+              task['task_status'] == status)
           .toList();
 
       // Process jsonData to count tasks with the given status
@@ -48,10 +54,93 @@ class TaskData {
   }
 }
 
-class Task extends StatelessWidget {
+class Task extends StatefulWidget {
+  @override
+  State<Task> createState() => _TaskState();
+}
+
+class _TaskState extends State<Task> {
+  List<String> attributeList = [];
+  String name = "";
+  String role = '';
+  String singleRegion = '';
+  String country = '';
+  double completeRate = 0;
+  int totaltask = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserAttributes();
+  }
+
+  void getUserAttributes() async {
+    try {
+      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
+      List<AuthUserAttribute> attributes =
+          await Amplify.Auth.fetchUserAttributes();
+      List<String> attributesList = [];
+      for (AuthUserAttribute attribute in attributes) {
+        print(attribute.value);
+
+        if (attribute.userAttributeKey.key.contains("custom")) {
+          var valueKey = attribute.userAttributeKey.key.split(":");
+          attributesList.add('${valueKey[1]}:${attribute.value}');
+          print(valueKey[1]);
+        } else {
+          attributesList
+              .add('${attribute.userAttributeKey.key}:${attribute.value}');
+        }
+      }
+      setState(() {
+        attributeList = attributesList;
+        singleRegion = attributeList[7].split(":")[1];
+        country = attributeList[4].split(":")[1];
+        role = attributeList[5].split(":")[1];
+      });
+      name = attributeList[3].split(":")[1];
+      CompleteRate(name);
+      if (kDebugMode) {
+        print(attributeList.toList());
+        print(attributeList[3].split(":")[1]);
+      }
+      // Process the user attributes
+    } catch (e) {
+      print('Error retrieving user attributes: $e');
+    }
+  }
+
+  void CompleteRate(String name) async {
+    final url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> Tasks =
+          jsonData.where((task) => task['submited_by'] == name).toList();
+      final List<dynamic> completeTasks = jsonData
+          .where((task) =>
+              task['task_status'] == 'Completed' && task['submited_by'] == name)
+          .toList();
+      int _totalTask = Tasks.length ;
+      int _completeTask = completeTasks.length ;
+      var TaskcompleteRate = (_completeTask / _totalTask) * 100;
+      print("_completeTask $_completeTask");
+      print("_totalTask $_totalTask");
+      print("TaskcompleteRate $TaskcompleteRate");
+      setState(() {
+        totaltask = _totalTask;
+        completeRate = TaskcompleteRate;
+
+      });
+      // Return the count value
+    } else {
+      throw Exception('Failed to fetch tasks');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: DefaultTabController(
         length: 4,
@@ -60,11 +149,14 @@ class Task extends StatelessWidget {
             Container(
               constraints: BoxConstraints.expand(height: 40),
               child: TabBar(tabs: [
-
-                Tab(text: "My Task",),
+                Tab(
+                  text: "My Task",
+                ),
                 Tab(text: "Team Task"),
                 Tab(text: "Pending/Request"),
-                Tab(text: "Report",),
+                Tab(
+                  text: "Report",
+                ),
               ]),
             ),
             Expanded(
@@ -72,86 +164,78 @@ class Task extends StatelessWidget {
                 margin: EdgeInsets.all(15),
                 child: TabBarView(children: [
                   SingleChildScrollView(
-
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              minimumSize: Size.fromHeight(40), // fromHeight use double.infinity as width and 40 is the height
+                              minimumSize: Size.fromHeight(
+                                  40), // fromHeight use double.infinity as width and 40 is the height
                             ),
-                            onPressed: (){
+                            onPressed: () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => LocationMap(),
-                                  )
-                              );
-                            }, child: Text("Map")),
+                                  ));
+                            },
+                            child: Text("Map")),
                         ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              minimumSize: Size.fromHeight(40), // fromHeight use double.infinity as width and 40 is the height
+                              minimumSize: Size.fromHeight(
+                                  40), // fromHeight use double.infinity as width and 40 is the height
                             ),
                             onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TaskRadio(),
-                                    ));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MyTaskNew(),
+                                  ));
                             },
                             child: Text("Add New Task")),
                         Card(
                           shadowColor: Colors.amber,
                           color: Colors.black,
                           child: ListTile(
-                            title: Center(child: Text("Overrall Task Complete Rate 34%", style: TextStyle(fontSize: 15,color: Colors.yellow))),
+                            title: Center(
+                                child: Text(
+                                    "Overrall Task Complete Rate $completeRate%",
+                                    style: TextStyle(
+                                        fontSize: 15, color: Colors.yellow))),
                             dense: true,
                           ),
                         ),
-
                         TaskList(
                           task_title: 'Portfolio Quality',
-
-
+                          name: name,
                         ),
                         TaskList(
                           task_title: 'Pilot/Process Management',
-
-
-
+                          name: name,
                         ),
                         TaskList(
                           task_title: 'Collection Drive',
-
-
-
+                          name: name,
                         ),
                         TaskList(
                           task_title: 'Customer Management',
-
-
-
+                          name: name,
                         ),
                         TaskList(
                           task_title: 'Team Management',
-
-
-
+                          name: name,
                         ),
                       ],
                     ),
-
                   ),
                   Container(
                     child: TeamTask(),
                   ),
                   Container(
-
-                    child:PendingTask(),
+                    child: PendingTask(),
                   ),
                   Container(
-
-                    child:Report(),
+                    child: Report(),
                   ),
                 ]),
               ),
@@ -163,17 +247,11 @@ class Task extends StatelessWidget {
   }
 }
 
-
 class TaskList extends StatefulWidget {
-
   final String task_title;
-  const TaskList({Key? key,
-    required this.task_title,
-
-  })
+  final String name;
+  const TaskList({Key? key, required this.task_title, required this.name})
       : super(key: key);
-
-
 
   @override
   State<TaskList> createState() => _TaskListState();
@@ -188,15 +266,14 @@ class _TaskListState extends State<TaskList> {
       setState(() {
         data = jsonDecode(response.body);
       });
-    }else{
+    } else {
       print('Request failed with status: ${response.statusCode}');
-
     }
   }
+
   final TaskData taskData = TaskData();
   @override
   Widget build(BuildContext context) {
-
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyy-MM').format(now);
     return InkWell(
@@ -204,11 +281,14 @@ class _TaskListState extends State<TaskList> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => MyTaskView(endPoint: 'tasks',title: widget.task_title,),
+              builder: (context) => MyTaskView(
+                endPoint: 'tasks',
+                title: widget.task_title,
+                name: widget.name,
+              ),
             ));
       },
-
-      child:Container(
+      child: Container(
         height: 70,
         padding: EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 5),
         margin: EdgeInsets.only(left: 5, right: 5, bottom: 10, top: 5),
@@ -227,8 +307,10 @@ class _TaskListState extends State<TaskList> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                FutureBuilder<int>(
-                  future: taskData.countTask(widget.task_title),
+                StreamBuilder<int>(
+                  stream: taskData
+                      .countTask(widget.task_title, widget.name)
+                      .asStream(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
@@ -244,8 +326,11 @@ class _TaskListState extends State<TaskList> {
                     }
                   },
                 ),
-                FutureBuilder<int>(
-                  future: taskData.countByStatus(widget.task_title, 'Completed'),
+                StreamBuilder<int>(
+                  stream: taskData
+                      .countByStatus(
+                          widget.task_title, 'Completed', widget.name)
+                      .asStream(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
@@ -261,8 +346,10 @@ class _TaskListState extends State<TaskList> {
                     }
                   },
                 ),
-                FutureBuilder<int>(
-                  future: taskData.countByStatus(widget.task_title, 'Pending'),
+                StreamBuilder<int>(
+                  stream: taskData
+                      .countByStatus(widget.task_title, 'Pending', widget.name)
+                      .asStream(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
@@ -283,10 +370,6 @@ class _TaskListState extends State<TaskList> {
           ],
         ),
       ),
-
     );
   }
 }
-
-
-

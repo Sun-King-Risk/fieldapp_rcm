@@ -93,8 +93,7 @@ class  LocationMapState extends State<LocationMap> {
     };
   }
   List<LatLng> polylineCoordinates = [];
-  List<LatLng> latLngList = [LatLng(-2.52783833333, 36.4846716667), LatLng(-4.095425, 36.37742), LatLng(-3.3696954, 36.6866288), LatLng(-3.307349, 36.6289648), LatLng(-3.4564848, 36.7089226), LatLng(-3.5309735, 36.117591), LatLng(-3.36875796318, 36.8862104416), LatLng(-3.3744688, 36.7568668), LatLng(-3.3220967, 36.4468417), LatLng(-3.2450547, 36.9935586),
-    LatLng(-2.5516329, 36.7840539), LatLng(-2.52783833333, 36.4846716667), LatLng(-4.095425, 36.37742)];
+  List<LatLng> latLngList = [];
   final Completer<GoogleMapController> _controller = Completer();
   LatLng _currentLocation = LatLng(0, 0);
   Future<void> _getCurrentLocation() async {
@@ -122,8 +121,12 @@ class  LocationMapState extends State<LocationMap> {
         desiredAccuracy: LocationAccuracy.high,
       );
       LatLng currentLocation = LatLng(position.latitude, position.longitude);
+      int addedCoordinates = 0;
 
       for (final task in filteredTasks) {
+        if (addedCoordinates >= 10) {
+          break; // Stop adding coordinates when the limit (10) is reached
+        }
         final coordinate = task['Location Latitudelongitude'];
         if (coordinate != null && coordinate != '') {
           List<String> coordinatevalue = coordinate.split(',');
@@ -139,6 +142,7 @@ class  LocationMapState extends State<LocationMap> {
             );
             if (distance / 1000 <= 30) {
               latLngList.add(latLng);
+              addedCoordinates++;
             }else{
               latLngList.add(latLng);
             }
