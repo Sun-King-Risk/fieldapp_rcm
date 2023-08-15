@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,9 +19,48 @@ class  LocationMapState extends State<LocationMap> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    maploading = false;
+    getUserAttributes();
     listItems("customer_location");
     _getCurrentLocation();
 
+  }
+  List<String> attributeList = [];
+  String name ="";
+  String country ="";
+  bool complete= false;
+  void getUserAttributes() async {
+    try {
+      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
+      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
+      List<String> attributesList = [];
+      for (AuthUserAttribute attribute in attributes) {
+        print(attribute.value);
+
+        if(attribute.userAttributeKey.key.contains("custom")){
+          var valueKey = attribute.userAttributeKey.key.split(":");
+          attributesList.add('"${valueKey[1]}":"${attribute.value}"');
+          print(valueKey[1]);
+        }else{
+          attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
+        }
+
+      }
+      setState(() {
+        attributeList = attributesList;
+        name = attributeList[3].split(":")[1];
+      });
+      name = attributeList[3].split(":")[1];
+      country = attributeList[4].split(":")[1];
+      if (kDebugMode) {
+        print(attributeList.toList());
+        print("Dennis ${attributeList[4].split(":")[1]}");
+      }
+      // Process the user attributes
+
+    } catch (e) {
+      print('Error retrieving user attributes: $e');
+    }
   }
   List? data = [];
   List<String> region= [];
@@ -62,7 +102,6 @@ class  LocationMapState extends State<LocationMap> {
         print("Key: $key");
 
         return resultList.first;
-
       } else {
         print('No files found in the S3 bucket with key containing "$key".');
         return null;
@@ -93,8 +132,8 @@ class  LocationMapState extends State<LocationMap> {
     };
   }
   List<LatLng> polylineCoordinates = [];
-  List<LatLng> latLngList = [LatLng(-2.52783833333, 36.4846716667), LatLng(-4.095425, 36.37742), LatLng(-3.3696954, 36.6866288), LatLng(-3.307349, 36.6289648), LatLng(-3.4564848, 36.7089226), LatLng(-3.5309735, 36.117591), LatLng(-3.36875796318, 36.8862104416), LatLng(-3.3744688, 36.7568668), LatLng(-3.3220967, 36.4468417), LatLng(-3.2450547, 36.9935586),
-    LatLng(-2.5516329, 36.7840539), LatLng(-2.52783833333, 36.4846716667), LatLng(-4.095425, 36.37742)];
+  List<LatLng> latLngList = [ ];
+  bool maploading = true;
   final Completer<GoogleMapController> _controller = Completer();
   LatLng _currentLocation = LatLng(0, 0);
   Future<void> _getCurrentLocation() async {
@@ -113,8 +152,9 @@ class  LocationMapState extends State<LocationMap> {
 
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
+      print(jsonData);
       final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['Region'] == 'Northern' && task['Country'] =='Tanzania'
+          .where((task) => task['Country'] ==country
           &&task['Location Latitudelongitude'] != null && task['Location Latitudelongitude'] != '' )
           .toList();
       print(filteredTasks);
@@ -146,6 +186,9 @@ class  LocationMapState extends State<LocationMap> {
 
         }
       }
+      setState(() {
+        maploading = true;
+      });
       print(latLngList);
 
 
@@ -158,10 +201,10 @@ class  LocationMapState extends State<LocationMap> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Customers'),
+          title: Text('Customers'),
           elevation: 2,
         ),
-    body:FutureBuilder<LatLng>(
+    body:maploading?FutureBuilder<LatLng>(
 
       future: getCurrentLocation(),
 
@@ -209,7 +252,7 @@ class  LocationMapState extends State<LocationMap> {
       return Center(child: CircularProgressIndicator());
     }
     }
-    ));
+    ):complete?Center(child: Text("No Customer in your current place"),):Center(child: CircularProgressIndicator()));
   }
 
 }
