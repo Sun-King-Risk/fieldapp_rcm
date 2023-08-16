@@ -2,7 +2,7 @@ import 'dart:core';
 import 'package:fieldapp_rcm/area/pending_calls.dart';
 import 'package:fieldapp_rcm/services/calls_detail.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -31,15 +31,10 @@ class AreaDashboardState extends State<AreaDashboard> {
       });
     });
   }
-  dataAll() async {
-    final usersRef = FirebaseFirestore.instance.collection('Users');
-    QuerySnapshot<Map<String, dynamic>> snapshot = await usersRef.get();
-    print(snapshot.docs.length);
-    return snapshot;
-  }
+
   initState() {
     userArea();
-    dataAll();
+
     print(newuser);
     super.initState();
   }
@@ -68,42 +63,18 @@ class AreaDashboardState extends State<AreaDashboard> {
           ),
           Row(
             children: [
-              RowData(
-                value: 0,
-                label: 'Call Attempt',
-                future: USerCallDetail().CountComplete('Call'),
-              ),
-              RowData(
-                value: 0,
-                label: 'Call Made',
-                future: USerCallDetail().CountCallMade('Call'),
-              ),
-              RowData(
-                label: 'Calls Pending',
-                value: 0,
-                future: USerCallDetail().CountPendingCall('Call'),
-              ),
+
+
+
 
 
             ],
           ),
           Row(
             children: [
-              RowData(
-                value: 0,
-                label: 'Complete Rate',
-                future: USerCallDetail().CompleteCallRate('Call'),
-              ),
-              RowData(
-                value: 32,
-                label: 'Success Calls',
-                future: USerCallDetail().CountSucceful('Call'),
-              ),
-              RowData(
-                value: 35,
-                label: 'Total Collected',
-                future: USerCallDetail().Amount('Call'),
-              ),
+
+
+
             ],
           ),
           KpiTittle(
@@ -113,42 +84,18 @@ class AreaDashboardState extends State<AreaDashboard> {
           ),
           Row(
             children: [
-              RowData(
-                value: 20,
-                label: 'Visit Attempt',
-                future: USerCallDetail().CountComplete('Visit'),
-              ),
-              RowData(
-                value: 20,
-                label: 'Visit Made',
-                future: USerCallDetail().CountVisitMade('Visit'),
-              ),
-              RowData(
-                value: 40,
-                label: 'Visit Pending',
-                future: USerCallDetail().CountPendingVisit('Visit'),
-              ),
+
+
+
             ],
           ),
           Row(
             children: [
 
-              RowData(
-                value: 35,
-                label: 'Complete Rate',
-                future: USerCallDetail().CompleteVistRate('Visit'),
-              ),
 
-              RowData(
-                value: 20,
-                label: 'Success Visit',
-                future: USerCallDetail().CountSucceful('Visit'),
-              ),
-              RowData(
-                value: 35,
-                label: 'Total Collected',
-                future: USerCallDetail().Amount('Visit'),
-              ),
+
+
+
             ],
           ),
           SizedBox(

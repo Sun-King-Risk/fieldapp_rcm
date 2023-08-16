@@ -1,7 +1,6 @@
 
 import 'package:fieldapp_rcm/routing/bottom_nav.dart';
 import 'package:fieldapp_rcm/services/auth_services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -61,11 +60,10 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
           setState(() {
             _isSigningIn = true;
           });
-          User? user = await Authentication.signInWithGoogle(context: context);
           setState(() {
             _isSigningIn = false;
           });
-          if (user != null) {
+          if ("user" != null) {
             String? email;
               Navigator.of(context).pushReplacement(
 

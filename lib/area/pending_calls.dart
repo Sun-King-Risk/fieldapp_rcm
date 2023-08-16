@@ -6,15 +6,10 @@ import 'package:fieldapp_rcm/area/customer_vist.dart';
 import 'package:fieldapp_rcm/services/calls_detail.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fieldapp_rcm/services/user_detail.dart';
-import 'package:call_log/call_log.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:intl/intl.dart';
 
 import '../widget/drop_down.dart';
-import 'customer_profile.dart';
 
 class PendingCalls extends StatefulWidget {
   const PendingCalls({Key? key}) : super(key: key);
@@ -48,8 +43,8 @@ class PendingCallsState extends State<PendingCalls> {
     return photo;
   }
 
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  var currentUser = FirebaseAuth.instance.currentUser;
+
+
   var fnumberupdate;
   var cmnumberupdate;
   var number1update;
@@ -70,30 +65,6 @@ class PendingCallsState extends State<PendingCalls> {
   }
 
   String _searchQuery = '';
-  List<DocumentSnapshot> _data = [];
-  Future<void> _getDocuments() async {
-    QuerySnapshot querySnapshot = await firestore
-        .collection("new_calling")
-        .where("Area", isEqualTo: await UserDetail().getUserArea())
-        .where('Status', isNotEqualTo: 'Complete')
-        .get();
-    setState(() {
-      _data = querySnapshot.docs;
-    });
-  }
-
-  Future<void> _getFilterdata(String Task) async {
-    QuerySnapshot querySnapshot = await firestore
-        .collection("new_calling")
-        .where("Area", isEqualTo: await UserDetail().getUserArea())
-        .where('Status', isNotEqualTo: 'Complete')
-        .where('Task', isEqualTo: Task)
-        .get();
-    setState(() {
-      _data = querySnapshot.docs;
-      visit = false;
-    });
-  }
 
   int daysBetween(DateTime from, DateTime to) {
     from = DateTime(from.year, from.month, from.day);
@@ -104,40 +75,9 @@ class PendingCallsState extends State<PendingCalls> {
   void callLogs(String docid, String feedback, String angaza) async {
     String _docid = docid;
 
-    Iterable<CallLogEntry> entries = await CallLog.get();
-    fnumberupdate = entries.elementAt(0).formattedNumber;
-    cmnumberupdate = entries.elementAt(0).cachedMatchedNumber;
-    number1update = entries.elementAt(0).number;
-    name1update = entries.elementAt(0).name;
-    calltypeupdate = entries.elementAt(0).callType;
-    timedateupdate = entries.elementAt(0).timestamp;
-    duration1update = entries.elementAt(0).duration;
-    accidupdate = entries.elementAt(0).phoneAccountId;
-    simnameupdate = entries.elementAt(0).simDisplayName;
-
     if (duration1update >= 30) {
-      CollectionReference newCalling = firestore.collection("new_calling");
-      await newCalling.doc(_docid).update({
-        'Duration': duration1update,
-        'ACE Name': currentUser?.displayName,
-        "User UID": currentUser?.uid,
-        "date": DateFormat('yyyy-MM-dd kk:mm').format(DateTime.now()),
-        "Task Type": "Call",
-        "Status": "Complete",
-        "Promise date": dateInputController.text,
-      });
-      CollectionReference feedBack = firestore.collection("FeedBack");
-      await feedBack.add({
-        "Angaza ID": angaza,
-        "Duration": duration1update,
-        "User UID": currentUser?.uid,
-        "date": DateFormat('yyyy-MM-dd kk:mm').format(DateTime.now()),
-        "Task Type": "Call",
-        "Status": "Complete",
-        "Promise date": DateFormat('yyyy-MM-dd')
-            .format(dateInputController.text as DateTime),
-        "Feedback": feedback
-      });
+
+
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -193,11 +133,6 @@ class PendingCallsState extends State<PendingCalls> {
                             hint: 'Select Phone Number',
                             items: phone,
                             onChanged: (String value) async {
-                              setState(() {
-                                phoneselected = value;
-                              });
-                              await FlutterPhoneDirectCaller.callNumber(
-                                  phoneselected!);
                             }),
                         SizedBox(
                           height: 10,
@@ -315,7 +250,7 @@ class PendingCallsState extends State<PendingCalls> {
           );
         });
   }
-
+ final _data = [];
   bool isDescending = false;
 
   // This list holds the data for the list view
@@ -324,7 +259,6 @@ class PendingCallsState extends State<PendingCalls> {
   initState() {
     // at the beginning, all users are shown
     userArea();
-    _getDocuments();
     super.initState();
   }
 
@@ -350,20 +284,20 @@ class PendingCallsState extends State<PendingCalls> {
               onSelected: (value) {
                 switch (value) {
                   case 'All':
-                    _getDocuments();
+
                     print(value);
                     break;
                   case 'Call':
                     print(value);
-                    _getFilterdata('Call');
+
                     break;
                   case 'Disabled':
                     print(value);
-                    _getFilterdata('Disable');
+
                     break;
                   case 'Visit':
                     print(value);
-                    _getFilterdata('Visit');
+
                     break;
                 }
               },
@@ -396,13 +330,13 @@ class PendingCallsState extends State<PendingCalls> {
               ? ListView.separated(
                   itemCount: _data.length,
                   itemBuilder: (context, index) {
-                    DocumentSnapshot data = _data[index];
-                    String phoneList = '${data["Customer Phone Number"]},' +
-                        '${data["Phone Number 1"].toString()},' +
-                        '${data["Phone Number 2"].toString()},' +
-                        '${data["Phone Number 3"].toString()},' +
-                        '${data["Phone Number 4"].toString()},';
-                    if (data["Task"] == 'Visit') {
+
+                    String phoneList = '${_data[index]["Customer Phone Number"]},' +
+                        '${_data[index]["Phone Number 1"].toString()},' +
+                        '${_data[index]["Phone Number 2"].toString()},' +
+                        '${_data[index]["Phone Number 3"].toString()},' +
+                        '${_data[index]["Phone Number 4"].toString()},';
+                    if (_data[index]["Task"] == 'Visit') {
                       visit = true;
                     } else {
                       visit = false;
@@ -415,14 +349,7 @@ class PendingCallsState extends State<PendingCalls> {
                     }
                     return InkWell(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CProfile(
-                                id: data.id,
-                                angaza: data['Angaza ID'],
-                              ),
-                            ));
+
                       },
                       key: ValueKey(_data[index]),
                       child: Card(
@@ -464,18 +391,18 @@ class PendingCallsState extends State<PendingCalls> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text("${data['Customer Name']}",
+                                      Text("${_data[index]['Customer Name']}",
                                           style: TextStyle(
                                             fontSize: 13,
                                             color: Colors.black,
                                           )),
                                       Text(
-                                          "${data['Account Number'].toString()}",
+                                          "${_data[index]['Account Number'].toString()}",
                                           style: TextStyle(
                                             fontSize: 13,
                                             color: Colors.black,
                                           )),
-                                      Text("${data['Product Name']}",
+                                      Text("${_data[index]['Product Name']}",
                                           style: TextStyle(
                                             fontSize: 13,
                                             color: Colors.black,
@@ -498,8 +425,8 @@ class PendingCallsState extends State<PendingCalls> {
                                       : IconButton(
                                           padding: new EdgeInsets.all(0.0),
                                           onPressed: () {
-                                            _callNumber(phoneList, data.id,
-                                                data["Angaza ID"]);
+                                            _callNumber(phoneList, _data[index].id,
+                                                _data[index]["Angaza ID"]);
                                           },
                                           icon: Icon(Icons.phone, size: 20.0)),
                                   IconButton(
@@ -510,8 +437,8 @@ class PendingCallsState extends State<PendingCalls> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   CustomerVisit(
-                                                id: data.id,
-                                                angaza: data["Angaza ID"],
+                                                id: _data[index].id,
+                                                angaza: _data[index]["Angaza ID"],
                                               ),
                                             ));
                                       },

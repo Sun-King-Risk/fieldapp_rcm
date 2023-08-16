@@ -8,10 +8,8 @@ import 'package:fieldapp_rcm/task/portfolio.dart';
 import 'package:fieldapp_rcm/task/team.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:multiselect_dropdown_flutter/multiselect_dropdown_flutter.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'task/customer.dart';
@@ -23,73 +21,9 @@ class StepAddTask extends StatefulWidget {
 
 class _StepAddTaskState extends State<StepAddTask> {
  late String _region;
-  Future<void> _getRegion() async {
-
-    var  query = await firestore.collection('Users').where("UID", isEqualTo: currentUser).get();
-    var snapshot = query.docs[0];
-    var data = snapshot.data();
-    setState(() {
-      _region = data['Region'];
-    });
-    return ;
-  }
   var caseselected;
   var customerselected;
   List<TextEditingController> _controllers = [];
-  formPost() async {
-    CollectionReference task = firestore.collection("task");
-    var currentUser = FirebaseAuth.instance.currentUser;
-    await task.add({
-      "task_title": selectedTask,
-      "User UID": currentUser?.uid,
-      "sub_task": selectedSubTask,
-      "task_description": _text.text.toString(),
-      "process_audit":"",
-      "task_start_date":  DateTime.now(),
-      "task_end_date": DateTime.now(),
-      "task_status": "Pending",
-      "task_with": agentselected,
-      "task_area": areaselected.toString(),
-      "task_region": regionselected,
-      "submited_by":currentUser?.displayName ,
-      "case_name":caseselected,
-      "Customer": customerselected,
-      "submited_role": null,
-      "task_country": "Tanzania",
-      "priority": priority,
-      "timestamp": DateTime.now(),
-      "is_approved": "pending"
-    }
-    );
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => NavPage()),
-    );
-
-    /* Map data = {
-        'task_title': _myActivitiesResult.toString().replaceAll("(^\\[|\\]", ""),
-        'sub_task': _subtaskResult,
-        'task_region': _regionResult,
-        'task_area': _areaResult,
-        'priority': priority.toString(),
-        'task_with': _userRoleResult,
-        'task_description': 'Testing',
-        'task_start_date': '2022-11-04',
-        'task_end_date': '2022-11-09',
-        'task_status': 'Pending',
-        'submited_by': 'Dennis',
-        'timestamp': '23454',
-        'is_approved': 'No'
-      };
-      var body = json.encode(data);
-      var url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/create');
-      http.Response response = await http.post(url, body: body, headers: {
-        "Content-Type": "application/json",
-      });
-      print(response.body);*/
-  }
-
-
   late String _myActivitiesResult;
   bool _validate = false;
   List? _myActivities;
@@ -99,7 +33,6 @@ class _StepAddTaskState extends State<StepAddTask> {
   @override
   void initState() {
     super.initState();
-    _getRegion();
     _myActivities = [];
     _myActivitiesResult = '';
     laststep = false;
@@ -134,8 +67,6 @@ class _StepAddTaskState extends State<StepAddTask> {
   List<String> priortySelected = [];
   StepperType stepperType = StepperType.vertical;
   bool _isSelected = false;
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  var currentUser = FirebaseAuth.instance.currentUser;
 
   Widget build(BuildContext context) {
     List<Step> stepList() => [
@@ -314,8 +245,6 @@ class TaskForm extends StatefulWidget {
 }
 
 class _TaskFormState extends State<TaskForm> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  var currentUser = FirebaseAuth.instance.currentUser!.uid;
   String _region ="";
   initState() {
     // at the beginning, all users are shown
@@ -324,30 +253,9 @@ class _TaskFormState extends State<TaskForm> {
    //_getArea();
     super.initState();
   }
-  void _getRegion() async {
 
-    var  query = await firestore.collection('Users').where("UID", isEqualTo: currentUser).get();
-    var snapshot = query.docs[0];
-    var data = snapshot.data();
-    setState(() {
-      _region = data['Region'];
-
-    });
-    return ;
-  }
   List<String> _area = [];
-  Future<void> _getArea() async {
 
-    QuerySnapshot querySnapshot =
-    await firestore.collection("TZ_agent_welcome_call")
-        .where("Region", isEqualTo:await _region)
-        .get();
-    setState(() {
-      _area =querySnapshot.docs.map((doc) => doc["Area"].toString()).toSet().toList();
-      print(_area);
-
-    });
-  }
   String? selectedTask;
 
   String? selectedSubTask;
@@ -441,7 +349,6 @@ class _TaskFormState extends State<TaskForm> {
               items: ["Region 1", "Region 2"],
               onChanged: (value){
                 widget.onregionselected(value!);
-                _getArea();
               }),
           SizedBox(
             height: 8,

@@ -1,11 +1,10 @@
 import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fieldapp_rcm/task_actions.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 

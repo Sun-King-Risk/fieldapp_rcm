@@ -1,5 +1,5 @@
 import '../task_actions.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 import 'package:flutter/material.dart';
 
@@ -23,16 +23,9 @@ class PortfolioUpdate extends StatefulWidget {
 }
 
 class PortfolioUpdateState extends State<PortfolioUpdate> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  Future<void> _getDocuments() async {
-    final querySnapshot =
-        await firestore.collection("task").doc(widget.task).get();
-    final data = querySnapshot.data();
-    print(data?['Area']);
-  }
+
   @override
   void initState() {
-    _getDocuments();
     super.initState();
   }
   @override

@@ -7,7 +7,6 @@ import 'package:fieldapp_rcm/routing/bottom_nav.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/task_actions.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -62,23 +61,13 @@ class SingleTaskState extends State<SingleTask> {
       throw Exception('Failed to load data');
     }
   }
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  List<DocumentSnapshot> _data = [];
-  Future<void> _getDocuments() async {
-    QuerySnapshot querySnapshot =
-    await firestore.collection("task").doc(widget.task).collection('action').get();
-    setState(() {
-      _data = querySnapshot.docs;
-      var denn = _data.toList();
-      print(denn);
-    });
-  }
+
 
 
   @override
   void initState() {
     this.fetchData();
-    _getDocuments();
+
   }
 
   @override

@@ -1,10 +1,8 @@
 import 'dart:convert';
 
-import 'package:call_log/call_log.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -36,40 +34,14 @@ class CProfileState extends State<CProfile> {
   void callLogs(String docid,String feedback,String angaza) async {
     String _docid = docid;
 
-    Iterable<CallLogEntry> entries = await CallLog.get();
-    fnumberupdate = entries.elementAt(0).formattedNumber;
-    cmnumberupdate = entries.elementAt(0).cachedMatchedNumber;
-    number1update = entries.elementAt(0).number;
-    name1update = entries.elementAt(0).name;
-    calltypeupdate = entries.elementAt(0).callType;
-    timedateupdate = entries.elementAt(0).timestamp;
-    duration1update = entries.elementAt(0).duration;
-    accidupdate = entries.elementAt(0).phoneAccountId;
-    simnameupdate = entries.elementAt(0).simDisplayName;
+
 
 
     if (duration1update >= 30) {
-      CollectionReference newCalling = firestore.collection("new_calling");
-      await newCalling.doc(_docid).update({
-        'Duration': duration1update,
-        'ACE Name': currentUser?.displayName,
-        "User UID": currentUser?.uid,
-        "date": DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now()),
-        "Task Type": "Call",
-        "Status": "Complete",
-        "Promise date": dateInputController.text,
-      });
-      CollectionReference feedBack = firestore.collection("FeedBack");
-      await feedBack.add({
-        "Angaza ID":angaza,
-        "Duration": duration1update,
-        "User UID": currentUser?.uid,
-        "date": DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now()),
-        "Task Type": "Call",
-        "Status": "Complete",
-        "Promise date": dateInputController.text,
-        "Feedback":feedback
-      });
+
+
+
+
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -121,10 +93,7 @@ class CProfileState extends State<CProfile> {
                           hint: 'Select Phone Number',
                           items: phone,
                           onChanged: (String value) async {
-                            setState((){
-                              phoneselected = value;
-                            });
-                            await FlutterPhoneDirectCaller.callNumber(phoneselected!);
+
                           }),
                       SizedBox(height: 10,),
                       DropdownButtonFormField(
@@ -264,11 +233,10 @@ class CProfileState extends State<CProfile> {
         .firstWhere((attr) => attr['name'] == 'Client Photo')['value'];
     return photo;
   }
-  var currentUser = FirebaseAuth.instance.currentUser;
+
   bool onclick = false;
-  final querySnapshot =
-      FirebaseFirestore.instance.collection('new_calling').doc().get();
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
@@ -303,186 +271,6 @@ class CProfileState extends State<CProfile> {
                         return CircularProgressIndicator();
                       }
                     })),
-            StreamBuilder(
-              stream: firestore.collection("new_calling").doc(widget.id).snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  DocumentSnapshot data = snapshot.data!;
-                  String phoneList =
-                      '${data["Customer Phone Number"]},'+
-                          '${data["Phone Number 1"].toString()},'+
-                          '${data["Phone Number 2"].toString()},'+
-                          '${data["Phone Number 3"].toString()},'+
-                          '${data["Phone Number 4"].toString()},'
-                  ;
-                  var agentname = data['Responsible User'].split('(');
-                  var date = data['Registration Date'];
-                  return Column(
-
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Name:',
-                                  style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
-                              Text('Account:',
-                                  style: const TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('${data['Customer Name']}',
-                                  style: const TextStyle(fontSize: 20)),
-                              Text(' ${data['Account Number']}',
-                                  style: const TextStyle(fontSize: 20)),
-                            ],
-                          )
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              _callNumber(
-                                  phoneList,
-                                  data.id,
-                                  data["Angaza ID"]
-                              );
-                            },
-                            child: Text(
-                              data['Customer Phone Number'],
-                              style: const TextStyle(
-                                  fontSize: 20, color: Colors.black),
-                            ),
-                          ),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          CustomerVisit(id: data.id,
-                                            angaza: data["Angaza ID"],
-                                          ),
-                                    ));
-                              },
-                              child: Text(data['Area'].toString(),
-                                  style: const TextStyle(
-                                      fontSize: 20, color: Colors.black))),
-                        ],
-                      ),
-                      const Card(
-                        shadowColor: Colors.amber,
-                        color: Colors.black,
-                        child: ListTile(
-                          title: Center(
-                              child: Text("Account Detail",
-                                  style: TextStyle(
-                                      fontSize: 15, color: Colors.yellow))),
-                          dense: true,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Agent Name: ',
-                                    style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold)),
-                                Text(
-                                  'Agent Username: ',
-                                  style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  'Registration Date: ',
-                                  style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  'Product Name: ',
-                                  style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  'Is FPD: ',
-                                  style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
-                                ),
-                                Text('Amount to Collect: ',
-                                  style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
-                                Text('Amount Collected: ',
-                                  style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
-
-                                Text('Promise date: ',
-                                    style: const TextStyle(fontSize: 15,fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(' ${agentname[0]}',
-                                    style: const TextStyle(fontSize: 15)),
-                                Text(
-                                  ' ${agentname[1].replaceAll(')', '')}',
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                                Text(
-                                  ' ${DateTime.fromMillisecondsSinceEpoch(date.seconds*1000).toString().substring(0,10)}',
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-
-                                Text(
-                                  ' ${data['Product Name']}',
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                                Text(
-                                  ' ${data['FPD']}',
-                                  style: const TextStyle(fontSize: 15),
-                                ),
-                                Text(' ${data['Amount to Collect']}',
-                                    style: const TextStyle(fontSize: 15)),
-                                Text(' ${data['Amount Collected']}',
-                                    style: const TextStyle(fontSize: 15)),
-
-                                Text(' ${data['Promise date']}',
-                                    style: const TextStyle(fontSize: 15)),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-
-
-                      SizedBox(
-                        height: 10,
-                      ),
-
-                    ],
-                  );
-                } else if (snapshot.hasError) {
-                  return Column(
-                    children: const [
-                      CircularProgressIndicator(),
-                      Text("Error Loading data")
-                    ],
-                  );
-                } else {
-                  return Column(
-                    children: const [
-                      CircularProgressIndicator(),
-                      Text("Loading data...")
-                    ],
-                  );
-                }
-              },
-            ),
             const Card(
               shadowColor: Colors.amber,
               color: Colors.black,
@@ -522,34 +310,7 @@ class CProfileState extends State<CProfile> {
             Container(
                 height: 300,
 
-                child: FutureBuilder(
-                  future:firestore.collection("FeedBack").where('Angaza ID',isEqualTo: widget.angaza).get(),
-                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> feedbackdata) {
-                    print(feedbackdata);
-                    if(feedbackdata.hasData){
-                      return ListView.separated(
-                          itemCount: feedbackdata.data!.docs.length,
-                          separatorBuilder: (BuildContext context, int index) {
-                            return Divider();
-                          },
-                          itemBuilder: (BuildContext context, int index) {
-                            return CustomFeedBack(
-                              serial: index+1,
-                              feedback:feedbackdata.data!.docs[index]["Feedback"],
-                              task:feedbackdata.data!.docs[index]["Task Type"],
-                              date:feedbackdata.data!.docs[index]["date"],
-
-                            );
-                          });
-                    }else{
-                      return Column(
-                        children: [
-                          Text("No record Found")
-                        ],
-                      );
-                    }
-
-                  },)
+                child: Center(child: Text(""),)
             )
           ],
         )

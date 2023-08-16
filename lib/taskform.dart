@@ -6,15 +6,13 @@ import 'package:fieldapp_rcm/area/customer_vist.dart';
 import 'package:fieldapp_rcm/services/calls_detail.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fieldapp_rcm/services/user_detail.dart';
-import 'package:call_log/call_log.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
+
 import 'package:flutter/material.dart';
-import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+
 import 'package:intl/intl.dart';
 
 import '../widget/drop_down.dart';
-import 'area/customer_profile.dart';
 
 class UserList extends StatefulWidget {
   const UserList({Key? key}) : super(key: key);
@@ -73,8 +71,7 @@ class PendingCallsState extends State<UserList> {
     var dd = json.decode(response.body);
     return data;
   }
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  var currentUser = FirebaseAuth.instance.currentUser;
+
   var fnumberupdate;
   var cmnumberupdate;
   var number1update;
@@ -102,40 +99,11 @@ class PendingCallsState extends State<UserList> {
   void callLogs(String docid,String feedback,String angaza) async {
     String _docid = docid;
 
-    Iterable<CallLogEntry> entries = await CallLog.get();
-    fnumberupdate = entries.elementAt(0).formattedNumber;
-    cmnumberupdate = entries.elementAt(0).cachedMatchedNumber;
-    number1update = entries.elementAt(0).number;
-    name1update = entries.elementAt(0).name;
-    calltypeupdate = entries.elementAt(0).callType;
-    timedateupdate = entries.elementAt(0).timestamp;
-    duration1update = entries.elementAt(0).duration;
-    accidupdate = entries.elementAt(0).phoneAccountId;
-    simnameupdate = entries.elementAt(0).simDisplayName;
+
 
 
     if (duration1update >= 30) {
-      CollectionReference newCalling = firestore.collection("new_calling");
-      await newCalling.doc(_docid).update({
-        'Duration': duration1update,
-        'ACE Name': currentUser?.displayName,
-        "User UID": currentUser?.uid,
-        "date": DateFormat('yyyy-MM-dd kk:mm').format(DateTime.now()),
-        "Task Type": "Call",
-        "Status": "Complete",
-        "Promise date": dateInputController.text,
-      });
-      CollectionReference feedBack = firestore.collection("FeedBack");
-      await feedBack.add({
-        "Angaza ID":angaza,
-        "Duration": duration1update,
-        "User UID": currentUser?.uid,
-        "date": DateFormat('yyyy-MM-dd kk:mm').format(DateTime.now()),
-        "Task Type": "Call",
-        "Status": "Complete",
-        "Promise date": dateInputController.text,
-        "Feedback":feedback
-      });
+
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -189,10 +157,6 @@ class PendingCallsState extends State<UserList> {
                           hint: 'Select Phone Number',
                           items: phone,
                           onChanged: (String value) async {
-                            setState((){
-                              phoneselected = value;
-                            });
-                            await FlutterPhoneDirectCaller.callNumber(phoneselected!);
                           }),
                       SizedBox(height: 10,),
                       DropdownButtonFormField(
@@ -470,341 +434,7 @@ class PendingCallsState extends State<UserList> {
           const SizedBox(
             height: 10,
           ),
-          StreamBuilder<QuerySnapshot>(
 
-              stream: firestore
-                  .collection("new_calling")
-                  .where("Area", isEqualTo:Area).where('Status', isNotEqualTo: 'Complete')
-                  .snapshots(),
-              builder:
-                  (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-
-                  return Column(
-                    children: [
-                      CircularProgressIndicator(),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text('Loading...'),
-                    ],
-                  );
-                } else {
-                  List<QueryDocumentSnapshot> docsdata = snapshot.data!.docs
-                      .where((doc) => doc["Customer Name"].toString().toLowerCase().contains(_searchText))
-                      .toList();
-                  return Expanded(
-                    child:snapshot.data!.docs.length>0
-                        ? ListView.separated(
-                      itemCount: docsdata.length,
-                      itemBuilder: (context, index) {
-                        DocumentSnapshot data = docsdata[index];
-                        String phoneList =
-                            '${data["Customer Phone Number"]},'+
-                                '${data["Phone Number 1"].toString()},'+
-                                '${data["Phone Number 2"].toString()},'+
-                                '${data["Phone Number 3"].toString()},'+
-                                '${data["Phone Number 4"].toString()},'
-                        ;
-
-                        /*final sortedItems = _foundUsers
-                            ..sort((item1, item2) => isDescending
-                                ? item2['name'].compareTo(item1['name'])
-                                : item1['name'].compareTo(item2['name']));
-                          final name = sortedItems[index]['name'];*/
-                        /*FutureBuilder(
-                                future: getPhoto(),
-                                builder: (BuildContext context, AsyncSnapshot<dynamic> accountdata) {
-      if (accountdata.hasData) {
-
-      }else if(accountdata.hasError){
-        return Text("Error loading data");
-      }else{
-        return CircularProgressIndicator();
-      }
-
-                                },
-
-                              );*/
-                        return FutureBuilder(
-                          future: getAccountData(data['Angaza ID']),
-                          builder: (BuildContext context, AsyncSnapshot<dynamic> accountdata) {
-                            if (accountdata.hasData) {
-                              var querydata =  accountdata.data.toString();
-                              var accountdetail = jsonDecode(querydata);
-                              bool isdisable = false;
-                              var date = DateTime.parse(accountdetail["payment_due_date"]);
-                              var days = daysBetween(date,DateTime.now());
-                              if(days<0){
-                                days = 0;
-                              }
-                              if(accountdetail["status"] =='DISABLED'){
-                                isdisable = true;
-                              }
-
-                              return InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            CProfile(id: data.id,
-                                              angaza: data['Angaza ID'],
-                                            ),
-                                      ));
-                                },
-                                key: ValueKey(snapshot.data!.docs[index]),
-                                child: Row(
-                                  children: [
-                                    FutureBuilder(
-                                        future: getPhoto(accountdetail["client_qids"][0]),
-                                        builder: (BuildContext context,
-                                            AsyncSnapshot<dynamic> photourl) {
-                                          if (photourl.hasData) {
-                                            String photo = photourl.data!;
-                                            return SizedBox(
-                                              height: 50,
-                                              width: 50,
-                                              child: Image.network(photo),
-                                            );
-                                          } else if (snapshot.hasError) {
-                                            return CircleAvatar(
-                                              backgroundColor: Colors.blueGrey.shade800,
-                                              radius: 20,
-
-                                            );
-                                          }else {
-                                            return CircularProgressIndicator();
-                                          }
-                                        }),
-                                    SizedBox(
-                                      width: 2,
-                                    ),
-                                    Flexible(
-                                      child: Container(
-                                        height: 70,
-                                        child: Card(
-                                          color: isdisable?Colors.red:Colors.green.withOpacity(0.6),
-                                          elevation: 5,
-                                          child: Padding(
-                                            padding:
-                                            EdgeInsets.fromLTRB(5.0, 5, 0, 0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text("Name:", style: TextStyle(
-                                                            fontSize: 13, color: Colors.black,fontWeight: FontWeight.bold)),
-                                                        Text("Account:",style: TextStyle(
-                                                            fontSize: 13, color: Colors.black,fontWeight: FontWeight.bold)),
-                                                        Text("Disable:",style: TextStyle(
-                                                            fontSize: 13, color: Colors.black,fontWeight: FontWeight.bold)),
-                                                        // Text("${account}"),
-
-                                                      ],
-                                                    ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text("${data['Customer Name']}",style: TextStyle(
-                                                          fontSize: 13, color: Colors.black,)),
-                                                        Text("${data['Account Number']
-                                                            .toString()}",style: TextStyle(
-                                                          fontSize: 13, color: Colors.black,)),
-                                                        Text("$days",style: TextStyle(
-                                                          fontSize: 13, color: Colors.black,)),
-                                                        // Text("${account}"),
-
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                                if(data["Task Type"] != 'Visit')
-                                                  Row(
-                                                    children: [
-                                                      IconButton(
-                                                          padding: new EdgeInsets.all(0.0),
-                                                          onPressed: () {
-                                                            _callNumber(
-                                                                phoneList,
-                                                                data.id,
-                                                                data["Angaza ID"]
-                                                            );
-                                                          },
-                                                          icon: Icon(Icons.phone,size: 20.0)),
-                                                      IconButton(
-                                                          padding: new EdgeInsets.all(0.0),
-                                                          onPressed: () {
-                                                            Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                  builder: (context) =>
-                                                                      CustomerVisit(id: data.id,
-
-                                                                        angaza: data["Angaza ID"],
-                                                                      ),
-                                                                ));
-                                                          },
-                                                          icon: Icon(Icons
-                                                              .location_on_outlined,size: 20.0))
-                                                    ],
-                                                  ),
-                                                if(data["Task Type"] == 'Visit')
-                                                  Row(
-                                                    children: [
-                                                      IconButton(
-                                                          padding: new EdgeInsets.all(0.0),
-                                                          onPressed: () {
-
-                                                          },
-                                                          icon: Icon(Icons.phone_disabled,size: 20.0)),
-                                                      IconButton(
-                                                          padding: new EdgeInsets.all(0.0),
-                                                          onPressed: () {
-                                                            Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                  builder: (context) =>
-                                                                      CustomerVisit(id: data.id,
-                                                                        angaza: data["Angaza ID"],
-                                                                      ),
-                                                                ));
-                                                          },
-                                                          icon: Icon(Icons
-                                                              .location_on_outlined,size: 20.0))
-                                                    ],
-                                                  )
-
-
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }else if(accountdata.hasError){
-                              return Text("Error loading data");
-                            }else{
-                              return CircularProgressIndicator();
-                            }
-
-                          },
-
-                        );
-                        /* return InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            CProfile(id: data.id),
-                                      ));
-                                },
-                                key: ValueKey(snapshot.data!.docs[index]),
-                                child: Row(
-                                  children: [
-                                    FutureBuilder(
-                                        future: getPhoto(),
-                                        builder: (BuildContext context,
-      AsyncSnapshot<dynamic> photourl) {
-      if (photourl.hasData) {
-        String photo = photourl.data!;
-        return CircleAvatar(
-          backgroundColor: Colors.blueGrey.shade800,
-          radius: 20,
-          child: Image.network(photo),
-        );
-      } else if (snapshot.hasError) {
-       return CircleAvatar(
-          backgroundColor: Colors.blueGrey.shade800,
-          radius: 20,
-
-        );
-      }else {
-        return CircularProgressIndicator();
-      }
-                                        }),
-                                    SizedBox(
-                                      width: 2,
-                                    ),
-                                    Flexible(
-                                      child: Container(
-                                        height: 80,
-                                        child: Card(
-                                          elevation: 5,
-                                          child: Padding(
-                                            padding:
-                                                EdgeInsets.fromLTRB(5.0, 5, 0, 0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text("Name: ${data['Customer Name']}"),
-                                                    Text("Account: ${data['Account Number']
-                                                        .toString()}"),
-                                                    Text("Days Disable: 0",style: TextStyle(color: Colors.red),),
-                                                   // Text("${account}"),
-
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    IconButton(
-                                                        onPressed: () {
-                                                          _callNumber(
-                                                              data[
-                                                                  'Customer Phone Number'],
-                                                              data.id);
-                                                        },
-                                                        icon: Icon(Icons.phone)),
-                                                    IconButton(
-                                                        onPressed: () {
-                                                          Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder: (context) =>
-                                                                    CustomerVisit(id: data.id),
-                                                              ));
-                                                        },
-                                                        icon: Icon(Icons
-                                                            .location_on_outlined))
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );*/
-                      },
-                      separatorBuilder: (BuildContext context, int index) =>
-                          Divider(),
-                    )
-                        : const Text(
-                      'No results found',
-                      style: TextStyle(fontSize: 15),
-                    ),
-                  );
-                }
-                ;
-              }),
         ],
       ),
     );

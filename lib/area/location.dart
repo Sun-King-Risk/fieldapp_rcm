@@ -1,10 +1,10 @@
 
 import 'dart:core';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:googleapis/youtube/v3.dart';
 import 'dart:async';
 import 'package:location/location.dart';
 
@@ -30,13 +30,13 @@ class CustomerLocationState extends State<CustomerLocation> {
 
   final Completer<GoogleMapController> _controller = Completer();
   static const LatLng sourceLocation = LatLng(-3.4066411, 36.7039782);
-  late GeoPoint destination = const GeoPoint(0.0, 0.0);
+  late GeoPoint destination = GeoPoint();
   static const LatLng sourceL= LatLng(-2.4066411, 30.7039782);
   LocationData? currentLocation;
   @override
   void initState() {
     super.initState();
-    getPolyPoints();
+
     location = widget.customerLocation;
 
     if(location is GeoPoint){
@@ -44,11 +44,10 @@ class CustomerLocationState extends State<CustomerLocation> {
     }else if(location is LatLng){
       lat = double.parse(latlong[0]);
       long = double.parse(latlong[1]);
-      destination  = GeoPoint(lat, long);
+
     }else{
       lat = double.parse(latlong[0]);
       long = double.parse(latlong[1]);
-      destination  = GeoPoint(lat, long);
     }
     setState(() {
 
@@ -56,7 +55,7 @@ class CustomerLocationState extends State<CustomerLocation> {
   }
   void _onMapCreat(GoogleMapController controller) {
     mapController = controller;
-    getPolyPoints();
+
   }
   Marker _destination = Marker(
     markerId: MarkerId('destination'),
@@ -65,22 +64,7 @@ class CustomerLocationState extends State<CustomerLocation> {
     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
   );
   List<LatLng> polylineCoordinates = [];
-  void getPolyPoints() async {
-    PolylinePoints polylinePoints = PolylinePoints();
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      'AIzaSyCxmwQB8Kkkvj2I4rLpsreA54-XAlvUryk', // Your Google Map Key
-      PointLatLng(sourceL.latitude, sourceL.longitude),
-      PointLatLng(destination.latitude, destination.longitude),
-    );
-    if (result.points.isNotEmpty) {
-      result.points.forEach(
-            (PointLatLng point) => polylineCoordinates.add(
-          LatLng(point.latitude, point.longitude),
-        ),
-      );
-      setState(() {});
-    }
-  }
+
 
   late LatLng _currentPosition;
   bool _isLoading = true;
@@ -95,7 +79,7 @@ class CustomerLocationState extends State<CustomerLocation> {
       ),
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
-          target:  LatLng(destination.latitude,destination.longitude),
+          target:  LatLng(0.0,0.0),
           zoom: 10,
         ),
         myLocationEnabled: true,
@@ -105,7 +89,7 @@ class CustomerLocationState extends State<CustomerLocation> {
             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
             markerId: const MarkerId("destination"),
             infoWindow: InfoWindow(title: widget.name),
-            position: LatLng(destination.latitude,destination.longitude),
+
           ),
         },
         onMapCreated: (mapController) {

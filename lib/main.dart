@@ -2,26 +2,21 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:fieldapp_rcm/aws_bucket.dart';
-import 'package:fieldapp_rcm/step_form.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:fieldapp_rcm/routing/nav_page.dart';
 import 'package:flutter/material.dart';
-import 'package:googleapis/servicecontrol/v2.dart';
+
 import 'package:http/http.dart' as http;
-import 'package:aws_s3_private_flutter/aws_s3_private_flutter.dart';
+
 import 'package:aws_s3_private_flutter/export.dart';
 
 import 'add_task.dart';
 import 'amplifyconfiguration.dart';
-import 'firebase_options.dart';
 import 'new_design.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await _configureAmplify();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
 
   runApp(MyApp());

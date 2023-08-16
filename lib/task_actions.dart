@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,12 +19,11 @@ class Visiting extends StatefulWidget {
 class _Visiting extends State<Visiting> {
   @override
   void initState() {
-    _getDocuments();
     super.initState();
   }
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   List<String> _data = [];
-  List<DocumentSnapshot> _result = [];
+
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
@@ -104,17 +102,7 @@ class _Visiting extends State<Visiting> {
     });
 
   }
-  Future<void> _getDocuments() async {
 
-    QuerySnapshot querySnapshot =
-    await firestore.collection("task").doc(widget.docid).collection('action').get();
-    setState(() {
-      _result = querySnapshot.docs;
-      _data = _result.map((doc) => doc['Customer'].toString()).toSet().toList();
-      print(_data.length);
-
-    });
-  }
 
   String? selectedSubTask;
   String? selectedaction;
@@ -224,9 +212,8 @@ class Work extends StatefulWidget {
 }
 
 class _Work extends State<Work> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
   String _data = '';
-  List<DocumentSnapshot> _result = [];
+
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
@@ -304,27 +291,9 @@ class _Work extends State<Work> {
     });
 
   }
-  Future<void> _getDocuments() async {
-    final documentReference = FirebaseFirestore.instance
-        .collection('task')
-        .doc(widget.id)
-        .collection('action')
-        .doc(widget.docid);
-    final documentSnapshot = await documentReference.get();
-
-
-    /*QuerySnapshot querySnapshot =
-    await firestore.collection("task").doc(widget.id).collection('action').doc(widget.docid).get();*/
-    setState(() {
-      //_result = querySnapshot.docs;
-      _data =documentSnapshot['Customer'];
-      print(_data);
-
-    });
-  }
   @override
   void initState() {
-    _getDocuments();
+
     super.initState();
   }
   String? selectedSubTask;
@@ -594,9 +563,7 @@ class FieldVisit extends StatefulWidget {
   State<FieldVisit> createState() => _FieldVisit();
 }
 class _FieldVisit extends State<FieldVisit> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
   String _data = '';
-  List<DocumentSnapshot> _result = [];
   _YesUpdate(String doc,String id) async {
     Map data = {
 
@@ -647,24 +614,9 @@ class _FieldVisit extends State<FieldVisit> {
     print(response.body);
 
   }
-  Future<void> _getDocuments() async {
-    final documentReference = FirebaseFirestore.instance
-        .collection('task')
-        .doc(widget.id)
-        .collection('action')
-        .doc(widget.docid);
-    final documentSnapshot = await documentReference.get();
-
-    setState(() {
-      //_result = querySnapshot.docs;
-      _data =documentSnapshot['Customer'];
-      print(_data);
-
-    });
-  }
   @override
   void initState() {
-    _getDocuments();
+
     super.initState();
   }
   String? selectedSubTask;
@@ -1007,9 +959,8 @@ class Repo extends StatefulWidget {
   State<Repo> createState() => _Repo();
 }
 class _Repo extends State<Repo>{
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   String _data = '';
-  List<DocumentSnapshot> _result = [];
   _YesUpdate(String doc,String id) async {
     Map data = {
 
@@ -1058,24 +1009,9 @@ class _Repo extends State<Repo>{
     });
 
   }
-  Future<void> _getDocuments() async {
-    final documentReference = FirebaseFirestore.instance
-        .collection('task')
-        .doc(widget.id)
-        .collection('action')
-        .doc(widget.docid);
-    final documentSnapshot = await documentReference.get();
-
-    setState(() {
-      //_result = querySnapshot.docs;
-      _data =documentSnapshot['Customer'];
-      print(_data);
-
-    });
-  }
   @override
   void initState() {
-    _getDocuments();
+
     super.initState();
   }
   String? selectedSubTask;
@@ -1475,9 +1411,8 @@ class WorkUpdate extends StatefulWidget {
   State<WorkUpdate> createState() => _WorkUpdate();
 }
 class _WorkUpdate extends State<WorkUpdate> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   String _data = '';
-  List<DocumentSnapshot> _result = [];
   _YesUpdate(String doc,String id) async {
     Map data = {
       "sub_task":"Visits Tampering Home 400",
@@ -1504,34 +1439,13 @@ class _WorkUpdate extends State<WorkUpdate> {
   }
   _NoUpdate(String doc,String id){
     print(feedbackController.text);
-    DocumentReference task = firestore.collection("task").doc(doc);
-    DocumentReference subCollectionReference = task.collection('action').doc(id);
-    subCollectionReference.update({
-      "Feedback":feedbackController.text,
-      "Status":"Complete",
-      "Get user":"No",
-      "date":DateTime.now()
-    });
+
 
   }
-  Future<void> _getDocuments() async {
-    final documentReference = FirebaseFirestore.instance
-        .collection('task')
-        .doc(widget.id)
-        .collection('action')
-        .doc(widget.docid);
-    final documentSnapshot = await documentReference.get();
 
-    setState(() {
-      //_result = querySnapshot.docs;
-      _data =documentSnapshot['Customer'];
-      print(_data);
-
-    });
-  }
   @override
   void initState() {
-    _getDocuments();
+
     super.initState();
   }
   String? selectedSubTask;
@@ -1661,10 +1575,9 @@ class Agent extends StatefulWidget {
   State<Agent> createState() => _Agent();
 }
 class _Agent extends State<Agent> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
   String _data = '';
   File? imageFile;
-  List<DocumentSnapshot> _result = [];
+
   void getImage() async{
     final file  = await ImagePicker().pickImage(source: ImageSource.camera);
     if(file?.path != null){
@@ -1752,24 +1665,9 @@ class _Agent extends State<Agent> {
     print(feedbackController.text);
 
   }
-  Future<void> _getDocuments() async {
-    final documentReference = FirebaseFirestore.instance
-        .collection('task')
-        .doc(widget.id)
-        .collection('action')
-        .doc(widget.docid);
-    final documentSnapshot = await documentReference.get();
-
-    setState(() {
-      //_result = querySnapshot.docs;
-      _data =documentSnapshot['Customer'];
-      print(_data);
-
-    });
-  }
   @override
   void initState() {
-    _getDocuments();
+
     super.initState();
   }
   String? selectedSubTask;

@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -47,11 +46,6 @@ class PendingTaskState extends State<PendingTask> {
       print('Response body: ${response.body}');
     }
   }
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-
-
-
   bool isDescending = false;
 _taskStatus(docid)async{
   bool _approved = false;

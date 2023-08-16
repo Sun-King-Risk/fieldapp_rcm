@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:fieldapp_rcm/routing/bottom_nav.dart';
 import 'package:fieldapp_rcm/services/auth_services.dart';
 import 'package:fieldapp_rcm/sign_up.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -124,11 +123,10 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
           setState(() {
             _isSigningIn = true;
           });
-          User? user = await Authentication.signInWithGoogle(context: context);
           setState(() {
             _isSigningIn = false;
           });
-          if (user != null) {
+          if ("user" != null) {
             String? email;
             Navigator.of(context).pushReplacement(
 

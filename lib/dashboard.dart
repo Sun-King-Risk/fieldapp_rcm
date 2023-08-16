@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:fieldapp_rcm/dash_view.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'utils/themes/theme.dart';

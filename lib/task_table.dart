@@ -5,7 +5,7 @@ import 'package:fieldapp_rcm/update/pilot_update.dart';
 import 'package:fieldapp_rcm/update/portfolio_update.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/update/team_update.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'dart:core';
@@ -19,11 +19,10 @@ class MyTaskView extends StatefulWidget {
   MyTaskViewState createState() => MyTaskViewState();
 }
 class MyTaskViewState extends State<MyTaskView> {
-  List<DocumentSnapshot> _data = [];
-  List<DocumentSnapshot> _action = [];
+
   bool decoration = false;
 
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   List? data = [];
   void fetchData() async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
@@ -36,15 +35,7 @@ class MyTaskViewState extends State<MyTaskView> {
       print('Request failed with status: ${response.statusCode}');
     }
   }
-  Future<int> TaskCount(id) async{
-    QuerySnapshot querySnapshot =
-    await firestore.collection("task").doc(id).collection('action').get();
-    setState(() {
-      _data = querySnapshot.docs;
 
-    });
-    return querySnapshot.docs.length;
-  }
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
@@ -332,24 +323,8 @@ class MyTaskViewState extends State<MyTaskView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    StreamBuilder(
-                      stream: TaskData().CountByStatus(widget.title,'Complete').asStream(),
-                      builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Complete",style: TextStyle(color: Colors.orange));
-                      },
-                    ),
-                    StreamBuilder(
-                      stream: TaskData().CountByStatus(widget.title,'Pending').asStream(),
-                      builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Pending",style: TextStyle(color: Colors.red));
-                      },
-                    ),
-                    StreamBuilder(
-                      stream: TaskData().CountTask(widget.title).asStream(),
-                      builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Total",style: TextStyle(color: Colors.green));
-                      },
-                    ),
+
+
 
 
 
@@ -364,24 +339,9 @@ class MyTaskViewState extends State<MyTaskView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    FutureBuilder(
-                      future: TaskData().CountPriority(widget.title,'high'),
-                      builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" High",style: TextStyle(color: Colors.green));
-                      },
-                    ),
-                    FutureBuilder(
-                      future: TaskData().CountPriority(widget.title,'normal'),
-                      builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Normal",style: TextStyle(color: Colors.orange));
-                      },
-                    ),
-                    FutureBuilder(
-                      future: TaskData().CountPriority(widget.title,'low'),
-                      builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Low",style: TextStyle(color: Colors.red));
-                      },
-                    ),
+
+
+
 
 
                   ],

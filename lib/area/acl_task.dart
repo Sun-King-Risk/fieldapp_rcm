@@ -3,7 +3,7 @@ import 'package:fieldapp_rcm/area/agent.dart';
 import 'package:fieldapp_rcm/area/pending_calls.dart';
 import 'package:fieldapp_rcm/services/calls_detail.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -29,15 +29,10 @@ class CustomerState extends State<Customer> {
       });
     });
   }
-  dataAll() async {
-    final usersRef = FirebaseFirestore.instance.collection('Users');
-    QuerySnapshot<Map<String, dynamic>> snapshot = await usersRef.get();
-    return snapshot;
-  }
+
   initState() {
     // at the beginning, all users are shown
     userArea();
-    dataAll();
     super.initState();
   }
   Widget build(BuildContext context) {

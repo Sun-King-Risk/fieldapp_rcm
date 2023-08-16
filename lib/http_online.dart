@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:fieldapp_rcm/pending_task.dart';
 import 'package:fieldapp_rcm/task.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -329,82 +327,9 @@ class PreviewScreen extends StatefulWidget {
 }
 
 class _PreviewScreenState extends State<PreviewScreen> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  void _save() async{
 
-    CollectionReference task = firestore.collection("task");
-    var currentUser = FirebaseAuth.instance.currentUser;
-    print(widget.actions);
-    print(widget.customers);
-    var result = await task.add({
-      "task_title": widget.task,
-      "User UID": currentUser?.uid,
-      "sub_task": widget.subTask,
-      "task_region": widget.region,
-      "task_area": widget.area,
-      "timestamp": DateTime.now(),
-      "is_approved": "Pending",
-        "submited_by":currentUser?.displayName ,
-    });
 
-    Map data = {
-      'task_title': widget.task,
-      'sub_task': widget.subTask,
-      'task_region': widget.region,
-      'task_area':widget.area,
-      "task_start_date": "2023-05-05",
-      "timestamp": 1683282979,
-      "task_end_date": "2023-05-10",
-      "submited_by":currentUser?.displayName,
-    'is_approved': 'No'
-    };
-    var body = json.encode(data);
-    var url = Uri.parse('https://1d39-102-89-46-32.ngrok-free.app/api/create');
-    http.Response response = await http.post(url, body: body, headers: {
-      "Content-Type": "application/json",
-    });
-    var result_task = jsonDecode(response.body);
-    subCollection(result.id,result_task["id"]);
-  }
-  void subCollection(id,task) async{
-    CollectionReference task = firestore.collection("task");
-    widget.customers!.forEach((customer) async {
-      List<String> items = customer.split("-");
-      String? perc = items[1].substring(0, items[1].length - 1);
-      double total = double.parse(widget.actions[customer]!['target']!)+double.parse(perc!);
-      task.doc(id).collection("action").add({
-        "Customer":items[0],
-        "Current":items[1],
-        "priority":widget.actions[customer]?['priority'],
-        "Action plan":widget.actions[customer]?['action'],
-        "Target":widget.actions[customer]?['target'],
-        "Goal":total,
-      }
 
-      );
-      Map data =  {
-        "task": items[0],
-        "account_number":items[0],
-        "goals": total,
-        "task_description": widget.actions[customer]?['action'],
-        "priority": widget.actions[customer]?['priority'],
-        "task_status": "Pending"
-      };
-      var body = json.encode(data);
-      var url = Uri.parse('https://f2e3-102-89-32-23.ngrok-free.app/api/taskgoals/create');
-      http.Response response = await http.post(url, body: body, headers: {
-        "Content-Type": "application/json",
-      });
-      print(response.body);
-    });
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Task(),
-      ),
-    );
-
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -465,7 +390,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
             ),
             ElevatedButton(onPressed:
             (){
-              _save();
+
             }, child: Text("Submit"))
           ],
         ),
@@ -521,7 +446,6 @@ class _PreviewScreenState extends State<PreviewScreen> {
             ),
             ElevatedButton(onPressed:
                 (){
-              _save();
             }, child: Text("Submit"))
           ],
         ),
