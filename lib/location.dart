@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,9 +19,48 @@ class  LocationMapState extends State<LocationMap> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    maploading = false;
+    getUserAttributes();
     listItems("customer_location");
     _getCurrentLocation();
 
+  }
+  List<String> attributeList = [];
+  String name ="";
+  String country ="";
+  bool complete= false;
+  void getUserAttributes() async {
+    try {
+      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
+      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
+      List<String> attributesList = [];
+      for (AuthUserAttribute attribute in attributes) {
+        print(attribute.value);
+
+        if(attribute.userAttributeKey.key.contains("custom")){
+          var valueKey = attribute.userAttributeKey.key.split(":");
+          attributesList.add('"${valueKey[1]}":"${attribute.value}"');
+          print(valueKey[1]);
+        }else{
+          attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
+        }
+
+      }
+      setState(() {
+        attributeList = attributesList;
+        name = attributeList[3].split(":")[1];
+      });
+      name = attributeList[3].split(":")[1];
+      country = attributeList[4].split(":")[1];
+      if (kDebugMode) {
+        print(attributeList.toList());
+        print("Dennis ${attributeList[4].split(":")[1]}");
+      }
+      // Process the user attributes
+
+    } catch (e) {
+      print('Error retrieving user attributes: $e');
+    }
   }
   List? data = [];
   List<String> region= [];
@@ -62,7 +102,6 @@ class  LocationMapState extends State<LocationMap> {
         print("Key: $key");
 
         return resultList.first;
-
       } else {
         print('No files found in the S3 bucket with key containing "$key".');
         return null;
@@ -93,7 +132,8 @@ class  LocationMapState extends State<LocationMap> {
     };
   }
   List<LatLng> polylineCoordinates = [];
-  List<LatLng> latLngList = [];
+  List<LatLng> latLngList = [ ];
+  bool maploading = true;
   final Completer<GoogleMapController> _controller = Completer();
   LatLng _currentLocation = LatLng(0, 0);
   Future<void> _getCurrentLocation() async {
@@ -112,8 +152,9 @@ class  LocationMapState extends State<LocationMap> {
 
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
+      print(jsonData);
       final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['Region'] == 'Northern' && task['Country'] =='Tanzania'
+          .where((task) => task['Country'] ==country
           &&task['Location Latitudelongitude'] != null && task['Location Latitudelongitude'] != '' )
           .toList();
       print(filteredTasks);
@@ -121,12 +162,8 @@ class  LocationMapState extends State<LocationMap> {
         desiredAccuracy: LocationAccuracy.high,
       );
       LatLng currentLocation = LatLng(position.latitude, position.longitude);
-      int addedCoordinates = 0;
 
       for (final task in filteredTasks) {
-        if (addedCoordinates >= 10) {
-          break; // Stop adding coordinates when the limit (10) is reached
-        }
         final coordinate = task['Location Latitudelongitude'];
         if (coordinate != null && coordinate != '') {
           List<String> coordinatevalue = coordinate.split(',');
@@ -142,7 +179,6 @@ class  LocationMapState extends State<LocationMap> {
             );
             if (distance / 1000 <= 30) {
               latLngList.add(latLng);
-              addedCoordinates++;
             }else{
               latLngList.add(latLng);
             }
@@ -150,6 +186,9 @@ class  LocationMapState extends State<LocationMap> {
 
         }
       }
+      setState(() {
+        maploading = true;
+      });
       print(latLngList);
 
 
@@ -162,58 +201,58 @@ class  LocationMapState extends State<LocationMap> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Customers'),
+          title: Text('Customers'),
           elevation: 2,
         ),
-    body:FutureBuilder<LatLng>(
+        body:maploading?FutureBuilder<LatLng>(
 
-      future: getCurrentLocation(),
+            future: getCurrentLocation(),
 
-    builder: (context, snapshot)
-    {
-    if (snapshot.hasData) {
-      LatLng currentLocation = snapshot.data!;
-      _markers.add(
-        Marker(
-          markerId: MarkerId('currentLocation'),
-          position: currentLocation,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-        ),
-      );
-      return GoogleMap(
-        initialCameraPosition: CameraPosition(
-          target:  currentLocation,
-          zoom: 14,
-        ),
-        circles: _createCircle(),
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        markers: latLngList.map((LatLng latLng) => Marker(
-          markerId: MarkerId(latLng.toString()),
-          position: latLng,
-        ))
-            .toSet(),
-        onMapCreated: (mapController) {
-          _controller.complete(mapController);
-        },
-        polylines: {
-          Polyline(
-            polylineId: const PolylineId("route"),
-            points: polylineCoordinates,
-            color: const Color(0xFF7B61FF),
-            width: 6,
-          ),
-        },
-      );
+            builder: (context, snapshot)
+            {
+              if (snapshot.hasData) {
+                LatLng currentLocation = snapshot.data!;
+                _markers.add(
+                  Marker(
+                    markerId: MarkerId('currentLocation'),
+                    position: currentLocation,
+                    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                  ),
+                );
+                return GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target:  currentLocation,
+                    zoom: 14,
+                  ),
+                  circles: _createCircle(),
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  markers: latLngList.map((LatLng latLng) => Marker(
+                    markerId: MarkerId(latLng.toString()),
+                    position: latLng,
+                  ))
+                      .toSet(),
+                  onMapCreated: (mapController) {
+                    _controller.complete(mapController);
+                  },
+                  polylines: {
+                    Polyline(
+                      polylineId: const PolylineId("route"),
+                      points: polylineCoordinates,
+                      color: const Color(0xFF7B61FF),
+                      width: 6,
+                    ),
+                  },
+                );
 
-    }
-    else if (snapshot.hasError) {
-      return Center(child: Text('Error: ${snapshot.error}'));
-    }else{
-      return Center(child: CircularProgressIndicator());
-    }
-    }
-    ));
+              }
+              else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }else{
+                return Center(child: CircularProgressIndicator());
+              }
+            }
+        ):complete?Center(child: Text("No Customer in your current place"),):Center(child: CircularProgressIndicator()));
   }
 
 }
