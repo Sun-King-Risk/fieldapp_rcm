@@ -21,14 +21,14 @@ class  LocationMapState extends State<LocationMap> {
     super.initState();
     maploading = false;
     getUserAttributes();
-    listItems("customer_location");
+
     _getCurrentLocation();
 
   }
   List<String> attributeList = [];
   String name ="";
   String country ="";
-  bool complete= false;
+  int complete= 0;
   void getUserAttributes() async {
     try {
       AuthUser currentUser = await Amplify.Auth.getCurrentUser();
@@ -52,6 +52,7 @@ class  LocationMapState extends State<LocationMap> {
       });
       name = attributeList[3].split(":")[1];
       country = attributeList[4].split(":")[1];
+      listItems("customer_location");
       if (kDebugMode) {
         print(attributeList.toList());
         print("Dennis ${attributeList[4].split(":")[1]}");
@@ -66,6 +67,36 @@ class  LocationMapState extends State<LocationMap> {
   List<String> region= [];
   bool isLoading = true;
   double _radius  = 30000;
+
+  void _showPointDetailsDialog(String name, String account,String phone) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Point Details"),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Name: $name"),
+              Text("Address: $account"),
+              Text("Phone: $phone"),
+              // Add more details as needed
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
 
   Future<LatLng> getCurrentLocation() async {
@@ -153,17 +184,17 @@ class  LocationMapState extends State<LocationMap> {
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
       print(jsonData);
+
+      var _country = country.replaceAll('"', '');
       final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['Country'] ==country
-          &&task['Location Latitudelongitude'] != null && task['Location Latitudelongitude'] != '' )
-          .toList();
-      print(filteredTasks);
+          .where((task) => task['Country'] == _country).toList();
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
       LatLng currentLocation = LatLng(position.latitude, position.longitude);
 
       for (final task in filteredTasks) {
+        print(task);
         final coordinate = task['Location Latitudelongitude'];
         if (coordinate != null && coordinate != '') {
           List<String> coordinatevalue = coordinate.split(',');
@@ -179,16 +210,30 @@ class  LocationMapState extends State<LocationMap> {
             );
             if (distance / 1000 <= 30) {
               latLngList.add(latLng);
-            }else{
-              latLngList.add(latLng);
+              _markers.add(
+                Marker(
+                  markerId: MarkerId(task['Angaza ID']),
+                  position: latLng, // Location for Leyla R Abdallah
+                  infoWindow: InfoWindow(
+                      title: task['Customer Name'],
+                      snippet: 'Disabled: ${task['Days Disabled']} Phone: ${task['Customer Phone Number']}'),
+                )
+
+              );
+
+
             }
           }
 
         }
+
       }
       setState(() {
+        print(latLngList);
         maploading = true;
+        complete = latLngList.length;
       });
+
       print(latLngList);
 
 
@@ -204,7 +249,9 @@ class  LocationMapState extends State<LocationMap> {
           title: Text('Customers'),
           elevation: 2,
         ),
-        body:maploading?FutureBuilder<LatLng>(
+        body:complete>0?
+
+        FutureBuilder<LatLng>(
 
             future: getCurrentLocation(),
 
@@ -217,6 +264,7 @@ class  LocationMapState extends State<LocationMap> {
                     markerId: MarkerId('currentLocation'),
                     position: currentLocation,
                     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                    infoWindow: InfoWindow(title: '$name current location')
                   ),
                 );
                 return GoogleMap(
@@ -227,11 +275,7 @@ class  LocationMapState extends State<LocationMap> {
                   circles: _createCircle(),
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
-                  markers: latLngList.map((LatLng latLng) => Marker(
-                    markerId: MarkerId(latLng.toString()),
-                    position: latLng,
-                  ))
-                      .toSet(),
+                  markers: _markers.toSet(),
                   onMapCreated: (mapController) {
                     _controller.complete(mapController);
                   },
@@ -252,7 +296,8 @@ class  LocationMapState extends State<LocationMap> {
                 return Center(child: CircularProgressIndicator());
               }
             }
-        ):complete?Center(child: Text("No Customer in your current place"),):Center(child: CircularProgressIndicator()));
+        ):
+        maploading?Center(child: Text("No Customer in your current place"),):Center(child: CircularProgressIndicator()));
   }
 
 }

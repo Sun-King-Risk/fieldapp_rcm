@@ -11,8 +11,38 @@ class MyTaskNew extends StatefulWidget {
   @override
   _MyTaskNewState createState() => _MyTaskNewState();
 }
-enum TaskMode { Task, SubTask, Region, Area, TableTask, ActionPlan, Preview }
+enum TaskMode { Task, SubTask, Region, Area, TableTask, ActionPlan, Date, Preview }
 class _MyTaskNewState extends State<MyTaskNew> {
+  DateTime selectedDate = DateTime.now();
+  int currentYear = DateTime.now().year;
+   String endDate =  "";
+   String startDate = "";
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(currentYear),
+      lastDate: DateTime(currentYear+1),
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        List<String> parts = picked.toString().split(" ");
+        startDate = parts[0];
+      });
+  }
+  Future<void> _endDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(currentYear),
+      lastDate: DateTime(currentYear+1),
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        List<String> parts = picked.toString().split(" ");
+        endDate = parts[0];
+      });
+  }
   TaskMode _taskMode = TaskMode.Task;
   List<String> keys = [];
   String searchQuery = '';
@@ -20,7 +50,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
   bool target =true;
   String rate = '';
   int _currentPage = 0;
-  int _pageSize = 2;
+  int _pageSize = 9;
   List getPageData() {
     final startIndex = _currentPage * _pageSize;
     final endIndex = startIndex + _pageSize;
@@ -67,9 +97,9 @@ class _MyTaskNewState extends State<MyTaskNew> {
       'sub_task': SelectedSubtask,
       'task_region': selectedRegion,
       'task_area':selectedArea,
-      "task_start_date": "2023-07-12",
+      "task_start_date": startDate,
       "timestamp": 1683282979,
-      "task_end_date": "2023-07-20",
+      "task_end_date": endDate,
       "submited_by":name,
       'is_approved': 'Pending',
       'task_status':'Pending',
@@ -93,9 +123,9 @@ class _MyTaskNewState extends State<MyTaskNew> {
       'sub_task': SelectedSubtask,
       'task_region': selectedRegion,
       'task_area':selectedArea,
-      "task_start_date": "2023-07-12",
+      "task_start_date": startDate,
       "timestamp": 1683282979,
-      "task_end_date": "2023-07-20",
+      "task_end_date": endDate,
       "submited_by":name,
       'is_approved': 'Pending',
       'task_status':'Pending',
@@ -992,9 +1022,6 @@ Future<void> TableData() async{
                             }),
                       ),
 
-
-
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -1005,7 +1032,7 @@ Future<void> TableData() async{
                         }, child: Text("Back")),
                         ElevatedButton(onPressed: (){
                           setState(() {
-                            _taskMode = TaskMode.Preview;
+                            _taskMode = TaskMode.Date;
                           });
                         }, child: Text("Next"))
                       ],
@@ -1013,38 +1040,78 @@ Future<void> TableData() async{
                   ],
                 ),
               ),
+            if(_taskMode == TaskMode.Date)
+              Expanded(child: Column(
+                children: [
+                  ElevatedButton(onPressed: (){
+                    _selectDate(context);
+                  }, child: Text("Date start")),
+                  ElevatedButton(onPressed: (){
+                    _endDate(context);
+                  }, child: Text("Date End")),
+
+                  Text("Start: $startDate"),
+                  Text("End: $endDate"),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+
+                      ElevatedButton(onPressed: (){
+                        setState(() {
+                          _taskMode = TaskMode.ActionPlan;
+                        });
+                      }, child: Text("Back")),
+                      ElevatedButton(onPressed: (){
+                        setState(() {
+                          _taskMode = TaskMode.Preview;
+                        });
+                      }, child: Text("Next"))
+                    ],
+                  )
+                ],
+              )),
             if(_taskMode == TaskMode.Preview)
               Expanded(
                 child: Column(
                   children: [
                     Text("Preveiw"),
+                    Text(
+                      'Region: ${singleRegion}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Area: ${selectedArea}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Task: ${selectedOption}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Sub Task: ${SelectedSubtask}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Task start date: ${startDate}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Task End date: ${endDate}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'Task Action:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     target?Column(
                       children: [
-                        Text(
-                          'Region: ${singleRegion}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Area: ${selectedArea}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Task: ${selectedOption}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Sub Task: ${SelectedSubtask}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Task Action:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
                         SizedBox(height: 8),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1075,31 +1142,6 @@ Future<void> TableData() async{
 
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
-                        Text(
-                          'Region: ${singleRegion}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'Area: ${selectedArea}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Task: ${selectedOption}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Sub Task: ${SelectedSubtask}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Task Action:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 8),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: taskDataList!.map((task) {
@@ -1126,7 +1168,7 @@ Future<void> TableData() async{
                       children: [
                         ElevatedButton(onPressed: (){
                           setState(() {
-                            _taskMode = TaskMode.ActionPlan;
+                            _taskMode = TaskMode.Date;
                           });
                         }, child: Text("Back")),
                         ElevatedButton(onPressed: (){
