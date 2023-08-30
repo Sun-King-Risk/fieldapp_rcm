@@ -7,11 +7,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+
+import 'multTeam.dart';
 class MyTaskNew extends StatefulWidget {
   @override
   _MyTaskNewState createState() => _MyTaskNewState();
 }
-enum TaskMode { Task, SubTask, Region, Area, TableTask, ActionPlan, Date, Preview }
+enum TaskMode {
+  Task, SubTask, Region, Area, TableTask, ActionPlan, Date, Preview ,TeamCountry,
+  TeamZone,TeamRegion,TeamArea,TeamRole,
+
+}
 class _MyTaskNewState extends State<MyTaskNew> {
   DateTime selectedDate = DateTime.now();
   int currentYear = DateTime.now().year;
@@ -50,12 +56,12 @@ class _MyTaskNewState extends State<MyTaskNew> {
   bool target =true;
   String rate = '';
   int _currentPage = 0;
-  int _pageSize = 9;
+  int _pageSize = 10;
   List getPageData() {
     final startIndex = _currentPage * _pageSize;
     final endIndex = startIndex + _pageSize;
 
-    return taskData!.sublist(startIndex, endIndex);
+    return taskData!.sublist(startIndex, endIndex < taskData!.length ? endIndex : taskData!.length);
   }
   Map<String, String> selectedValues = {};
   List<String> _priorities = ['High', 'Medium', 'Low'];
@@ -608,9 +614,20 @@ Future<void> TableData() async{
                         }, child: Text("Back")),
                         ElevatedButton(onPressed: (){
                           setState(() {
-                            getUserAttributes();
-                            listItems(SelectedSubtask.replaceAll(' ', '_'));
-                            _taskMode = TaskMode.Region;
+                            if(selectedOption =='Team Management'){
+                              print("object");
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(builder: (context) => TeamTaskCreate(
+                                  title: selectedOption,
+                                  sub: SelectedSubtask,
+                                )),
+                              );
+                            }else{
+                              getUserAttributes();
+                              listItems(SelectedSubtask.replaceAll(' ', '_'));
+                              _taskMode = TaskMode.Region;
+                            }
+
                           });
                         }, child: Text("Next"))
                       ],
@@ -833,21 +850,26 @@ Future<void> TableData() async{
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          IconButton(
-                            icon: Icon(Icons.chevron_left),
-                            onPressed: _currentPage > 1
-                                ? () {
-                              setState(() {
-                                _currentPage--;
-                              });
-                            }
-                                : null,
-                          ),
-                          Text('Page $_currentPage'),
-                          IconButton(
-                            icon: Icon(Icons.chevron_right),
-                            onPressed:(){},
-                          ),
+                          TextButton(
+                              onPressed: (){
+                                setState(() {
+                                  _currentPage = _currentPage > 0 ? _currentPage - 1 : 0;
+                                });
+                              },
+                              child: Text("Previous Table"
+                                ,style: TextStyle(color: Colors.black),)),
+                          TextButton(
+                              onPressed: (){
+                                setState(() {
+                                  final nextPageStartIndex = (_currentPage + 1) * _pageSize;
+                                  if (nextPageStartIndex < taskData!.length) {
+                                    _currentPage++;
+                                  }
+                                });
+                              },
+                              child: Text("Next Table"
+                                ,style: TextStyle(color: Colors.black),)),
+
                         ],
                       ),
                       Row(
@@ -893,8 +915,7 @@ Future<void> TableData() async{
               Expanded(
                 child: Column(
                   children: [
-                    if (target) SizedBox(
-                      height: 600,
+                    if (target) Expanded(
                       child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: taskDataList!.length,
@@ -923,7 +944,6 @@ Future<void> TableData() async{
                                               labelText: 'Action Plan',
                                             ),
                                             onChanged: (value) {
-                                              print(value);
                                               setState(() {
                                                 _actions[agent]!['action'] = value;
                                               });
@@ -964,8 +984,8 @@ Future<void> TableData() async{
                           }),
                     ) else
 
-                      SizedBox(
-                        height: 600,
+                      Expanded(
+
                         child: ListView.builder(
                             shrinkWrap: true,
                             itemCount: taskDataList!.length,

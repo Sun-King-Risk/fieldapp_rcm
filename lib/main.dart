@@ -18,6 +18,7 @@ import 'package:aws_s3_private_flutter/export.dart';
 import 'add_task.dart';
 import 'amplifyconfiguration.dart';
 import 'firebase_options.dart';
+import 'multTeam.dart';
 import 'multform.dart';
 import 'new_design.dart';
 
