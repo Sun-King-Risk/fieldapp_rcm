@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PendingTask extends StatefulWidget {
   const PendingTask({Key? key}) : super(key: key);
@@ -109,38 +110,20 @@ List? data = [];
    String zone ='';
   String role = '';
    void getUserAttributes() async {
-     try {
-       AuthUser currentUser = await Amplify.Auth.getCurrentUser();
-       List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
-       List<String> attributesList = [];
-       for (AuthUserAttribute attribute in attributes) {
-         print(attribute.value);
-
-         if(attribute.userAttributeKey.key.contains("custom")){
-           var valueKey = attribute.userAttributeKey.key.split(":");
-           attributesList.add('${valueKey[1]}:${attribute.value}');
-           print(valueKey[1]);
-         }else{
-           attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
-         }
-
-       }
+     SharedPreferences prefs = await SharedPreferences.getInstance();
        setState(() {
-         attributeList = attributesList;
        });
-       name = attributeList[3].split(":")[1];
-       userRegion = attributeList[7].split(":")[1];
-       country = attributeList[4].split(":")[1];
-       role = attributeList[5].split(":")[1];
-       zone = attributeList[1].split(":")[1];
+       name = prefs.getString("name")!;
+       userRegion =  prefs.getString("region")!;
+       country =  prefs.getString("country")!;
+       role = prefs.getString("role")!;
+       zone =  prefs.getString("zone")!;
        fetchData();
        if (kDebugMode) {
        }
        // Process the user attributes
 
-     } catch (e) {
-       print('Error retrieving user attributes: $e');
-     }
+
    }
   void fetchData() async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
@@ -150,8 +133,26 @@ List? data = [];
       setState(() {
         print(response.body);
         var jsonData = jsonDecode(response.body);
-        data = jsonData.where((task)=>
-           task['is_approved'] == 'Pending' && task['submited_by'] == name).toList();
+        if(role== 'RCM'){
+          data = jsonData.where((task)=>
+          task['is_approved'] == 'Pending'
+              && task['submited_role'] == 'ACE'
+              && task['country'] == country
+              && task['task_region'] == region
+          ).toList();
+        }else if(role == 'Credit Analyst'){
+          data = jsonData.where((task)=>
+          task['is_approved'] == 'Pending'
+              && task['submited_role'] == 'RCM'
+              && task['country'] == country
+              && task['task_zone'] == zone).toList();
+        }else if(role == 'Country Credit Analyst'){
+          data = jsonData.where((task)=>
+          task['is_approved'] == 'Pending'
+              && task['submited_role'] == 'Credit Analyst'
+              && task['country'] == country
+              && task['task_zone'] == zone).toList();
+        }
       });
     }else{
       print('Request failed with status: ${response.statusCode}');

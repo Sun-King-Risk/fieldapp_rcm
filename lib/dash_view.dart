@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
+import 'package:fieldapp_rcm/models/db.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,12 +28,7 @@ class DashViewState extends State<DashView> {
   Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation = await Amplify.Storage.list(
-        options: const StorageListOptions(
-          accessLevel: StorageAccessLevel.guest,
-          pluginOptions: S3ListPluginOptions.listAll(),
-        ),
-      );
+      operation = await Database.listItems();
 
       Future<StorageListResult<StorageItem>> result = operation.result;
       List<StorageItem> resultList = (await operation.result).items;
@@ -105,7 +101,6 @@ class DashViewState extends State<DashView> {
     // TODO: implement initState
     super.initState();
     listItems("dashboard");
-    print("dennis");
   }
   Widget build(BuildContext context) {
     return Scaffold(

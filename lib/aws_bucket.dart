@@ -18,6 +18,7 @@ import 'package:postgres/postgres.dart';
 import 'package:postgres_dart/postgres_dart.dart';
 
 import 'http_online.dart';
+import 'models/db.dart';
 
 
 class Bucket extends StatefulWidget {
@@ -46,8 +47,10 @@ class BucketState extends State<Bucket> {
   @override
   initState() {
     Conent();
+    listItems('Reginal');
 
   }
+
   void Conent() async {
     var connection = PostgreSQLConnection(
         'ec2-54-91-61-224.compute-1.amazonaws.com',
@@ -68,7 +71,37 @@ class BucketState extends State<Bucket> {
     }
     }
 
+  Future<StorageItem?> listItems(key) async {
+    try {
+      StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
+      operation =  await Database.listItems();
 
+      Future<StorageListResult<StorageItem>> result = operation.result;
+      List<StorageItem> resultList = (await operation.result).items;
+      resultList = resultList.where((file) => file.key.contains(key)).toList();
+      if (resultList.isNotEmpty) {
+        // Sort the files by the last modified timestamp in descending order
+        resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
+        StorageItem latestFile = resultList.first;
+        print(latestFile);
+        return resultList.first;
+
+      } else {
+        print('No files found in the S3 bucket with key containing "$key".');
+        return null;
+      }
+
+      for (StorageItem item in resultList) {
+        print('Key: ${item.key}');
+        print('Last Modified: ${item.lastModified}');
+        // Access other properties as needed
+      }
+
+      safePrint('Got items: ${resultList.length}');
+    } on StorageException catch (e) {
+      safePrint('Error listing items: $e');
+    }
+  }
   final _formKey = GlobalKey<FormState>();
   late String selectedTask = '';
   String selectedSubTask = '';

@@ -14,10 +14,14 @@ import 'package:googleapis/servicecontrol/v2.dart';
 import 'package:http/http.dart' as http;
 import 'package:aws_s3_private_flutter/aws_s3_private_flutter.dart';
 import 'package:aws_s3_private_flutter/export.dart';
+import 'package:postgres/postgres.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'add_task.dart';
 import 'amplifyconfiguration.dart';
+import 'dashboard.dart';
 import 'firebase_options.dart';
+import 'models/db.dart';
 import 'multTeam.dart';
 import 'multform.dart';
 import 'new_design.dart';
@@ -28,8 +32,7 @@ void main() async{
   await _configureAmplify();
 
   runApp(
-      MyApp()
-      );
+      MyApp());
 }
 Future<void> _configureAmplify() async {
   try {
@@ -56,122 +59,21 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  bool isLogin = false;
+  void getUserAuth() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? auth = prefs.getBool('isLogin');
+    setState(() {
+      isLogin = auth!;
+    });
+
+  }
   @override
   void initState() {
     super.initState();
-    getUserAttributes();
-    listItems();
-  }
-  void getUserAttributes() async {
-    try {
-      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
-      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
-      List<String> attributeList = [];
-      for (AuthUserAttribute attribute in attributes) {
-        print(attribute.value);
-
-        if(attribute.userAttributeKey.key.contains("custom")){
-         var valueKey = attribute.userAttributeKey.key.split(":");
-         attributeList.add('"${valueKey[1]}":"${attribute.value}"');
-         print(valueKey[1]);
-        }else{
-          attributeList.add('${attribute.userAttributeKey.key}:${attribute.value}');
-        }
-
-      }
-      if (kDebugMode) {
-        print(attributeList.toList());
-        print(attributeList[3].split(":")[1]);
-      }
-      // Process the user attributes
-
-    } catch (e) {
-      print('Error retrieving user attributes: $e');
-    }
-  }
-  Future<void> downloadToMemory(String key) async {
-    try {
-      final result = await Amplify.Storage.downloadData(
-        key: key,
-
-        onProgress: (progress) {
-          safePrint('Fraction completed: ${progress.fractionCompleted}');
-        },
-      ).result;
-
-      safePrint('Downloaded data: ${result.bytes}');
-    } on StorageException catch (e) {
-      safePrint(key+e.message);
-    }
-  }
-  Future<void> getFileFromS3Bucket() async {
-    try {
-      // Replace `key` with the actual key of the file in your S3 bucket
-      final String key = 'example.txt';
-
-      // Get the pre-signed URL for the file
-      final urlResult = await Amplify.Storage.getUrl(
-        key: key,
-      );
-
-      // Download the file using the URL
-      final response = await http.get(urlResult as Uri);
-
-      // Handle the downloaded file as needed
-      // For example, you can save it to local storage
-      // or process its content
-
-      // Print the file content
-      print(response.body);
-    } catch (e) {
-      print('Error retrieving file from S3 bucket: $e');
-    }
+    getUserAuth();
   }
 
-  Future<void> listItems() async {
-    try {
-      final result = await Amplify.Storage.list();
-      final items = result.toString();
-      safePrint('Got items: $items');
-      List listResult = await Amplify.Storage.list() as List;
-      for (StorageItem item in listResult) {
-        print('Key: ${item.key}, Size: ${item.size}');
-      }
-    } on StorageException catch (e) {
-      safePrint('Error listing items: $e');
-    }
-  }
-
-  Future<void> uploadExampleData() async {
-    const dataString = 'Example file contents';
-
-    try {
-      final result = await Amplify.Storage.uploadData(
-        data: S3DataPayload.string(dataString),
-        key: 'ExampleKey',
-        onProgress: (progress) {
-          safePrint('Transferred bytes: ${progress.transferredBytes}');
-        },
-      ).result;
-
-      safePrint('Uploaded data to location: ${result.uploadedItem.key}');
-    } on StorageException catch (e) {
-      safePrint(e.message);
-    }
-  }
-
-  Future<void> getFileProperties() async {
-    try {
-      final result = await Amplify.Storage.getProperties(
-        key: 's3://Agents_with_low_welcome_calls_2023-05-05T0940_wyTm57.json',
-      ).result;
-
-      safePrint('File size: ${result.storageItem.size}');
-    } on StorageException catch (e) {
-      safePrint('Could not retrieve properties: ${e.message}');
-      rethrow;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +85,12 @@ class _MyAppState extends State<MyApp> {
     late String priority = '';
     late String target;
     List? _myActivities;
-    return Authenticator(
+    return MaterialApp(
+      theme: AppTheme.lightTheme,
+      debugShowCheckedModeBanner: false,
+      home:NavPage(),
+    );
+    /*return Authenticator(
         signUpForm: SignUpForm.custom(
           fields: [
             SignUpFormField.email(required: true),
@@ -255,7 +162,7 @@ class _MyAppState extends State<MyApp> {
         ),
         home:NavPage(),
       ),
-    );
+    );*/
   }
 
 }
@@ -278,12 +185,7 @@ class _LoginSignUpState extends State<LoginSignUp> {
   Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation = await Amplify.Storage.list(
-        options: const StorageListOptions(
-          accessLevel: StorageAccessLevel.guest,
-          pluginOptions: S3ListPluginOptions.listAll(),
-        ),
-      );
+      operation =  await Database.listItems();
 
       Future<StorageListResult<StorageItem>> result = operation.result;
       List<StorageItem> resultList = (await operation.result).items;
@@ -302,14 +204,6 @@ class _LoginSignUpState extends State<LoginSignUp> {
         print('No files found in the S3 bucket with key containing "$key".');
         return null;
       }
-
-      for (StorageItem item in resultList) {
-        print('Key: ${item.key}');
-        print('Last Modified: ${item.lastModified}');
-        // Access other properties as needed
-      }
-
-      safePrint('Got items: ${resultList.length}');
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
     }
@@ -486,9 +380,9 @@ class LoginSignupApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Login and Sign Up Page',
+
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.yellow,
       ),
       home: LoginSignupPage(),
     );
@@ -503,56 +397,69 @@ enum AuthMode { Login, Signup }
 class _LoginSignupPageState extends State<LoginSignupPage> {
   final _formKey = GlobalKey<FormState>();
 
-  late String _email;
-  late String _password;
-  late String _confirmPassword;
+   String _email ='';
+   String _password ='';
+   String _confirmPassword ='';
+   String role ='';
+   String zone ='';
+   String region ='';
+   String area ='';
+   String country ='';
+   String firstname ='';
+   String lastname ='';
   AuthMode _authMode = AuthMode.Login;
 
   Future<void> _submitForm() async {
     print(_authMode);
     if (_formKey.currentState!.validate()) {
+      var connection = await Database.connect();
       if(_authMode == AuthMode.Login){
-        Map data ={
-          "username": _email,
-          "password": _password
-        };
-        var body = json.encode(data);
-        var url = Uri.parse('https://greenlightppanetfraudapp.herokuapp.com/api/signup');
-        http.Response response = await http.post(url, body: body, headers: {
-          "Content-Type": "application/json",
-        });
-        var result_task = jsonDecode(response.body);
-        print(result_task);
+        var results = await connection.query( "SELECT * FROM fieldappusers_feildappuser WHERE email = @email AND password = @password",
+          substitutionValues: {"email":_email,"password": _password},);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+
+        if (results.isNotEmpty) {
+          print(results);
+          var Row = results[0];
+          prefs.setString('email', Row[4]);
+          prefs.setString('name', Row[6]);
+          prefs.setString('country', Row[8]);
+          prefs.setString('zone', Row[10]);
+          prefs.setString('region', Row[9]);
+          prefs.setString('area', Row[14]);
+          prefs.setString('role', Row[11]);
+          prefs.setString('email', _email);
+          prefs.setBool('isLogin',true);
+          print(prefs.get('name'));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavPage()));
+        }else{
+          final snackBar = SnackBar(
+            content: Text('Incorrect credentials please try again'),
+            duration: Duration(seconds: 3),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
       }else {
-        Map data = {
-          "username": "Dennis224",
-          "pass1": "Dennis2244",
-          "pass2": "Dennis2244",
-          "email": "ayinke@gmial.com",
-          "fname": "Ayinke",
-          "lname": "Oladeji",
-          "country": "Nigeria",
-          "region": "NA",
-          "area": "Amuloko",
-          "role": "RCM"
-        };
-      }
-      // Perform login or sign-up logic here
-      // For simplicity, we'll just print the email and password
-      print('Email: $_email');
-      print('Password: $_password');
+        try{
+          await  connection.execute("insert into fieldappusers_feildappuser (username,email,password, first_name,last_name,country,zone,region,area,role,is_superuser,is_staff,is_active) values ('$_email','$_email','$_password','$firstname','$lastname','$country','$zone','$region','$zone','$role','false','true','true')   ");
+        }catch (e) {
+          print('Error executing query: $e');
+        } finally {
+          await connection.close();
+        }
+        }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login and Sign Up Page'),
-      ),
+
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.all(20.0),
+          padding: EdgeInsets.fromLTRB(10,100.0,0,0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -569,7 +476,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                         return null;
                       },
                       onChanged: (value) {
-                        _email = value;
+                        firstname = value;
                       },
                     ),
                     TextFormField(
@@ -581,7 +488,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                         return null;
                       },
                       onChanged: (value) {
-                        _email = value;
+                        lastname = value;
                       },
                     ),
                     TextFormField(
@@ -593,7 +500,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                         return null;
                       },
                       onChanged: (value) {
-                        _email = value;
+                        country = value;
                       },
                     ),
                     TextFormField(
@@ -605,7 +512,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                         return null;
                       },
                       onChanged: (value) {
-                        _email = value;
+                        zone = value;
                       },
                     ),
                     TextFormField(
@@ -617,7 +524,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                         return null;
                       },
                       onChanged: (value) {
-                        _email = value;
+                        region = value;
                       },
                     ),
                     TextFormField(
@@ -629,7 +536,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                         return null;
                       },
                       onChanged: (value) {
-                        _email = value;
+                        role = value;
                       },
                     ),
                   ],),

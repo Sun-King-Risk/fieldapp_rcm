@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'multTeam.dart';
 class MyTaskNew extends StatefulWidget {
@@ -264,42 +265,24 @@ Future<void> TableData() async{
 
 }
   void getUserAttributes() async {
-    try {
-      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
-      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
-      List<String> attributesList = [];
-      for (AuthUserAttribute attribute in attributes) {
-        print(attribute.value);
-
-        if(attribute.userAttributeKey.key.contains("custom")){
-          var valueKey = attribute.userAttributeKey.key.split(":");
-          attributesList.add('${valueKey[1]}:${attribute.value}');
-          print(valueKey[1]);
-        }else{
-          attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
-        }
-
-      }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
       setState(() {
-        attributeList = attributesList;
-        singleRegion = attributeList[7].split(":")[1];
 
+        singleRegion = prefs.getString("region")!;
+        name = prefs.getString("name")!;
+        userRegion = prefs.getString("region")!;
+        country = prefs.getString("country")!;
+        submited_role = prefs.getString("role")!;
+        task_zone = prefs.getString("zone")!;
       });
-      name = attributeList[3].split(":")[1];
-      userRegion = attributeList[7].split(":")[1];
-      country = attributeList[4].split(":")[1];
-      submited_role = attributeList[5].split(":")[1];
-      task_zone = attributeList[1].split(":")[1];
       if (kDebugMode) {
-        print(attributeList.toList());
-        print(attributeList[3].split(":")[1]);
+        print(submited_role);
+        print(name);
         print( task_zone);
       }
       // Process the user attributes
 
-    } catch (e) {
-      print('Error retrieving user attributes: $e');
-    }
+
   }
   Future<StorageItem?> listItems(key) async {
     try {
@@ -615,7 +598,6 @@ Future<void> TableData() async{
                         ElevatedButton(onPressed: (){
                           setState(() {
                             if(selectedOption =='Team Management'){
-                              print("object");
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(builder: (context) => TeamTaskCreate(
                                   title: selectedOption,

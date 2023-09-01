@@ -6,6 +6,7 @@ import 'package:fieldapp_rcm/report.dart';
 import 'package:fieldapp_rcm/task_table.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'location.dart';
 import 'multform.dart';
 import 'pending_task.dart';
@@ -67,6 +68,8 @@ class _TaskState extends State<Task> {
   String country = '';
   double completeRate = 0;
   int totaltask = 0;
+  String email ="";
+
   @override
   void initState() {
     // TODO: implement initState
@@ -75,39 +78,22 @@ class _TaskState extends State<Task> {
   }
 
   void getUserAttributes() async {
-    try {
-      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
-      List<AuthUserAttribute> attributes =
-          await Amplify.Auth.fetchUserAttributes();
-      List<String> attributesList = [];
-      for (AuthUserAttribute attribute in attributes) {
-        print(attribute.value);
-
-        if (attribute.userAttributeKey.key.contains("custom")) {
-          var valueKey = attribute.userAttributeKey.key.split(":");
-          attributesList.add('${valueKey[1]}:${attribute.value}');
-          print(valueKey[1]);
-        } else {
-          attributesList
-              .add('${attribute.userAttributeKey.key}:${attribute.value}');
-        }
-      }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
       setState(() {
-        attributeList = attributesList;
-        singleRegion = attributeList[7].split(":")[1];
-        country = attributeList[4].split(":")[1];
-        role = attributeList[5].split(":")[1];
+
+        singleRegion = prefs.getString("region")!;
+        country = prefs.getString("country")!;
+        role = prefs.getString("role")!;
+        name = prefs.getString("name")!;
+        email = prefs.getString("email")!;
       });
-      name = attributeList[3].split(":")[1];
+
       CompleteRate(name);
       if (kDebugMode) {
         print(attributeList.toList());
-        print(attributeList[3].split(":")[1]);
+        print(name);
       }
-      // Process the user attributes
-    } catch (e) {
-      print('Error retrieving user attributes: $e');
-    }
+
   }
 
   void CompleteRate(String name) async {

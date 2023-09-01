@@ -8,6 +8,9 @@ import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:postgres/postgres.dart';
+
+import 'models/db.dart';
+import 'multform.dart';
 class TeamTaskCreate extends StatefulWidget {
   final title;
   final sub;
@@ -27,46 +30,73 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
   String endDate =  "";
   String startDate = "";
   List? users =[];
-  void Conent() async {
-    var connection = PostgreSQLConnection(
-        'ec2-54-91-61-224.compute-1.amazonaws.com',
-        5432,
-        "dd9vqp2r0c7soq",
-        username: "uf9fso6v2tj5up",
-        password: "p9e0b305a3dd4a434a1763d5ce35170e9c7041e8ad5bcbdd5881472e508693472",
-        useSSL: true
-    );
+  bool userComplete = false;
+  void RoleList() async {
+      switch (submited_role) {
+        case "Admin":
+          setState(() {
 
-    try {
-      await connection.open();
-      var results = await connection.query("SELECT Role FROM users_newuser");
-      print(results.map((row) => row[0]).where((role) => role != null && role.isNotEmpty).toSet().toList());
-      setState(() {
-        Role =results.map((row) => row[0]).where((role) => role != null && role.isNotEmpty).toSet().toList();
-      });
+          });
 
-    }catch(e){
-      print("error");
-      print(e.toString());
-    }
+          break;
+        case "Fraud Manager":
+          setState(() {
+
+          });
+
+          break;
+        case "Credit Analyst":
+        case "CCA":
+
+          setState(() {
+            Role = [
+              'ACE',
+              'RCM'
+            ];
+          });
+
+          break;
+        case "CCM":
+
+        setState(() {
+          Role = [
+            'ACE',
+            'Credit Analyst',
+            'CLE',
+            'Fraud Analyst'
+          ];
+        });
+          break;
+
+        case "CLE":
+        case "RCM":
+          setState(() {
+           Role= [
+
+
+              'CLE',
+
+            ];
+          });
+
+        // Code to handle Admin role
+
+          break;
+        default:
+      }
+      print(Role);
+
+
   }
   void Users() async  {
-    var connection = PostgreSQLConnection(
-        'ec2-54-91-61-224.compute-1.amazonaws.com',
-        5432,
-        "dd9vqp2r0c7soq",
-        username: "uf9fso6v2tj5up",
-        password: "p9e0b305a3dd4a434a1763d5ce35170e9c7041e8ad5bcbdd5881472e508693472",
-        useSSL: true
-    );
-
+    var connection = await Database.connect();
     try {
-      await connection.open();
-      var results = await connection.query( "SELECT first_name, last_name FROM users_newuser WHERE Role = @role",
-        substitutionValues: {"role": selectedOption},);
+      var results = await connection.query( "SELECT first_name, last_name FROM users_newuser WHERE Role = @role AND Country = @country",
+        substitutionValues: {"role":selectedOption,"country": country},);
       print(results.map((row) => row[0]).where((role) => role != null && role.isNotEmpty).toSet().toList());
       setState(() {
         users =results.map((row) => "${row[0]} ${row[1]}").where((name) => name != null && name.isNotEmpty).toSet().toList();
+        userComplete = true;
       });
 
     }catch(e){
@@ -266,13 +296,14 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
       setState(() {
         attributeList = attributesList;
         singleRegion = attributeList[7].split(":")[1];
+        name = attributeList[3].split(":")[1];
+        userRegion = attributeList[7].split(":")[1];
+        country = attributeList[4].split(":")[1];
+        submited_role = attributeList[5].split(":")[1];
+        task_zone = attributeList[1].split(":")[1];
 
       });
-      name = attributeList[3].split(":")[1];
-      userRegion = attributeList[7].split(":")[1];
-      country = attributeList[4].split(":")[1];
-      submited_role = attributeList[5].split(":")[1];
-      task_zone = attributeList[1].split(":")[1];
+      RoleList();
       if (kDebugMode) {
         print(attributeList.toList());
         print(attributeList[3].split(":")[1]);
@@ -284,86 +315,8 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
       print('Error retrieving user attributes: $e');
     }
   }
-  Future<StorageItem?> listItems(key) async {
-    try {
-      StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation = await Amplify.Storage.list(
-        options: const StorageListOptions(
-          accessLevel: StorageAccessLevel.guest,
-          pluginOptions: S3ListPluginOptions.listAll(),
-        ),
-      );
-
-      Future<StorageListResult<StorageItem>> result = operation.result;
-      List<StorageItem> resultList = (await operation.result).items;
-      resultList = resultList.where((file) => file.key.contains(key)).toList();
-      if (resultList.isNotEmpty) {
-        // Sort the files by the last modified timestamp in descending order
-        resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
-        StorageItem latestFile = resultList.first;
-
-        RegionTask(latestFile.key);
-        print(latestFile.key);
-        if(
-        SelectedSubtask== 'Work with the Agents with low welcome calls to improve'||
-            SelectedSubtask=='Increase the Kazi Visit Percentage' ||
-            SelectedSubtask == 'Field Visits with low-performing Agents in Collection Score'
-        ){
-          target = true;
-        }else{
-          target = false;
-        }
-        return resultList.first;
-      } else {
-        print('No files found in the S3 bucket with key containing "$key".');
-        return null;
-      }
-      safePrint('Got items: ${resultList.length}');
-    } on StorageException catch (e) {
-      safePrint('Error listing items: $e');
-    }
-  }
-  Future<void> RegionTask(key) async {
-    List<String> uniqueRegion = [];
-    print("object: $key");
 
 
-    try {
-
-      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
-          key: key)
-          .result;
-
-      final response = await http.get(urlResult.url);
-      final jsonData = jsonDecode(response.body);
-      print('File_team: $jsonData');
-      final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['Region'] == singleRegion &&
-          task['Country'] == country
-      ).toList();
-      print(filteredTasks.length);
-
-      for (var item in filteredTasks) {
-        //String region = item['Region'];
-        //region?.add(region);
-        if(item['Region'] == null){
-        }else{
-          uniqueRegion.add(item['Region']);
-        }
-
-      }
-      setState(() {
-        data = filteredTasks;
-        region = uniqueRegion.toSet().toList();
-        isLoading = false;
-
-
-      });
-    } on StorageException catch (e) {
-      safePrint('Could not retrieve properties: ${e.message}');
-      rethrow;
-    }
-  }
   int _currentStep = 0;
   final List<String>CCM = [
     "CCM 1",
@@ -403,7 +356,6 @@ void initState() {
     // TODO: implement initState
     super.initState();
     getUserAttributes();
-    Conent();
 
   }
   @override
@@ -418,7 +370,7 @@ void initState() {
               if(_taskMode == TaskMode.Task)
                 Expanded(
                   child:
-        Role!.length==0?Center(
+                  Role!.length==0?Center(
           child: Column(
             children: [
 
@@ -426,8 +378,7 @@ void initState() {
               Text(' Please wait...')
             ],
           ),
-        ):
-                  Column(children: [
+        ):Column(children: [
                     Expanded(
                       child: ListView.builder(
                           shrinkWrap: true,
@@ -449,6 +400,24 @@ void initState() {
                             );
                           }
                       ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(onPressed: (){
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (context) => MyTaskNew(
+
+                            )),
+                          );
+                        }, child: Text("Back")),
+                        ElevatedButton(onPressed: (){
+                          setState(() {
+                            _taskMode = TaskMode.SubTask;
+
+                          });
+                        }, child: Text("Next"))
+                      ],
                     )
                   ],),
                 ),
@@ -457,14 +426,15 @@ void initState() {
                   child: Column(
                     children: [
                       Expanded(
-                        child: users!.length==0?Center(
+                        child: users!.isEmpty&&userComplete==false?Center(
                           child: Column(
                             children: [
-
                               CircularProgressIndicator(),
                               Text(' Please wait...')
                             ],
                           ),
+                        ): users!.length==0&& userComplete==true?Center(
+                          child: Text("No users found with role ${Role![0]}."),
                         ):
                         ListView.builder(
                             shrinkWrap: true,
@@ -492,6 +462,7 @@ void initState() {
 
                             setState(() {
                               _taskMode = TaskMode.Task;
+                              users= [];
                             });
                           }, child: Text("Back")),
                           ElevatedButton(onPressed: (){

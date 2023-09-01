@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'utils/themes/theme.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
@@ -22,6 +23,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<String> attributeList = [];
+
   String name ="";
   String region = '';
   String country ='';
@@ -31,41 +33,26 @@ class _HomeState extends State<Home> {
     // TODO: implement initState
     super.initState();
     getUserAttributes();
+
   }
   void getUserAttributes() async {
-    try {
-      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
-      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
-      List<String> attributesList = [];
-      for (AuthUserAttribute attribute in attributes) {
-        print(attribute.value);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        if(attribute.userAttributeKey.key.contains("custom")){
-          var valueKey = attribute.userAttributeKey.key.split(":");
-          attributesList.add('${valueKey[1]}:${attribute.value}');
-          print(valueKey[1]);
-        }else{
-          attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
-        }
-
-      }
       setState(() {
-        attributeList = attributesList;
-        role = attributeList[5].split(":")[1];
-        name = attributeList[3].split(":")[1];
-        region = attributeList[7].split(":")[1];
-        country = attributeList[4].split(":")[1];
+
+        role = prefs.getString("role")!;
+        name = prefs.getString("name")!;
+        region = prefs.getString("region")!;
+        country = prefs.getString("country")!;
       });
-      name = attributeList[3].split(":")[1];
+      name = prefs.getString("name")!;
       if (kDebugMode) {
-        print(attributeList.toList());
-        print(attributeList[3].split(":")[1]);
+        print(country);
+        print(name);
       }
       // Process the user attributes
 
-    } catch (e) {
-      print('Error retrieving user attributes: $e');
-    }
+
   }
   @override
   Widget build(BuildContext context) {

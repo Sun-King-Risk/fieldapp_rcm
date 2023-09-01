@@ -3,12 +3,14 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
+import 'package:fieldapp_rcm/models/db.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocationMap  extends StatefulWidget {
   LocationMapState createState() => LocationMapState();
@@ -30,38 +32,17 @@ class  LocationMapState extends State<LocationMap> {
   String country ="";
   int complete= 0;
   void getUserAttributes() async {
-    try {
-      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
-      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
-      List<String> attributesList = [];
-      for (AuthUserAttribute attribute in attributes) {
-        print(attribute.value);
-
-        if(attribute.userAttributeKey.key.contains("custom")){
-          var valueKey = attribute.userAttributeKey.key.split(":");
-          attributesList.add('"${valueKey[1]}":"${attribute.value}"');
-          print(valueKey[1]);
-        }else{
-          attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
-        }
-
-      }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
       setState(() {
-        attributeList = attributesList;
-        name = attributeList[3].split(":")[1];
+
+        name = prefs.getString("name")!;
+        country =prefs.getString("country")!;
       });
-      name = attributeList[3].split(":")[1];
-      country = attributeList[4].split(":")[1];
       listItems("customer_location");
       if (kDebugMode) {
-        print(attributeList.toList());
-        print("Dennis ${attributeList[4].split(":")[1]}");
+        print(country);
+        print("$name");
       }
-      // Process the user attributes
-
-    } catch (e) {
-      print('Error retrieving user attributes: $e');
-    }
   }
   List? data = [];
   List<String> region= [];
@@ -114,12 +95,7 @@ class  LocationMapState extends State<LocationMap> {
   Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation = await Amplify.Storage.list(
-        options: const StorageListOptions(
-          accessLevel: StorageAccessLevel.guest,
-          pluginOptions: S3ListPluginOptions.listAll(),
-        ),
-      );
+      operation = await Database.listItems();
 
       Future<StorageListResult<StorageItem>> result = operation.result;
       List<StorageItem> resultList = (await operation.result).items;

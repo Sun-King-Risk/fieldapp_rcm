@@ -52,7 +52,7 @@ class NavPagePageState extends State<NavPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar:SKAppBar(height: 70,),
+      appBar:SKAppBar(height: 70, context: context,),
       body: Container(
           child: _tabs.elementAt(_selectedIndex)),
       bottomNavigationBar: Container(

@@ -12,39 +12,7 @@ class TeamTask extends StatefulWidget {
 
 class TeamTaskState extends State<TeamTask> {
   initState() {
-    getFileProperties();
     agentList.toList();
-  }
-  Future<void> getFileProperties() async {
-    List<String> uniqueAgentList = [];
-    try {
-      StorageGetPropertiesResult<StorageItem> result =
-      await Amplify.Storage.getProperties(
-        key: 'Agents_with_low_welcome_calls_2023-05-14T0204_r95sHZ.json',
-      ).result;
-      StorageGetUrlRequest fileResult = await Amplify.Storage.getUrl(
-          key: 'Agents_with_low_welcome_calls_2023-05-14T0204_r95sHZ.json')
-          .request;
-      StorageItem dd = result.storageItem;
-      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
-          key: 'Agents_with_low_welcome_calls_2023-05-14T0204_r95sHZ.json')
-          .result;
-      final response = await http.get(urlResult.url);
-      final jsonData = jsonDecode(response.body);
-      for (var item in jsonData) {
-        String agent = item['Area'];
-        uniqueAgentList.add(agent);
-      }
-      setState(() {
-        agentList = uniqueAgentList.toSet().toList();
-      });
-
-      safePrint('File size: $dd');
-      safePrint('File url: ${agentList}');
-    } on StorageException catch (e) {
-      safePrint('Could not retrieve properties: ${e.message}');
-      rethrow;
-    }
   }
   List<String> agentList = [];
   List data =[];
@@ -57,8 +25,8 @@ class TeamTaskState extends State<TeamTask> {
 
   ];
   bool isDescending =false;
+  Future<String> getUser() async {
 
-  Future<String> getData() async {
     const apiUrl = 'https://sun-kingfieldapp.herokuapp.com/api/tasks';
     final response = await http.get(Uri.parse(apiUrl,),headers:{
       "Content-Type": "application/json",});
