@@ -26,7 +26,6 @@ class TaskData {
               task['task_title'] == taskTitle && task['submited_by'] == name)
           .toList();
       return filteredTasks.length;
-
       // Return the count value
     } else {
       throw Exception('Failed to fetch tasks');

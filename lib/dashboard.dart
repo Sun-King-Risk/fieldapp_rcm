@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:fieldapp_rcm/dash_view.dart';
 import 'package:fieldapp_rcm/services/region_data.dart';
@@ -22,7 +21,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<String> attributeList = [];
 
   String name ="";
   String region = '';
@@ -30,7 +28,7 @@ class _HomeState extends State<Home> {
   String role = '';
   @override
   void initState() {
-    // TODO: implement initState
+
     super.initState();
     getUserAttributes();
 
@@ -92,18 +90,21 @@ class _HomeState extends State<Home> {
                         label: 'CSAT Rate',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                       RowData(
                         value: 'Disabled Rate',
                         label: 'Fraud SLA',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                       RowData(
-                        value: 'Repayment Speed 2',
+                        value: 'Contacted Rate',
                         label: 'Welcome Call Rate',
                         region: region,
                         country: country,
+                        item: 'welcome_rate',
                       ),
 
 
@@ -124,18 +125,21 @@ class _HomeState extends State<Home> {
                         label: 'At Risk Rate',
                         region: region,
                         country: country,
+                        item: 'Regional',
                       ),
                       RowData(
-                        value: 'At Risk Rate 60',
+                        value: 'Units First Pay Defaulted',
                         label: 'FPD',
                         region: region,
                         country: country,
+                        item: 'Regional',
                       ),
                       RowData(
-                        value: 'Detached Rate',
+                        value: 'Second Pay Default Rate',
                         label: 'SPD',
                         region: region,
                         country: country,
+                        item: 'Regional',
                       ),
                     ],
                   ),
@@ -157,18 +161,21 @@ class _HomeState extends State<Home> {
                         label: 'Audit Reports/Survey',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'FSE Revamp',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'Repo & Resale',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                     ],
                   ),
@@ -190,24 +197,28 @@ class _HomeState extends State<Home> {
                         label: 'Disabe Rate',
                         region: region,
                         country: country,
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'Collection Score',
                         label: 'Disable Rate > 180',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                       RowData(
                         value: 'At Risk Rate 60',
                         label: 'Disable Rate < 180',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                       RowData(
                         value: 'Repayment Speed 2',
                         label: 'Repayment Speed 2',
                         region: region,
                         country: country,
+                        item: 'Regional',
                       ),
 
 
@@ -226,24 +237,28 @@ class _HomeState extends State<Home> {
                         label: 'Collection Score',
                         region: region,
                         country: country,
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'Detached Rate',
                         label: 'Repossession Rate',
                         region: region,
                         country: country,
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'At Risk Rate',
                         label: 'Agent Restriction',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                       RowData(
-                        value: 'Repayment Speed Last 182 Days',
+                        value: 'Tasks Completed Percent',
                         label: 'Kazi Completion',
                         region: region,
                         country: country,
+                        item: 'task_completed',
                       ),
 
 
@@ -270,18 +285,21 @@ class _HomeState extends State<Home> {
                         label: 'CC Escalation',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'Replacement SLA',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'Change of Details',
                         region: region,
                         country: country,
+                        item: 'Reginal',
                       ),
                     ],
                   ),
@@ -305,12 +323,14 @@ class _HomeState extends State<Home> {
                       label: '',
                       region: region,
                       country: country,
+                      item: 'Reginal',
                     ),
                     RowData(
                       value: 'Repayment Speed 2',
                       label: '',
                       region: region,
                       country: country,
+                      item: 'Reginal',
                     ),
                   ]),
 
@@ -336,12 +356,13 @@ class RowData extends StatefulWidget {
   final String label;
   final String country;
   final String region;
-
+  final String item;
 
   const RowData({Key? key,
     required this.value,
     required this.label,
     required this.country,
+    required this.item,
     required this.region})
       : super(key: key);
 
@@ -350,11 +371,12 @@ class RowData extends StatefulWidget {
 }
 
 class _RowDataState extends State<RowData> {
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    listItems('Reginal');
+    listItems(widget.item);
   }
   List? data = [];
   bool isLoading = true;

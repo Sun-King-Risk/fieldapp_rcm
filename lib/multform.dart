@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'multTeam.dart';
 class MyTaskNew extends StatefulWidget {
+
   @override
   _MyTaskNewState createState() => _MyTaskNewState();
 }
@@ -20,6 +21,12 @@ enum TaskMode {
 
 }
 class _MyTaskNewState extends State<MyTaskNew> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getUserAttributes();
+  }
   DateTime selectedDate = DateTime.now();
   int currentYear = DateTime.now().year;
    String endDate =  "";
@@ -81,6 +88,9 @@ class _MyTaskNewState extends State<MyTaskNew> {
   List? data = [];
   String selectedArea = '';
   List? areadata = [];
+  String zone ='';
+  String role = '';
+  String email = "";
   List<String> region= [];
   Future<void> Area() async {
     List<String> uniqueArea = [];
@@ -336,7 +346,7 @@ Future<void> TableData() async{
 
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
-      print('File_team: $jsonData');
+      print('File Data: $jsonData');
       final List<dynamic> filteredTasks = jsonData
           .where((task) => task['Region'] == singleRegion &&
           task['Country'] == country
@@ -353,6 +363,7 @@ Future<void> TableData() async{
 
       }
       setState(() {
+
         data = filteredTasks;
         region = uniqueRegion.toSet().toList();
         isLoading = false;
@@ -659,10 +670,15 @@ Future<void> TableData() async{
                           });
                         }, child: Text("Back")),
                         ElevatedButton(onPressed: (){
-                          setState(() {
-                            _taskMode = TaskMode.Area;
-                            Area();
-                          });
+                          if(region.length ==0){
+
+                          }else{
+                            setState(() {
+                              _taskMode = TaskMode.Area;
+                              Area();
+                            });
+                          }
+
                         }, child: Text("Next"))
                       ],
                     )

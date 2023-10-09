@@ -114,12 +114,13 @@ List? data = [];
        setState(() {
        });
        name = prefs.getString("name")!;
-       userRegion =  prefs.getString("region")!;
+     region =  prefs.getString("region")!;
        country =  prefs.getString("country")!;
        role = prefs.getString("role")!;
        zone =  prefs.getString("zone")!;
        fetchData();
        if (kDebugMode) {
+         print("object kd");
        }
        // Process the user attributes
 
@@ -129,35 +130,44 @@ List? data = [];
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
     var response = await http.get(url);
     print("Sdsf $name");
+    print(response.statusCode);
     if (response.statusCode == 200) {
-      setState(() {
-        print(response.body);
+
         var jsonData = jsonDecode(response.body);
-        if(role== 'RCM'){
-          data = jsonData.where((task)=>
-          task['is_approved'] == 'Pending'
-              && task['submited_role'] == 'ACE'
-              && task['country'] == country
-              && task['task_region'] == region
-          ).toList();
-        }else if(role == 'Credit Analyst'){
-          data = jsonData.where((task)=>
-          task['is_approved'] == 'Pending'
-              && task['submited_role'] == 'RCM'
-              && task['country'] == country
-              && task['task_zone'] == zone).toList();
-        }else if(role == 'Country Credit Analyst'){
-          data = jsonData.where((task)=>
-          task['is_approved'] == 'Pending'
-              && task['submited_role'] == 'Credit Analyst'
-              && task['country'] == country
-              && task['task_zone'] == zone).toList();
+        if(role == 'Regional Collections Manager'){
+            data = jsonData.where((task)=>
+            task['is_approved'] == 'Pending'
+                && task['submited_role'] == 'ACE'
+                && task['country'] == country
+                && task['task_region'] == region
+            ).toList();
+        }else if(role == 'Zonal Credit Manager'){
+          setState(() {
+            data = jsonData.where((task)=>
+            task['is_approved'] == 'Pending'
+                && task['submited_role'] == 'Regional Collections Manager'
+                && task['task_country'] == country
+                && task['task_region'] == region
+            ).toList();
+          });
+
+
+        }else if(role == 'Country Credit Manager'){
+            data = jsonData.where((task)=>
+            task['is_approved'] == 'Pending'
+                && task['submited_role'] == 'ACE'
+                && task['country'] == country
+                && task['task_region'] == region
+            ).toList();
+
         }
-      });
+
     }else{
       print('Request failed with status: ${response.statusCode}');
     }
+
   }
+
 
 
 // Use the function to retrieve filtered data
@@ -252,7 +262,7 @@ List? data = [];
             ),
     //Text(data.toString()),
     Expanded(
-      child: data!.length==0?Center(child: Text("No new request task"),):ListView.separated(
+      child: data!.length==0?Center(child: Text("No new request task $data"),):ListView.separated(
         itemCount: data!.length, // Replace with your actual item count
         separatorBuilder: (BuildContext context, int index) {
           return Divider(
@@ -262,6 +272,7 @@ List? data = [];
         },
         itemBuilder: (BuildContext context, int index) {
           var task = data![index];
+          print(data);
           return InkWell(
               onTap: () {
                 Navigator.push(

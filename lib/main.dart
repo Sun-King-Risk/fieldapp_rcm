@@ -64,7 +64,10 @@ class _MyAppState extends State<MyApp> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? auth = prefs.getBool('isLogin');
     setState(() {
-      isLogin = auth!;
+      if(auth != null){
+        isLogin = auth!;
+      }
+
     });
 
   }
@@ -72,6 +75,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     getUserAuth();
+    print(isLogin);
   }
 
 
@@ -88,7 +92,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
-      home:NavPage(),
+      home: isLogin?NavPage():LoginSignupApp(),
     );
     /*return Authenticator(
         signUpForm: SignUpForm.custom(
@@ -179,40 +183,15 @@ class _LoginSignUpState extends State<LoginSignUp> {
   @override
   void initState() {
     super.initState();
-    listItems("country");
+    CoutryData("country");
     _configureAmplify();
   }
-  Future<StorageItem?> listItems(key) async {
-    try {
-      StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation =  await Database.listItems();
-
-      Future<StorageListResult<StorageItem>> result = operation.result;
-      List<StorageItem> resultList = (await operation.result).items;
-      resultList = resultList.where((file) => file.key.contains(key)).toList();
-      if (resultList.isNotEmpty) {
-        // Sort the files by the last modified timestamp in descending order
-        resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
-        StorageItem latestFile = resultList.first;
-        RegionTask(latestFile.key);
-        print(latestFile.key);
-        print("Key: $key");
-
-        return resultList.first;
-
-      } else {
-        print('No files found in the S3 bucket with key containing "$key".');
-        return null;
-      }
-    } on StorageException catch (e) {
-      safePrint('Error listing items: $e');
-    }
-  }
-  Future<void> RegionTask(key) async {
-    List<String> uniqueRegion = [];
+  Future<void> CoutryData(key) async {
+    List<String> uniqueCountry = [];
     print("object: $key");
 
     try {
+
       StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
           key: key)
           .result;
@@ -220,20 +199,18 @@ class _LoginSignUpState extends State<LoginSignUp> {
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
       print('File_team: $jsonData');
+
+      print(jsonData.length);
+
       for (var item in jsonData) {
-        //String region = item['Region'];
-        //region?.add(region);
-        if(item['Region'] == null){
-        }else{
-          uniqueRegion.add(item['Region']);
-        }
+        uniqueCountry.add(item['Region']);
 
       }
       setState(() {
+        countrydata = uniqueCountry.toSet().toList();
         data = jsonData;
-        region = uniqueRegion.toSet().toList();
-        safePrint('File_team: $jsonData');
         isLoading = false;
+
       });
     } on StorageException catch (e) {
       safePrint('Could not retrieve properties: ${e.message}');
@@ -242,6 +219,7 @@ class _LoginSignUpState extends State<LoginSignUp> {
   }
   bool isLoading = true;
   List? data = [];
+  List<String> countrydata = [];
   List<String> region= [];
 
   @override
@@ -407,6 +385,13 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
    String country ='';
    String firstname ='';
    String lastname ='';
+
+  bool isLoading = true;
+  List? data = [];
+  List<String> zonedata = [];
+  List<String> regiondata = [];
+  List<String> countrydata = [];
+  List<String> areadata = [];
   AuthMode _authMode = AuthMode.Login;
 
   Future<void> _submitForm() async {
@@ -414,36 +399,81 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
     if (_formKey.currentState!.validate()) {
       var connection = await Database.connect();
       if(_authMode == AuthMode.Login){
-        var results = await connection.query( "SELECT * FROM fieldappusers_feildappuser WHERE email = @email AND password = @password",
-          substitutionValues: {"email":_email,"password": _password},);
+        final response = await http.post(
+          Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/auth/signin'), // Replace with your API endpoint URL.
+          body: {
+            'email': _email,
+            'pass1': _password,
+          },
+        );
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
-
-
-        if (results.isNotEmpty) {
-          print(results);
+        if (response.statusCode== 200) {
+          var results = await connection.query( "SELECT * FROM fieldappusers_feildappuser WHERE email = @email",
+              substitutionValues: {"email":_email});
           var Row = results[0];
           prefs.setString('email', Row[4]);
-          prefs.setString('name', Row[6]);
+          prefs.setString('name', Row[6] + ' ' + Row[7]);
           prefs.setString('country', Row[8]);
-          prefs.setString('zone', Row[10]);
+          prefs.setString('zone', Row[14]);
           prefs.setString('region', Row[9]);
-          prefs.setString('area', Row[14]);
+          prefs.setString('area', Row[10]);
           prefs.setString('role', Row[11]);
           prefs.setString('email', _email);
           prefs.setBool('isLogin',true);
           print(prefs.get('name'));
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavPage()));
         }else{
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+          String successMessage = responseData['error'];
           final snackBar = SnackBar(
-            content: Text('Incorrect credentials please try again'),
+            content: Text(successMessage),
             duration: Duration(seconds: 3),
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       }else {
         try{
-          await  connection.execute("insert into fieldappusers_feildappuser (username,email,password, first_name,last_name,country,zone,region,area,role,is_superuser,is_staff,is_active) values ('$_email','$_email','$_password','$firstname','$lastname','$country','$zone','$region','$zone','$role','false','true','true')   ");
+          final response = await http.post(
+            Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/auth/signup'),
+            body: {
+              'username' : _email,
+              'fname' :firstname ,
+              'lname' : lastname,
+              'email' : _email,
+              'country' :country,
+              'zone' : zone,
+              'region' :region ,
+              'area' : area,
+              'role' : role,
+              'pass1' : _password,
+              'pass2' : _confirmPassword,
+
+            },
+          );
+          if(response.statusCode == 201){
+            final Map<String, dynamic> responseData = jsonDecode(response.body);
+            String successMessage = responseData['message'];
+            final snackBar = SnackBar(
+
+              content: Text(successMessage),
+              duration: Duration(seconds: 3),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            setState(() {
+              _authMode = AuthMode.Login;
+            });
+          }else{
+            print(response.body);
+            final Map<String, dynamic> responseData = jsonDecode(response.body);
+            String successMessage = responseData['error'];
+            final snackBar = SnackBar(
+              content: Text(successMessage),
+              duration: Duration(seconds: 3),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            print(successMessage);
+          }
         }catch (e) {
           print('Error executing query: $e');
         } finally {
@@ -452,7 +482,118 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
         }
     }
   }
+  Future<StorageItem?> listItems(key) async {
+    try {
+      StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
+      operation = await Amplify.Storage.list(
+        options: const StorageListOptions(
+          accessLevel: StorageAccessLevel.guest,
+          pluginOptions: S3ListPluginOptions.listAll(),
+        ),
+      );
 
+      Future<StorageListResult<StorageItem>> result = operation.result;
+      List<StorageItem> resultList = (await operation.result).items;
+      resultList = resultList.where((file) => file.key.contains(key)).toList();
+      if (resultList.isNotEmpty) {
+        // Sort the files by the last modified timestamp in descending order
+        resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
+        StorageItem latestFile = resultList.first;
+
+        CoutryData(latestFile.key);
+        return resultList.first;
+      } else {
+        print('No files found in the S3 bucket with key containing "$key".');
+        return null;
+      }
+      safePrint('Got items: ${resultList.length}');
+    } on StorageException catch (e) {
+      safePrint('Error listing items: $e');
+    }
+  }
+  Future<void> CoutryData(key) async {
+    List<String> uniqueCountry = [];
+    print("data Object: $key");
+
+
+    try {
+      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
+          key: key)
+          .result;
+
+      final response = await http.get(urlResult.url);
+      final jsonData = jsonDecode(response.body);
+      print('File_team: $jsonData');
+
+      print(jsonData.length);
+
+      for (var item in jsonData) {
+        uniqueCountry.add(item['Country']);
+
+      }
+      setState(() {
+        countrydata = uniqueCountry.toSet().toList();
+        data = jsonData;
+        isLoading = false;
+
+      });
+    } on StorageException catch (e) {
+      safePrint('Could not retrieve properties: ${e.message}');
+      rethrow;
+    }
+  }
+  Future<void> Zone() async {
+    List<String> uniqueZone = [];
+    final jsonZone = data?.where((item) => item['Country'] == country).toList();
+    for (var ZoneList in jsonZone!) {
+      String Zone = ZoneList['Zone'];
+      //region?.add(region);
+      uniqueZone.add(Zone);
+    }
+    setState(() {
+
+      zonedata = uniqueZone.toSet().toList();
+      safePrint('File_team: $data');
+    });
+    //safePrint('Area: $area');
+  }
+  Future<void> Region() async {
+    List<String> uniqueRegion= [];
+    final jsonArea = data?.where((item) => item['Zone'] == zone && item['Country']== country).toList();
+    for (var RegionList in jsonArea!) {
+      String region = RegionList['Region'];
+      //region?.add(region);
+      uniqueRegion.add(region);
+    }
+    setState(() {
+
+      regiondata = uniqueRegion.toSet().toList();
+      safePrint('File_team: $regiondata');
+    });
+    //safePrint('Area: $area');
+  }
+  Future<void> Area() async {
+    List<String> uniqueArea = [];
+    final jsonArea = data?.where((item) => item['Region'] == region && item['Country']== country).toList();
+    for (var areaList in jsonArea!) {
+      String area = areaList['Current Area'];
+      //region?.add(region);
+      uniqueArea.add(area);
+    }
+    setState(() {
+
+      areadata = uniqueArea.toSet().toList();
+      safePrint('File_team: $areadata');
+    });
+    //safePrint('Area: $area');
+  }
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    listItems("country");
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -491,55 +632,100 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                         lastname = value;
                       },
                     ),
-                    TextFormField(
-                      decoration: InputDecoration(labelText: 'Country'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your Country';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        country = value;
-                      },
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(labelText: 'Zone'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your Zone';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        zone = value;
-                      },
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(labelText: 'Region'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your Region';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        region = value;
-                      },
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(labelText: 'Role'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your Role';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        role = value;
-                      },
-                    ),
+                    SizedBox(height: 10,),
+                    AppDropDown(
+                        disable: false,
+                        label: "Country",
+                        hint: "Country",
+                        items: countrydata,
+                        validator: (value){
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your Country';
+                          }
+                          return null;
+                        },
+                        onChanged: (value){
+                          country = value;
+                          setState(() {
+                            zone = "";
+                            zonedata = [];
+                          });
+                          Zone();
+                        }),
+                    SizedBox(height: 10,),
+                    AppDropDown(
+                        disable: false,
+                        label: "Zone",
+                        hint: "Zone",
+                        items: zonedata,
+                        validator: (value){
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your Zone';
+                          }
+                          return null;
+                        },
+                        onChanged: (value){
+                          zone = value;
+                          regiondata=[];
+                          Region();
+                        }),
+                    SizedBox(height: 10,),
+
+                    AppDropDown(
+                        disable: false,
+                        label: "Region",
+                        hint: "Region",
+                        items: regiondata,
+                        validator: (value){
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your Zone';
+                          }
+                          return null;
+                        },
+                        onChanged: (value){
+                          region = value;
+                          Area();
+                        }),
+                    SizedBox(height: 10,),
+                    AppDropDown(
+                        disable: false,
+                        label: "Area",
+                        hint: "Area",
+                        items: areadata,
+                        validator: (value){
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your Area';
+                          }
+                          return null;
+                        },
+                        onChanged: (value){
+                          area = value;
+                        }),
+                    SizedBox(height: 10,),
+                    AppDropDown(
+                        disable: false,
+                        label: "Role",
+                        hint: "Role",
+                        items: const [
+                          "Area Collection Executive",
+                          "Country Credit Manager",
+                          "Zonal Credit Manager",
+                          "Senior Credit Analyst",
+                          "Regional Collections Manager"
+                        ],
+                        validator: (value){
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your Role';
+                          }
+                          return null;
+                        },
+                        onChanged: (value){
+                          role = value;
+                        }),
+
                   ],),
+                SizedBox(height: 10,),
+
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Email'),
                   validator: (value) {
