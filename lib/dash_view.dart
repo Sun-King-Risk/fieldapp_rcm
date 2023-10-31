@@ -17,7 +17,8 @@ class DashView extends StatefulWidget {
   final value;
   final country;
   final region;
-  DashView(this.title, this.value,this.country,this.region);
+  final item;
+  DashView(this.title, this.value,this.country,this.region,this.item);
   DashViewState createState() => DashViewState();
 }
 

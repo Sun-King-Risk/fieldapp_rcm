@@ -572,6 +572,46 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
     });
     //safePrint('Area: $area');
   }
+  Future<void> _showForgotPasswordDialog() async {
+    final TextEditingController emailController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Forgot Password'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text('Please enter your email to reset your password.'),
+              TextFormField(
+                controller: emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text('Reset Password'),
+              onPressed: () {
+                // Add your password reset logic here, e.g., send a password reset email
+                // You can use the emailController.text to get the user's email
+                // After the password reset is initiated, you can close the dialog.
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> Area() async {
     List<String> uniqueArea = [];
     final jsonArea = data?.where((item) => item['Region'] == region && item['Country']== country).toList();
@@ -606,6 +646,8 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Center(
+                    child: Image.asset('assets/logo/sk.png'),),
                 if(_authMode == AuthMode.Signup)
                   Column(children: [
                     TextFormField(
@@ -775,6 +817,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                   child: Text(_authMode == AuthMode.Login ? 'Login' : 'Sign Up'),
                   onPressed: _submitForm,
                 ),
+
                 TextButton(
                   child: Text(_authMode == AuthMode.Login ? 'Create Account' : 'Back to Login'),
                   onPressed: () {
@@ -782,6 +825,10 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                       _authMode = _authMode == AuthMode.Login ? AuthMode.Signup : AuthMode.Login;
                     });
                   },
+                ),
+                TextButton(
+                  child: Text('Forgot Password?'),
+                  onPressed: _showForgotPasswordDialog, // Create this function
                 ),
               ],
             ),

@@ -422,9 +422,9 @@ Future<void> TableData() async{
   String SelectedSubtask = '';
   List<String> Taskoptions = [
     'Portfolio Quality',
-    'Team Management',
     'Collection Drive',
-    'Pilot/Process Management',
+    /*'Pilot/Process Management',
+    'Team Management',*/
     'Customer Management',
   ];
   String selectedOption = '';

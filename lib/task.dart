@@ -194,18 +194,18 @@ class _TaskState extends State<Task> {
                           task_title: 'Portfolio Quality',
                           name: name,
                         ),
-                        TaskList(
+                        /*TaskList(
                           task_title: 'Pilot/Process Management',
                           name: name,
-                        ),
+                        ),*/
                         TaskList(
                           task_title: 'Collection Drive',
                           name: name,
                         ),
-                        TaskList(
+                        /*TaskList(
                           task_title: 'Customer Management',
                           name: name,
-                        ),
+                        ),*/
                         TaskList(
                           task_title: 'Team Management',
                           name: name,

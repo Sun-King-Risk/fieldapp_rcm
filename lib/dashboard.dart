@@ -1,15 +1,12 @@
 import 'dart:convert';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:fieldapp_rcm/dash_view.dart';
-import 'package:fieldapp_rcm/services/region_data.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'utils/themes/theme.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+
 import 'package:http/http.dart' as http;
 
 
@@ -90,21 +87,21 @@ class _HomeState extends State<Home> {
                         label: 'CSAT Rate',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'Disabled Rate',
                         label: 'Fraud SLA',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                       RowData(
-                        value: 'Contacted Rate',
+                        value: 'Disabled Rate',
                         label: 'Welcome Call Rate',
                         region: region,
                         country: country,
-                        item: 'welcome_rate',
+                        item: 'Regional',
                       ),
 
 
@@ -143,7 +140,7 @@ class _HomeState extends State<Home> {
                       ),
                     ],
                   ),
-                  const Divider(
+                 /* const Divider(
                     height: 10,
                     thickness: 0,
                     color: Colors.black,
@@ -161,24 +158,24 @@ class _HomeState extends State<Home> {
                         label: 'Audit Reports/Survey',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'FSE Revamp',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'Repo & Resale',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                     ],
-                  ),
+                  ),*/
                   const Divider(
                     height: 10,
                     thickness: 0,
@@ -204,14 +201,14 @@ class _HomeState extends State<Home> {
                         label: 'Disable Rate > 180',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'At Risk Rate 60',
                         label: 'Disable Rate < 180',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'Repayment Speed 2',
@@ -251,7 +248,7 @@ class _HomeState extends State<Home> {
                         label: 'Agent Restriction',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'Tasks Completed Percent',
@@ -267,7 +264,7 @@ class _HomeState extends State<Home> {
 
                   ],
                   ),
-                  const Divider(
+                  /*const Divider(
                     height: 10,
                     thickness: 0,
                     color: Colors.black,
@@ -285,24 +282,24 @@ class _HomeState extends State<Home> {
                         label: 'CC Escalation',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'Replacement SLA',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                       RowData(
                         value: 'Count Replacements',
                         label: 'Change of Details',
                         region: region,
                         country: country,
-                        item: 'Reginal',
+                        item: 'Regional',
                       ),
                     ],
-                  ),
+                  ),*/
                   const Divider(
                     height: 10,
                     thickness: 0,
@@ -323,14 +320,14 @@ class _HomeState extends State<Home> {
                       label: '',
                       region: region,
                       country: country,
-                      item: 'Reginal',
+                      item: 'Regional',
                     ),
                     RowData(
                       value: 'Repayment Speed 2',
                       label: '',
                       region: region,
                       country: country,
-                      item: 'Reginal',
+                      item: 'Regional',
                     ),
                   ]),
 
@@ -427,6 +424,7 @@ class _RowDataState extends State<RowData> {
       StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
           key: key)
           .result;
+      print("${widget.item} ${urlResult.url}");
 
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
@@ -465,6 +463,7 @@ class _RowDataState extends State<RowData> {
                     data![0][widget.value],
                   widget.country,
                     widget.region,
+                  widget.item
                     ),
 
               ));
