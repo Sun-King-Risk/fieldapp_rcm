@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../task_actions.dart';
 import '../widget/drop_down.dart';
@@ -12,7 +11,7 @@ class CollectionUpdate extends StatefulWidget {
   final id;
   final subtask;
   final taskGoalId;
-  CollectionUpdate(
+  const CollectionUpdate(
       {Key? key,
         required this.subtask,
         required this.id,
@@ -56,7 +55,7 @@ class _CollectionUpdateState extends State<CollectionUpdate> {
 
   @override
   Widget build(BuildContext context) {
-    String? _selectedValue;
+    String? selectedValue;
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
@@ -66,21 +65,21 @@ class _CollectionUpdateState extends State<CollectionUpdate> {
           children: [
             Text(widget.taskGoalId.toString()),
             Text(widget.id.toString()),
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
             AppDropDown(
                 disable: true,
                 label: widget.title,
                 hint: "hint",
                 items: [widget.title],
                 onChanged: (value) {}),
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
             AppDropDown(
                 disable: true,
                 label: widget.subtask,
                 hint: widget.subtask,
                 items: [widget.subtask],
                 onChanged: (value) {}),
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
             if(widget.subtask == 'Field Visits with low-performing Agents in Collection Score')
               Agent(
                 sub: widget.subtask,

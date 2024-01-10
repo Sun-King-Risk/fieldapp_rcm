@@ -1,20 +1,18 @@
 import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:postgres/postgres.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/db.dart';
 import 'multform.dart';
 class TeamTaskCreate extends StatefulWidget {
   final title;
   final sub;
-  TeamTaskCreate({required this.title,required this.sub});
+  const TeamTaskCreate({super.key, required this.title,required this.sub});
 
   @override
   _TeamTaskCreateState createState() => _TeamTaskCreateState();
@@ -91,11 +89,11 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
   void Users() async  {
     var connection = await Database.connect();
     try {
-      var results = await connection.query( "SELECT first_name, last_name FROM users_newuser WHERE Role = @role AND Country = @country",
-        substitutionValues: {"role":selectedOption,"country": country},);
+      var results = await connection.query( "SELECT first_name, last_name FROM fieldappusers_feildappuser WHERE Role = @role AND Country = @country",
+        substitutionValues: {"role":"ACE","country": country},);
       print(results.map((row) => row[0]).where((role) => role != null && role.isNotEmpty).toSet().toList());
       setState(() {
-        users =results.map((row) => "${row[0]} ${row[1]}").where((name) => name != null && name.isNotEmpty).toSet().toList();
+        users =results.map((row) => "${row[0]} ${row[1]}").where((name) => name.isNotEmpty).toSet().toList();
         userComplete = true;
       });
 
@@ -111,11 +109,12 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
       firstDate: DateTime(currentYear),
       lastDate: DateTime(currentYear+1),
     );
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         List<String> parts = picked.toString().split(" ");
         startDate = parts[0];
       });
+    }
   }
   Future<void> _endDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -124,11 +123,12 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
       firstDate: DateTime(currentYear),
       lastDate: DateTime(currentYear+1),
     );
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         List<String> parts = picked.toString().split(" ");
         endDate = parts[0];
       });
+    }
   }
   TaskMode _taskMode = TaskMode.Task;
   List<String> keys = [];
@@ -136,8 +136,8 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
   String selectedRegion = '';
   bool target =true;
   String rate = '';
-  int _currentPage = 0;
-  int _pageSize = 9;
+  final int _currentPage = 0;
+  final int _pageSize = 9;
   List getPageData() {
     final startIndex = _currentPage * _pageSize;
     final endIndex = startIndex + _pageSize;
@@ -145,8 +145,8 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
     return taskData!.sublist(startIndex, endIndex);
   }
   Map<String, String> selectedValues = {};
-  List<String> _priorities = ['High', 'Medium', 'Low'];
-  Map<String, Map<String, String>> _actions = {};
+  final List<String> _priorities = ['High', 'Medium', 'Low'];
+  final Map<String, Map<String, String>> _actions = {};
   List<String> textFieldValues = [];
   List<String> dropdownValues = [];
   bool isLoading = true;
@@ -159,6 +159,9 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
   String country ='';
   String userRegion = '';
   List? data = [];
+  String zone ='';
+  String email = "";
+  String role = '';
   String selectedArea = '';
   List? areadata = [];
   List<String> region= [];
@@ -196,14 +199,14 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
     };
 
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/create');
+    var url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    var result_task = jsonDecode(response.body);
-    print(result_task);
-    print(result_task["id"]);
-    taskActionNo(result_task["id"]);
+    var resultTask = jsonDecode(response.body);
+    print(resultTask);
+    print(resultTask["id"]);
+    taskActionNo(resultTask["id"]);
 
   }
 
@@ -222,7 +225,7 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
           "previous_goal":0
         };
         var body = json.encode(data);
-        var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
+        var url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/taskgoal/create/');
         http.Response response = await http.post(url, body: body, headers: {
           "Content-Type": "application/json",
         });
@@ -231,7 +234,7 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
 
     }
 
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Task Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -240,8 +243,8 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
   }
   List<Map<String, dynamic>> selectedItems = [];
   String key= 'Agent';
-  int _sortColumnIndex = 2;
-  bool _sortAscending = true;
+  final int _sortColumnIndex = 2;
+  final bool _sortAscending = true;
   List? taskData = [];
   List? Role = [];
   bool isLoadingTable = true;
@@ -277,47 +280,25 @@ class _TeamTaskCreateState extends State<TeamTaskCreate> {
 
   }
   void getUserAttributes() async {
-    try {
-      AuthUser currentUser = await Amplify.Auth.getCurrentUser();
-      List<AuthUserAttribute> attributes = await Amplify.Auth.fetchUserAttributes();
-      List<String> attributesList = [];
-      for (AuthUserAttribute attribute in attributes) {
-        print(attribute.value);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs.getString("name")!;
+      email = prefs.getString("email")!;
+      userRegion =  prefs.getString("region")!;
+      country =  prefs.getString("country")!;
+      role = prefs.getString("role")!;
+      zone =  prefs.getString("zone")!;
+    });
 
-        if(attribute.userAttributeKey.key.contains("custom")){
-          var valueKey = attribute.userAttributeKey.key.split(":");
-          attributesList.add('${valueKey[1]}:${attribute.value}');
-          print(valueKey[1]);
-        }else{
-          attributesList.add('${attribute.userAttributeKey.key}:${attribute.value}');
-        }
-
-      }
-      setState(() {
-        attributeList = attributesList;
-        singleRegion = attributeList[7].split(":")[1];
-        name = attributeList[3].split(":")[1];
-        userRegion = attributeList[7].split(":")[1];
-        country = attributeList[4].split(":")[1];
-        submited_role = attributeList[5].split(":")[1];
-        task_zone = attributeList[1].split(":")[1];
-
-      });
-      RoleList();
-      if (kDebugMode) {
-        print(attributeList.toList());
-        print(attributeList[3].split(":")[1]);
-        print( task_zone);
-      }
-      // Process the user attributes
-
-    } catch (e) {
-      print('Error retrieving user attributes: $e');
+    if (kDebugMode) {
     }
+    // Process the user attributes
+
+
   }
 
 
-  int _currentStep = 0;
+  final int _currentStep = 0;
   final List<String>CCM = [
     "CCM 1",
     "CCM 3",
@@ -356,13 +337,14 @@ void initState() {
     // TODO: implement initState
     super.initState();
     getUserAttributes();
+    Users();
 
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Add Task'),
+          title: const Text('Add Task'),
         ),
         body: Container(
           child: Column(
@@ -370,7 +352,7 @@ void initState() {
               if(_taskMode == TaskMode.Task)
                 Expanded(
                   child:
-                  Role!.length==0?Center(
+                  Role!.isEmpty?const Center(
           child: Column(
             children: [
 
@@ -406,17 +388,17 @@ void initState() {
                       children: [
                         ElevatedButton(onPressed: (){
                           Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) => MyTaskNew(
+                            MaterialPageRoute(builder: (context) => const MyTaskNew(
 
                             )),
                           );
-                        }, child: Text("Back")),
+                        }, child: const Text("Back")),
                         ElevatedButton(onPressed: (){
                           setState(() {
                             _taskMode = TaskMode.SubTask;
 
                           });
-                        }, child: Text("Next"))
+                        }, child: const Text("Next"))
                       ],
                     )
                   ],),
@@ -426,14 +408,14 @@ void initState() {
                   child: Column(
                     children: [
                       Expanded(
-                        child: users!.isEmpty&&userComplete==false?Center(
+                        child: users!.isEmpty&&userComplete==false?const Center(
                           child: Column(
                             children: [
                               CircularProgressIndicator(),
                               Text(' Please wait...')
                             ],
                           ),
-                        ): users!.length==0&& userComplete==true?Center(
+                        ): users!.isEmpty&& userComplete==true?Center(
                           child: Text("No users found with role ${Role![0]}."),
                         ):
                         ListView.builder(
@@ -464,14 +446,14 @@ void initState() {
                               _taskMode = TaskMode.Task;
                               users= [];
                             });
-                          }, child: Text("Back")),
+                          }, child: const Text("Back")),
                           ElevatedButton(onPressed: (){
                             setState(() {
                               _actions[SelectedSubtask] = {'action': '', 'priority': _priorities[0]};
                                 _taskMode = TaskMode.ActionPlan;
 
                             });
-                          }, child: Text("Next"))
+                          }, child: const Text("Next"))
                         ],
                       )
                     ],
@@ -491,9 +473,9 @@ void initState() {
                                       child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            SizedBox(height: 8),
+                                            const SizedBox(height: 8),
                                             TextField(
-                                              decoration: InputDecoration(
+                                              decoration: const InputDecoration(
                                                 hintText: 'Enter action plan',
                                                 labelText: 'Action Plan',
                                               ),
@@ -507,8 +489,8 @@ void initState() {
                                               },
                                               maxLines: 3,
                                             ),
-                                            SizedBox(height: 8),
-                                            SizedBox(height: 8),
+                                            const SizedBox(height: 8),
+                                            const SizedBox(height: 8),
                                             AppDropDown(
                                                 disable: true,
                                                 label: "Priority",
@@ -537,13 +519,13 @@ void initState() {
                             setState(() {
                               _taskMode = TaskMode.SubTask;
                             });
-                          }, child: Text("Back")),
+                          }, child: const Text("Back")),
                           ElevatedButton(onPressed: (){
                             setState(() {
                               _taskMode = TaskMode.Date;
                               print(_actions);
                             });
-                          }, child: Text("Next"))
+                          }, child: const Text("Next"))
                         ],
                       )
                     ],
@@ -554,10 +536,10 @@ void initState() {
                   children: [
                     ElevatedButton(onPressed: (){
                       _selectDate(context);
-                    }, child: Text("Date start")),
+                    }, child: const Text("Date start")),
                     ElevatedButton(onPressed: (){
                       _endDate(context);
-                    }, child: Text("Date End")),
+                    }, child: const Text("Date End")),
 
                     Text("Start: $startDate"),
                     Text("End: $endDate"),
@@ -570,12 +552,12 @@ void initState() {
                           setState(() {
                             _taskMode = TaskMode.ActionPlan;
                           });
-                        }, child: Text("Back")),
+                        }, child: const Text("Back")),
                         ElevatedButton(onPressed: (){
                           setState(() {
                             _taskMode = TaskMode.Preview;
                           });
-                        }, child: Text("Next"))
+                        }, child: const Text("Next"))
                       ],
                     )
                   ],
@@ -584,38 +566,38 @@ void initState() {
                 Expanded(
                   child: Column(
                     children: [
-                      Text("Preveiw"),
+                      const Text("Preveiw"),
                       Text(
-                        'Region: ${singleRegion}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        'Region: $singleRegion',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        'Area: ${selectedArea}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        'Area: $selectedArea',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         'Task: ${widget.title}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         'Sub Task: ${widget.sub}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        'Task start date: ${startDate}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        'Task start date: $startDate',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        'Task End date: ${endDate}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        'Task End date: $endDate',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 16),
-                      Text(
+                      const SizedBox(height: 16),
+                      const Text(
                         'Task Action:',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -625,18 +607,18 @@ void initState() {
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [SelectedSubtask]!.map((task) {
+                            children: [SelectedSubtask].map((task) {
                               String taskName = SelectedSubtask;
                               Map<String, String>? actions = _actions[taskName];
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Name: ${taskName} '),
-                                  SizedBox(height: 8),
+                                  Text('Name: $taskName '),
+                                  const SizedBox(height: 8),
                                   Text("Priority: ${actions!['priority']}"),
-                                  Text("Action Plan: ${actions!['action']}"),
+                                  Text("Action Plan: ${actions['action']}"),
 
-                                  SizedBox(height: 8),
+                                  const SizedBox(height: 8),
                                 ],
                               );
                             }).toList(),)
@@ -651,11 +633,11 @@ void initState() {
                             setState(() {
                               _taskMode = TaskMode.Date;
                             });
-                          }, child: Text("Back")),
+                          }, child: const Text("Back")),
                           ElevatedButton(onPressed: (){
                             print(target);
                             _saveNo();
-                          }, child: Text("Submit"))
+                          }, child: const Text("Submit"))
                         ],
                       )
                     ],

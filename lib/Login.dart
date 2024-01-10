@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
+  const Login({super.key});
+
   @override
   _LoginState createState() => _LoginState();
 }
@@ -23,7 +25,7 @@ class _LoginState extends State<Login> {
               Image.asset(
                 'assets/logo/sk.png',
               ),
-              GoogleSignInButton()
+              const GoogleSignInButton()
             ],
           ),
         ),
@@ -32,6 +34,8 @@ class _LoginState extends State<Login> {
   }
 }
 class GoogleSignInButton extends StatefulWidget {
+  const GoogleSignInButton({super.key});
+
   @override
   _GoogleSignInButtonState createState() => _GoogleSignInButtonState();
 }
@@ -70,7 +74,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
               Navigator.of(context).pushReplacement(
 
                 MaterialPageRoute(
-                  builder: (context) => NavPage(
+                  builder: (context) => const NavPage(
 
                   ),
                 ),
@@ -81,19 +85,19 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
           }else{
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => Login(
+                builder: (context) => const Login(
 
                 ),
               ),
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+        child: const Padding(
+          padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const <Widget>[
+            children: <Widget>[
               Image(
                 image: AssetImage("assets/logo/google.png"),
                 height: 35.0,

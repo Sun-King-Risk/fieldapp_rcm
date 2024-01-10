@@ -1,10 +1,9 @@
 // main.dart
 import 'dart:convert';
-import 'package:fieldapp_rcm/utils/themes/theme.dart';
+
 import 'package:http/http.dart' as http;
-import 'package:fieldapp_rcm/area/customer_vist.dart';
-import 'package:fieldapp_rcm/services/calls_detail.dart';
-import 'package:flutter/cupertino.dart';
+
+
 import 'package:fieldapp_rcm/services/user_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,7 +12,7 @@ import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:intl/intl.dart';
 
 import '../widget/drop_down.dart';
-import 'area/customer_profile.dart';
+
 
 class UserList extends StatefulWidget {
   const UserList({Key? key}) : super(key: key);
@@ -32,7 +31,7 @@ class PendingCallsState extends State<UserList> {
     var headers = {
       "Accept": "application/json",
       "method": "GET",
-      "Authorization": '${basicAuth}',
+      "Authorization": basicAuth,
       "account_qid": "AC5156322",
     };
     var uri = Uri.parse('https://payg.angazadesign.com/data/clients/$client');
@@ -54,7 +53,7 @@ class PendingCallsState extends State<UserList> {
     var headers = {
       "Accept": "application/json",
       "method":"GET",
-      "Authorization": '${basicAuth}',
+      "Authorization": basicAuth,
       "account_qid" : "AC5156322",
     };
     final httpPackageUrl = Uri.https('payg.angazadesign.com', '/data/clients',{"account_qid" : "AC5156322"},
@@ -99,12 +98,12 @@ class PendingCallsState extends State<UserList> {
   }
 
   void callLogs(String docid,String feedback,String angaza) async {
-    String _docid = docid;
+    String docid0 = docid;
 
 
     if (duration1update >= 30) {
       CollectionReference newCalling = firestore.collection("new_calling");
-      await newCalling.doc(_docid).update({
+      await newCalling.doc(docid0).update({
         'Duration': duration1update,
         'ACE Name': currentUser?.displayName,
         "User UID": currentUser?.uid,
@@ -126,7 +125,7 @@ class PendingCallsState extends State<UserList> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Your call has been record successfull'),
         ),
       );
@@ -135,7 +134,7 @@ class PendingCallsState extends State<UserList> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
 
-        SnackBar(
+        const SnackBar(
           content: Text('the call was not recorded as its not meet required duretion'),
         ),
       );
@@ -161,14 +160,14 @@ class PendingCallsState extends State<UserList> {
     phone  = phone.toSet().toList();
 
 
-    String _docid = docid;
+    String docid0 = docid;
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return SingleChildScrollView(
             child: AlertDialog(
-                title: Text('Customer Feedback'),
-                content: Container(
+                title: const Text('Customer Feedback'),
+                content: SizedBox(
                     height: 400,
                     child: Column(children: <Widget>[
                       AppDropDown(
@@ -182,13 +181,13 @@ class PendingCallsState extends State<UserList> {
                             });
                             await FlutterPhoneDirectCaller.callNumber(phoneselected!);
                           }),
-                      SizedBox(height: 10,),
+                      const SizedBox(height: 10,),
                       DropdownButtonFormField(
                           isExpanded: true,
                           decoration: InputDecoration(
                             filled: true,
                             labelText: "feedback",
-                            border: OutlineInputBorder(),
+                            border: const OutlineInputBorder(),
                             hintStyle: TextStyle(color: Colors.grey[800]),
                             hintText: "Name",
                           ),
@@ -206,11 +205,11 @@ class PendingCallsState extends State<UserList> {
                       TextField(
                         maxLines: 4,
                         controller: feedbackController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Additional Feedback',
                         ),
                       ),
-                      SizedBox(height: 10,),
+                      const SizedBox(height: 10,),
                       TextFormField(
                         decoration: const InputDecoration(
                           hintText: 'Date',
@@ -228,14 +227,14 @@ class PendingCallsState extends State<UserList> {
                               context: context,
                               initialDate: DateTime.now(),
                               firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(Duration(days: 5)));
+                              lastDate: DateTime.now().add(const Duration(days: 5)));
 
                           if (pickedDate != null) {
                             dateInputController.text =pickedDate.toString();
                           }
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       Row(
@@ -245,13 +244,13 @@ class PendingCallsState extends State<UserList> {
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
-                              child: Text('Cancel'),
+                              child: const Text('Cancel'),
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                callLogs(_docid,feedbackController.text,angaza);
+                                callLogs(docid0,feedbackController.text,angaza);
                               },
-                              child: Text('Submit'),
+                              child: const Text('Submit'),
                             ),
                           ])
                     ]))),
@@ -355,14 +354,14 @@ class PendingCallsState extends State<UserList> {
     });
   }
 
-  void _statusFilter(String _status) {
+  void _statusFilter(String status) {
     List<Map<String, dynamic>> results = [];
-    switch (_status) {
+    switch (status) {
       case "Complete":
         {
           results = _allUsers
               .where((user) =>
-              user["status"].toLowerCase().contains(_status.toLowerCase()))
+              user["status"].toLowerCase().contains(status.toLowerCase()))
               .toList();
         }
         break;
@@ -371,7 +370,7 @@ class PendingCallsState extends State<UserList> {
         {
           results = _allUsers
               .where((user) =>
-              user["status"].toLowerCase().contains(_status.toLowerCase()))
+              user["status"].toLowerCase().contains(status.toLowerCase()))
               .toList();
         }
         break;
@@ -380,7 +379,7 @@ class PendingCallsState extends State<UserList> {
         {
           results = _allUsers
               .where((user) =>
-              user["status"].toLowerCase().contains(_status.toLowerCase()))
+              user["status"].toLowerCase().contains(status.toLowerCase()))
               .toList();
         }
         break;
@@ -468,7 +467,7 @@ class PendingCallsState extends State<UserList> {
                   (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
 
-                  return Column(
+                  return const Column(
                     children: [
                       CircularProgressIndicator(),
                       SizedBox(
@@ -482,17 +481,13 @@ class PendingCallsState extends State<UserList> {
                       .where((doc) => doc["Customer Name"].toString().toLowerCase().contains(_searchText))
                       .toList();
                   return Expanded(
-                    child:snapshot.data!.docs.length>0
+                    child:snapshot.data!.docs.isNotEmpty
                         ? ListView.separated(
                       itemCount: docsdata.length,
                       itemBuilder: (context, index) {
                         DocumentSnapshot data = docsdata[index];
                         String phoneList =
-                            '${data["Customer Phone Number"]},'+
-                                '${data["Phone Number 1"].toString()},'+
-                                '${data["Phone Number 2"].toString()},'+
-                                '${data["Phone Number 3"].toString()},'+
-                                '${data["Phone Number 4"].toString()},'
+                            '${data["Customer Phone Number"]},${data["Phone Number 1"].toString()},${data["Phone Number 2"].toString()},${data["Phone Number 3"].toString()},${data["Phone Number 4"].toString()},'
                         ;
 
                         /*final sortedItems = _foundUsers
@@ -532,14 +527,7 @@ class PendingCallsState extends State<UserList> {
 
                               return InkWell(
                                 onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            CProfile(id: data.id,
-                                              angaza: data['Angaza ID'],
-                                            ),
-                                      ));
+
                                 },
                                 key: ValueKey(snapshot.data!.docs[index]),
                                 child: Row(
@@ -562,28 +550,28 @@ class PendingCallsState extends State<UserList> {
 
                                             );
                                           }else {
-                                            return CircularProgressIndicator();
+                                            return const CircularProgressIndicator();
                                           }
                                         }),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 2,
                                     ),
                                     Flexible(
-                                      child: Container(
+                                      child: SizedBox(
                                         height: 70,
                                         child: Card(
                                           color: isdisable?Colors.red:Colors.green.withOpacity(0.6),
                                           elevation: 5,
                                           child: Padding(
                                             padding:
-                                            EdgeInsets.fromLTRB(5.0, 5, 0, 0),
+                                            const EdgeInsets.fromLTRB(5.0, 5, 0, 0),
                                             child: Row(
                                               mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Row(
                                                   children: [
-                                                    Column(
+                                                    const Column(
                                                       crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                       children: [
@@ -601,12 +589,12 @@ class PendingCallsState extends State<UserList> {
                                                       crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                       children: [
-                                                        Text("${data['Customer Name']}",style: TextStyle(
+                                                        Text("${data['Customer Name']}",style: const TextStyle(
                                                           fontSize: 13, color: Colors.black,)),
-                                                        Text("${data['Account Number']
-                                                            .toString()}",style: TextStyle(
+                                                        Text(data['Account Number']
+                                                            .toString(),style: const TextStyle(
                                                           fontSize: 13, color: Colors.black,)),
-                                                        Text("$days",style: TextStyle(
+                                                        Text("$days",style: const TextStyle(
                                                           fontSize: 13, color: Colors.black,)),
                                                         // Text("${account}"),
 
@@ -618,7 +606,7 @@ class PendingCallsState extends State<UserList> {
                                                   Row(
                                                     children: [
                                                       IconButton(
-                                                          padding: new EdgeInsets.all(0.0),
+                                                          padding: const EdgeInsets.all(0.0),
                                                           onPressed: () {
                                                             _callNumber(
                                                                 phoneList,
@@ -626,21 +614,13 @@ class PendingCallsState extends State<UserList> {
                                                                 data["Angaza ID"]
                                                             );
                                                           },
-                                                          icon: Icon(Icons.phone,size: 20.0)),
+                                                          icon: const Icon(Icons.phone,size: 20.0)),
                                                       IconButton(
-                                                          padding: new EdgeInsets.all(0.0),
+                                                          padding: const EdgeInsets.all(0.0),
                                                           onPressed: () {
-                                                            Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                  builder: (context) =>
-                                                                      CustomerVisit(id: data.id,
 
-                                                                        angaza: data["Angaza ID"],
-                                                                      ),
-                                                                ));
                                                           },
-                                                          icon: Icon(Icons
+                                                          icon: const Icon(Icons
                                                               .location_on_outlined,size: 20.0))
                                                     ],
                                                   ),
@@ -648,24 +628,17 @@ class PendingCallsState extends State<UserList> {
                                                   Row(
                                                     children: [
                                                       IconButton(
-                                                          padding: new EdgeInsets.all(0.0),
+                                                          padding: const EdgeInsets.all(0.0),
                                                           onPressed: () {
 
                                                           },
-                                                          icon: Icon(Icons.phone_disabled,size: 20.0)),
+                                                          icon: const Icon(Icons.phone_disabled,size: 20.0)),
                                                       IconButton(
-                                                          padding: new EdgeInsets.all(0.0),
+                                                          padding: const EdgeInsets.all(0.0),
                                                           onPressed: () {
-                                                            Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                  builder: (context) =>
-                                                                      CustomerVisit(id: data.id,
-                                                                        angaza: data["Angaza ID"],
-                                                                      ),
-                                                                ));
+
                                                           },
-                                                          icon: Icon(Icons
+                                                          icon: const Icon(Icons
                                                               .location_on_outlined,size: 20.0))
                                                     ],
                                                   )
@@ -681,9 +654,9 @@ class PendingCallsState extends State<UserList> {
                                 ),
                               );
                             }else if(accountdata.hasError){
-                              return Text("Error loading data");
+                              return const Text("Error loading data");
                             }else{
-                              return CircularProgressIndicator();
+                              return const CircularProgressIndicator();
                             }
 
                           },
@@ -783,7 +756,7 @@ class PendingCallsState extends State<UserList> {
                               );*/
                       },
                       separatorBuilder: (BuildContext context, int index) =>
-                          Divider(),
+                          const Divider(),
                     )
                         : const Text(
                       'No results found',
@@ -791,7 +764,6 @@ class PendingCallsState extends State<UserList> {
                     ),
                   );
                 }
-                ;
               }),
         ],
       ),

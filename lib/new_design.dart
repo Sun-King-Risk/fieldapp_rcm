@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 class StepFormNew extends StatefulWidget{
+  const StepFormNew({super.key});
+
   @override
   _StepFormNewState createState() => _StepFormNewState();
 
@@ -25,6 +27,7 @@ class _StepFormNewState extends State<StepFormNew> {
     // Generate some sample rows for the table
 
   }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
@@ -70,13 +73,13 @@ class _StepFormNewState extends State<StepFormNew> {
                 selectedRows.add(item);
               }
             }
-            if(selectedRows.length==0){
+            if(selectedRows.isEmpty){
               print("no navigation");
             }else{
               print("no navigation ${selectedRows.length}");
             }
             print(selectedRows);
-          }, child: Text('Next'))
+          }, child: const Text('Next'))
         ],
       ),
     );
@@ -84,6 +87,8 @@ class _StepFormNewState extends State<StepFormNew> {
 }
 
 class TaskRadio extends StatefulWidget{
+  const TaskRadio({super.key});
+
 @override
 _TaskRadioState createState() => _TaskRadioState();
 }
@@ -96,6 +101,7 @@ class _TaskRadioState extends State<TaskRadio> {
     'Customer Management',
   ];
   String selectedOption = '';
+  @override
   Widget build(BuildContext context){
     Widget contentWidget;
     return Scaffold(
@@ -135,7 +141,7 @@ class _TaskRadioState extends State<TaskRadio> {
 }
 class SubTaskRadio extends StatefulWidget{
   final String taskOptions;
-  SubTaskRadio(
+  const SubTaskRadio(
       {super.key, required this.taskOptions,});
   @override
   _SubTaskRadioState createState() => _SubTaskRadioState();
@@ -185,6 +191,7 @@ class _SubTaskRadioState extends State<SubTaskRadio> {
     'Other'
   ];
   String SelectedSubtask = '';
+  @override
   Widget build(BuildContext context){
     return Scaffold(
         appBar: AppBar(
@@ -361,7 +368,7 @@ class _SubTaskRadioState extends State<SubTaskRadio> {
                );
              default:
                return Container(
-                 child: Text('No option selected'),
+                 child: const Text('No option selected'),
                );
 
 
@@ -374,7 +381,7 @@ class RegionRadio extends StatefulWidget{
   final String task;
   final String subtask;
 
-  RegionRadio(
+  const RegionRadio(
       {super.key, required this.task,required this.subtask});
   @override
   _RegionRadioState createState() => _RegionRadioState();
@@ -383,6 +390,7 @@ class RegionRadio extends StatefulWidget{
 class _RegionRadioState extends State<RegionRadio> {
   List? data = [];
   List<String> region= [];
+  @override
   initState() {
     getUserAttributes();
     listItems(widget.subtask.replaceAll(' ', '_'));
@@ -432,7 +440,7 @@ class _RegionRadioState extends State<RegionRadio> {
   Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation = await Amplify.Storage.list(
+      operation = Amplify.Storage.list(
         options: const StorageListOptions(
           accessLevel: StorageAccessLevel.guest,
           pluginOptions: S3ListPluginOptions.listAll(),
@@ -461,6 +469,7 @@ class _RegionRadioState extends State<RegionRadio> {
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
     }
+    return null;
   }
   Future<void> RegionTask(key) async {
     List<String> uniqueRegion = [];
@@ -499,10 +508,11 @@ class _RegionRadioState extends State<RegionRadio> {
       rethrow;
     }
   }
+  @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(title: Text("Region")),
-        body: isLoading?Center(
+      appBar: AppBar(title: const Text("Region")),
+        body: isLoading?const Center(
           child: Column(
             children: [
 
@@ -513,7 +523,7 @@ class _RegionRadioState extends State<RegionRadio> {
         ):SingleChildScrollView(
           child: Column(
             children: [
-              region.length==0?Center(child:Text("No Task under ${widget.subtask}")):
+              region.isEmpty?Center(child:Text("No Task under ${widget.subtask}")):
                ListView.builder(
                   shrinkWrap: true,
                   itemCount: region.length,
@@ -555,12 +565,13 @@ class AreaRadio extends StatefulWidget{
   final String region;
   final List? taskdata;
 
-  AreaRadio(
+  const AreaRadio(
       {super.key, required this.task,required this.subtask,required this.region, required this.taskdata});
   @override
   _AreaRadioState createState() => _AreaRadioState();
 }
 class _AreaRadioState extends State<AreaRadio> {
+  @override
   initState() {
 
     Area();
@@ -589,14 +600,15 @@ class _AreaRadioState extends State<AreaRadio> {
   }
   String selectedArea = '';
   bool isLoading = true;
+  @override
   Widget build(BuildContext context){
 
     return Scaffold(
-      appBar: AppBar(title: Text("Area"),),
+      appBar: AppBar(title: const Text("Area"),),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            isLoading?Center(
+            isLoading?const Center(
             child: CircularProgressIndicator(),
       ): ListView.builder(
                 shrinkWrap: true,
@@ -641,15 +653,17 @@ class TaskTable extends StatefulWidget {
   final String region;
   final String area;
   final List? taskdata;
-  TaskTable(
+  const TaskTable(
       {super.key, required this.task,required this.subtask,required this.region,required this.area, required this.taskdata});
 
+  @override
   _TaskTableState createState() => _TaskTableState();
 }
 class _TaskTableState extends State<TaskTable> {
 
 
 
+  @override
   initState() {
 
     print(widget.task);
@@ -719,7 +733,7 @@ class MyPaginatedTable extends StatefulWidget {
   final String region;
   final String area;
   final List? taskdata;
-  MyPaginatedTable(
+  const MyPaginatedTable(
       {super.key, required this.task,required this.subtask,required this.region,required this.area, required this.taskdata});
 
   @override
@@ -785,14 +799,14 @@ class _MyPaginatedTableState extends State<MyPaginatedTable> {
           _currentPage = pageIndex;
         });
       },
-      availableRowsPerPage: [5, 10, 20],
+      availableRowsPerPage: const [5, 10, 20],
       onRowsPerPageChanged: _handleRowsPerPageChanged,
-      header: Text('Table Example'),
+      header: const Text('Table Example'),
     );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Table Example'),
+        title: const Text('Table Example'),
       ),
       body: ListView(
         children: [
@@ -855,7 +869,7 @@ class PortfolioTable extends StatefulWidget {
   final String region;
   final String area;
   final List? taskdata;
-  PortfolioTable(
+  const PortfolioTable(
       {super.key, required this.task,required this.subtask,required this.region,required this.area, required this.taskdata});
 
   @override
@@ -907,7 +921,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
                   searchQuery = value;
                 });
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Search',
                 prefixIcon: Icon(Icons.search),
               ),
@@ -925,8 +939,8 @@ class _PortfolioTableState extends State<PortfolioTable> {
                             Text(keys[index]),
                             if (_sortColumnIndex == index)
                               _sortAscending
-                                  ? Icon(Icons.arrow_upward)
-                                  : Icon(Icons.arrow_downward),
+                                  ? const Icon(Icons.arrow_upward)
+                                  : const Icon(Icons.arrow_downward),
                           ],
                         ),
                         onSort: (columnIndex, ascending) {
@@ -946,7 +960,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
                           });
                         },
                       ),
-                  DataColumn(label: Text('Select')),
+                  const DataColumn(label: Text('Select')),
                 ],
                 rows: [
                   for (final item in taskData!)
@@ -960,27 +974,27 @@ class _PortfolioTableState extends State<PortfolioTable> {
                             ),
                         DataCell(
                           Checkbox(
-                            value: taskDataList!.contains(item),
+                            value: taskDataList.contains(item),
                             onChanged: (value) {
                               setState(() {
-                                if (taskDataList!.contains(item)) {
-                                  taskDataList!.remove(item);
+                                if (taskDataList.contains(item)) {
+                                  taskDataList.remove(item);
                                 } else {
-                                  taskDataList!.add(item);
+                                  taskDataList.add(item);
                                 }
                               });
                             },
                           ),
                         ),
                       ],
-                      selected: taskDataList!.contains(item),
+                      selected: taskDataList.contains(item),
                       onSelectChanged: (value) {
                         setState(() {
-                          if (taskDataList!.contains(item)) {
-                            taskDataList!.remove(item);
+                          if (taskDataList.contains(item)) {
+                            taskDataList.remove(item);
                           } else {
-                            taskDataList!.add(item);
-                            if (taskDataList!.length <= 5) {
+                            taskDataList.add(item);
+                            if (taskDataList.length <= 5) {
                               if (kDebugMode) {
                                 print(taskDataList);
                               }
@@ -1003,7 +1017,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: Icon(Icons.chevron_left),
+                  icon: const Icon(Icons.chevron_left),
                   onPressed: currentPage > 1
                       ? () {
                     setState(() {
@@ -1014,7 +1028,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
                 ),
                 Text('Page $currentPage'),
                 IconButton(
-                  icon: Icon(Icons.chevron_right),
+                  icon: const Icon(Icons.chevron_right),
                   onPressed: endIndex < taskData!.length
                       ? () {
                     setState(() {
@@ -1027,7 +1041,7 @@ class _PortfolioTableState extends State<PortfolioTable> {
             ),
 
             ElevatedButton(onPressed: (){
-              if(taskDataList!.length<=5&&taskDataList!.length>=1){
+              if(taskDataList.length<=5&&taskDataList.isNotEmpty){
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -1041,9 +1055,9 @@ class _PortfolioTableState extends State<PortfolioTable> {
                     )
                 );
 
-              }else if(taskDataList!.length>5){
+              }else if(taskDataList.length>5){
                 print("exceed select");
-                final snackBar = SnackBar(
+                const snackBar = SnackBar(
                   content: Text('Exceeded task selection limit!'),
                   duration: Duration(seconds: 3),
                 );
@@ -1051,14 +1065,14 @@ class _PortfolioTableState extends State<PortfolioTable> {
               }
               else{
                 print("No task selected");
-                final snackBar = SnackBar(
+                const snackBar = SnackBar(
                   content: Text('No task selected!'),
                   duration: Duration(seconds: 3),
                 );
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
               }
-            }, child: Text("Next"))
+            }, child: const Text("Next"))
           ],
         ),
       ),
@@ -1072,9 +1086,10 @@ class ActionScreenNew extends StatefulWidget {
   final String region;
   final String area;
   final List? taskdata;
-  ActionScreenNew(
+  const ActionScreenNew(
       {super.key, required this.task,required this.subtask,required this.region,required this.area, required this.taskdata});
 
+  @override
   _ActionScreenNewState createState() => _ActionScreenNewState();
 }
 
@@ -1082,8 +1097,8 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
   bool target = false;
   List<String> items = ["Item 1", "Item 2"];
   Map<String, String> selectedValues = {};
-  List<String> _priorities = ['High', 'Medium', 'Low'];
-  Map<String, Map<String, String>> _actions = {};
+  final List<String> _priorities = ['High', 'Medium', 'Low'];
+  final Map<String, Map<String, String>> _actions = {};
   List<String> textFieldValues = [];
   List<String> dropdownValues = [];
   List? data = [];
@@ -1121,7 +1136,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Action Plan"),
+        title: const Text("Action Plan"),
       ),
       body: Container(
         child: Column(
@@ -1145,12 +1160,12 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '$key: ${agent} - $agentRate ',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            '$key: $agent - $agentRate ',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           TextField(
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               hintText: 'Enter action plan',
                               labelText: 'Enter action plan',
                             ),
@@ -1161,10 +1176,10 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                             },
                             maxLines: 3,
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           TextField(
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
-                            decoration: InputDecoration(
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            decoration: const InputDecoration(
                               hintText: 'Enter Target',
                               labelText: 'Target',
                             ),
@@ -1213,11 +1228,11 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                     children: [
                       Text(
                         '$key: $agent',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       TextField(
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Enter action plan',
                           labelText: 'Action Plan',
                         ),
@@ -1229,7 +1244,7 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                         },
                         maxLines: 3,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       AppDropDown(
                           disable: true,
                           label: "Priority",
@@ -1262,13 +1277,13 @@ class _ActionScreenNewState extends State<ActionScreenNew> {
                           task: widget.task,
                           subTask: widget.subtask,
                           customers:widget.taskdata,
-                          actions: _actions!,
+                          actions: _actions,
                     )));
                 print(   _actions);
 
 
               },
-              child: Text('Next'),
+              child: const Text('Next'),
             ),
           ],
         ),
@@ -1288,7 +1303,7 @@ class PreviewScreenNew extends StatefulWidget {
   final List? customers;
   final Map<String, Map<String, String>> actions;
 
-  const PreviewScreenNew({
+  const PreviewScreenNew({super.key, 
     required this.region,
     required this.area,
     required this.target,
@@ -1297,6 +1312,7 @@ class PreviewScreenNew extends StatefulWidget {
     required this.customers,
     required this.actions,
   });
+  @override
   State<PreviewScreenNew> createState() => _PreviewScreenNewState();
 }
 class _PreviewScreenNewState extends State<PreviewScreenNew> {
@@ -1394,9 +1410,9 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    var result_task = jsonDecode(response.body);
-    print(result_task);
-    taskActionNo(result_task["id"]);
+    var resultTask = jsonDecode(response.body);
+    print(resultTask);
+    taskActionNo(resultTask["id"]);
 
   }
   void _save() async{
@@ -1417,9 +1433,9 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    var result_task = jsonDecode(response.body);
-    print(result_task);
-    taskAction(result_task["id"]);
+    var resultTask = jsonDecode(response.body);
+    print(resultTask);
+    taskAction(resultTask["id"]);
 
   }
   void taskAction(id) async {
@@ -1431,7 +1447,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
       if (agentDetails != null) {
         String current = agentDetails[rate];
         String? percvalue = current.substring(0,current.length - 1);
-        double total = double.parse(entry.value['target']!)+double.parse(percvalue!);
+        double total = double.parse(entry.value['target']!)+double.parse(percvalue);
         Map data =   {
           "task": id,
           "account_number":entry.key,
@@ -1439,7 +1455,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
           "task_description": entry.value['action'],
           "priority": entry.value['priority'],
           "task_status": "pending",
-          "previous_goal":double.parse(percvalue!)
+          "previous_goal":double.parse(percvalue)
         };
         var body = json.encode(data);
         var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
@@ -1451,7 +1467,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
 
       }
     }
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Task Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -1489,7 +1505,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
 
       }
     }
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Task Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -1501,40 +1517,41 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
 
 
   }
+  @override
   Widget build(BuildContext context) {
      return Scaffold(
       appBar: AppBar(
-        title: Text('Preview'),
+        title: const Text('Preview'),
       ),
       body: widget.target?SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Region: ${widget.region}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             Text(
               'Area: ${widget.area}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Task: ${widget.task}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Sub Task: ${widget.subTask}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'Task Action:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widget.customers!.map((customer) {
@@ -1544,19 +1561,19 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
                 Map<String, String>? actions = widget.actions[agentName];
                 //List<String> items = customer.split("-");
                 String? percvalue = current.substring(0,current.length - 1);
-                double total = double.parse(actions!['target']!)+double.parse(percvalue!);
+                double total = double.parse(actions!['target']!)+double.parse(percvalue);
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Name: ${agentName} '),
-                    SizedBox(height: 8),
-                    Text("Priority: ${actions!['priority']}"),
-                    Text("Action Plan: ${actions!['action']}"),
+                    Text('Name: $agentName '),
+                    const SizedBox(height: 8),
+                    Text("Priority: ${actions['priority']}"),
+                    Text("Action Plan: ${actions['action']}"),
                     Text('Current: $percvalue'),
-                    Text('Target: ${actions!['target']}'),
+                    Text('Target: ${actions['target']}'),
                     Text('Goal: $total'),
 
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                   ],
                 );
               }).toList(),
@@ -1565,40 +1582,40 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
                 (){
 
               _save( );
-            }, child: Text("Submit"))
+            }, child: const Text("Submit"))
           ],
         ),
       ):
 
       SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Region: ${widget.region}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             Text(
               'Area: ${widget.area}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Task: ${widget.task}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Sub Task: ${widget.subTask}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'Task Action:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widget.customers!.map((customer) {
@@ -1612,10 +1629,10 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Name: $agentName'),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text("Priority: Priority: ${actions?['priority'] ?? 'N/A'}"),
                    Text("Action: ${actions?['action'] ?? 'N/A'}"),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                   ],
                 );
               }).toList(),
@@ -1627,7 +1644,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
               print(widget.actions);
               print(widget.customers);
 
-            }, child: Text("Submit"))
+            }, child: const Text("Submit"))
           ],
         ),
       ),

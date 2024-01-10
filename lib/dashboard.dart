@@ -12,6 +12,8 @@ import 'package:http/http.dart' as http;
 
 
 class Home extends StatefulWidget {
+  const Home({super.key});
+
 
   @override
   State<Home> createState() => _HomeState();
@@ -23,27 +25,31 @@ class _HomeState extends State<Home> {
   String region = '';
   String country ='';
   String role = '';
+  String zone ='';
+  bool isUserLoading=true;
   @override
   void initState() {
-
     super.initState();
-    getUserAttributes();
+    init();
+    print("Dashbord");
+    print("Dennis - $name");
 
   }
-  void getUserAttributes() async {
+  void init() async {
+    await getUserAttributes();
+  }
+
+  Future<void> getUserAttributes() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
       setState(() {
-
         role = prefs.getString("role")!;
         name = prefs.getString("name")!;
         region = prefs.getString("region")!;
+        zone = prefs.getString("zone")!;
         country = prefs.getString("country")!;
+        isUserLoading= false;
       });
-      name = prefs.getString("name")!;
       if (kDebugMode) {
-        print(country);
-        print(name);
       }
       // Process the user attributes
 
@@ -51,20 +57,28 @@ class _HomeState extends State<Home> {
   }
   @override
   Widget build(BuildContext context) {
+
     //AuthUser user = Amplify.Auth.getCurrentUser() as AuthUser;
     //String loginId = user.username;
     //var loginId = Amplify.Auth.fetchUserAttributes();
 
     return SingleChildScrollView(
-      child: Container(
+      child: isUserLoading?const Center(
+        child: Column(
+          children: [
+            CircularProgressIndicator(),
+            Text('Loading...')
+          ],
+        ),
+      ):Container(
 
         padding: const EdgeInsets.all(12.3),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(name,style: TextStyle(fontSize: 10),),
+            Text(name,style: const TextStyle(fontSize: 10),),
 //summary
-            SizedBox(height: 5,),
+            const SizedBox(height: 5,),
             Container(
               child: Column(
                 children: [
@@ -75,7 +89,7 @@ class _HomeState extends State<Home> {
                     txtcolor: Colors.black87,
                   ),
 
-                  KpiTittle(
+                  const KpiTittle(
                     kpicolor: Colors.black87,
                     label: 'Portfolio Quality',
                     txtcolor: AppColor.mycolor,
@@ -87,21 +101,27 @@ class _HomeState extends State<Home> {
                         label: 'CSAT Rate',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                        zone: zone
                       ),
                       RowData(
                         value: 'Disabled Rate',
                         label: 'Fraud SLA',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
                       RowData(
                         value: 'Disabled Rate',
                         label: 'Welcome Call Rate',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:   role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
 
 
@@ -122,21 +142,27 @@ class _HomeState extends State<Home> {
                         label: 'At Risk Rate',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
                       RowData(
                         value: 'Units First Pay Defaulted',
                         label: 'FPD',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
                       RowData(
                         value: 'Second Pay Default Rate',
                         label: 'SPD',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item: role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
                     ],
                   ),
@@ -182,7 +208,7 @@ class _HomeState extends State<Home> {
                     color: Colors.black,
                   ),
                   const SizedBox(height: 5),
-                  KpiTittle(
+                  const KpiTittle(
                     kpicolor: Colors.black87,
                     label:' Collection Drive',
                     txtcolor: AppColor.mycolor,
@@ -194,28 +220,36 @@ class _HomeState extends State<Home> {
                         label: 'Disabe Rate',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
                       RowData(
                         value: 'Collection Score',
                         label: 'Disable Rate > 180',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item: role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
                       RowData(
                         value: 'At Risk Rate 60',
                         label: 'Disable Rate < 180',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
                       RowData(
                         value: 'Repayment Speed 2',
                         label: 'Repayment Speed 2',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
 
 
@@ -231,31 +265,39 @@ class _HomeState extends State<Home> {
                     children: [
                       RowData(
                         value: 'Collection Score',
-                        label: 'Collection Score',
+                        label: 'Score',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
                       RowData(
                         value: 'Detached Rate',
                         label: 'Repossession Rate',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
                       RowData(
                         value: 'At Risk Rate',
                         label: 'Agent Restriction',
                         region: region,
                         country: country,
-                        item: 'Regional',
+                        item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                        role: role,
+                          zone: zone
                       ),
                       RowData(
                         value: 'Tasks Completed Percent',
                         label: 'Kazi Completion',
                         region: region,
                         country: country,
-                        item: 'task_completed',
+                        item:  role == "CCM" ? 'Country_task_completed' : role == "Credit Analyst"||role == "ZCM" ? 'zone_task_completed' : 'Region_task_completed',
+                        role: role,
+                          zone: zone
                       ),
 
 
@@ -307,7 +349,7 @@ class _HomeState extends State<Home> {
                   ),
                   const SizedBox(height: 5),
 
-                  KpiTittle(
+                  const KpiTittle(
                     kpicolor: Colors.black87,
                     label: 'Team Management',
                     txtcolor: AppColor.mycolor,
@@ -320,14 +362,18 @@ class _HomeState extends State<Home> {
                       label: '',
                       region: region,
                       country: country,
-                      item: 'Regional',
+                      item:  role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                      role: role,
+                        zone: zone
                     ),
                     RowData(
                       value: 'Repayment Speed 2',
                       label: '',
                       region: region,
                       country: country,
-                      item: 'Regional',
+                      item: role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Regional',
+                      role: role,
+                        zone: zone
                     ),
                   ]),
 
@@ -354,13 +400,18 @@ class RowData extends StatefulWidget {
   final String country;
   final String region;
   final String item;
+  final String role;
+  final String zone;
 
   const RowData({Key? key,
     required this.value,
     required this.label,
     required this.country,
     required this.item,
-    required this.region})
+    required this.region,
+    required this.role,
+    required this.zone
+  })
       : super(key: key);
 
   @override
@@ -373,7 +424,8 @@ class _RowDataState extends State<RowData> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    listItems(widget.item);
+    print(widget.role);
+    listItems("dashboard/${widget.item}");
   }
   List? data = [];
   bool isLoading = true;
@@ -381,12 +433,16 @@ class _RowDataState extends State<RowData> {
   List<String> region= [];
 
   Future<StorageItem?> listItems(key) async {
+
+    print("$key - ${widget.label}");
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation = await Amplify.Storage.list(
+      operation = Amplify.Storage.list(
         options: const StorageListOptions(
           accessLevel: StorageAccessLevel.guest,
-          pluginOptions: S3ListPluginOptions.listAll(),
+          pluginOptions: S3ListPluginOptions.listAll(
+
+          ),
         ),
       );
 
@@ -416,6 +472,7 @@ class _RowDataState extends State<RowData> {
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
     }
+    return null;
   }
   Future<void> RegionTask(key) async {
     List<String> uniqueRegion = [];
@@ -424,21 +481,47 @@ class _RowDataState extends State<RowData> {
       StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
           key: key)
           .result;
-      print("${widget.item} ${urlResult.url}");
-
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
-      final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['Region'] == widget.region && task['Country'] == widget.country )
-          .toList();
-      setState(() {
+      if(widget.role=='CCM'){
+        final List<dynamic> filteredTasks = jsonData
+            .where((task) =>  task['Country'] == widget.country )
+            .toList();
+        setState(() {
 
           data = filteredTasks;
           region = uniqueRegion.toSet().toList();
           nodata = false;
           isLoading = false;
 
-      });
+        });
+      }else if(widget.role=='Credit Analyst'|| widget.role=='ZCM'){
+        final List<dynamic> filteredTasks = jsonData
+            .where((task) => task['Zone'] == widget.zone && task['Country'] == widget.country )
+            .toList();
+        setState(() {
+
+          data = filteredTasks;
+          region = uniqueRegion.toSet().toList();
+          nodata = false;
+          isLoading = false;
+
+        });
+      }else if(widget.role=='RCM'){
+        final List<dynamic> filteredTasks = jsonData
+            .where((task) => task['Region'] == widget.region && task['Country'] == widget.country )
+            .toList();
+        setState(() {
+
+          data = filteredTasks;
+          region = uniqueRegion.toSet().toList();
+          nodata = false;
+          isLoading = false;
+
+        });
+      }
+
+
     } on StorageException catch (e) {
       safePrint('Could not retrieve properties: ${e.message}');
       rethrow;
@@ -462,23 +545,26 @@ class _RowDataState extends State<RowData> {
                     widget.value,
                     data![0][widget.value],
                   widget.country,
+
                     widget.region,
-                  widget.item
+                  widget.item,
+                  widget.zone,
+                    widget.role
                     ),
 
               ));
 
         },
-        key: ValueKey("dad"),
+        key: const ValueKey("dad"),
         child: Card(
           elevation: 8,
-          child: Container(
+          child: SizedBox(
             height: 60,
             width: 50,
-            child: isLoading?Center(child: CircularProgressIndicator()):Column(
+            child: isLoading?const Center(child: CircularProgressIndicator()):Column(
               children: [
-                Text(data![0][widget.value], style: TextStyle(fontSize: 20,)),
-                Text(widget.label, style: TextStyle(fontSize: 9))
+                Text(data![0][widget.value], style: const TextStyle(fontSize: 20,)),
+                Text(widget.label, style: const TextStyle(fontSize: 9))
               ],
             ),
           ),

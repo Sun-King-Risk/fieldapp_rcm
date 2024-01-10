@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PortfolioUpdate extends StatefulWidget {
-  PortfolioUpdate(
+  const PortfolioUpdate(
       {Key? key,
       required this.subtask,
       required this.id,
@@ -21,7 +21,7 @@ class PortfolioUpdate extends StatefulWidget {
   final taskGoalId;
 
   @override
-  PortfolioUpdateState createState() => new PortfolioUpdateState();
+  PortfolioUpdateState createState() => PortfolioUpdateState();
 }
 
 class PortfolioUpdateState extends State<PortfolioUpdate> {
@@ -58,14 +58,14 @@ class PortfolioUpdateState extends State<PortfolioUpdate> {
             child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
             AppDropDown(
                 disable: true,
                 label: widget.title,
                 hint: "hint",
                 items: [widget.title],
                 onChanged: (value) {}),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             AppDropDown(
@@ -74,7 +74,7 @@ class PortfolioUpdateState extends State<PortfolioUpdate> {
                 hint: widget.subtask,
                 items: [widget.subtask],
                 onChanged: (value) {}),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             if (widget.subtask == 'Visiting unreachable welcome call clients')

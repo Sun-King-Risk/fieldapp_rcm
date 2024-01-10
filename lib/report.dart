@@ -2,13 +2,9 @@
 import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:fieldapp_rcm/pending_task.dart';
-import 'package:fieldapp_rcm/services/region_data.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class Report extends StatefulWidget {
   const Report({Key? key}) : super(key: key);
@@ -19,13 +15,13 @@ class Report extends StatefulWidget {
 class ReportState extends State<Report> {
    bool isDescending = false;
   _taskStatus(docid)async{
-    bool _approved = false;
+    bool approved = false;
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return SingleChildScrollView(
               child: AlertDialog(
-                  content: Text('Do you approve or reject this action?'),
+                  content: const Text('Do you approve or reject this action?'),
                   actions: <Widget>[
                     Column(
                       children: [
@@ -36,7 +32,7 @@ class ReportState extends State<Report> {
                           children: [
 
                             TextButton(
-                              child: Text('Approve'),
+                              child: const Text('Approve'),
                               onPressed: ()async{
                                 Map data = {
                                   'is_approved': 'Approved',
@@ -48,14 +44,14 @@ class ReportState extends State<Report> {
                                   "Content-Type": "application/json",
 
                                 });
-                                var result_task = jsonDecode(response.body);
+                                var resultTask = jsonDecode(response.body);
 
-                                print(result_task);
+                                print(resultTask);
 
                               },
                             ),
                             TextButton(
-                              child: Text('Reject'),
+                              child: const Text('Reject'),
                               onPressed: () async{
                                 Map data = {
                                   'is_approved': 'Rejected'
@@ -65,7 +61,7 @@ class ReportState extends State<Report> {
                                 http.Response response = await http.put(url, body: body, headers: {
                                   "Content-Type": "application/json",
                                 });
-                                var result_task = jsonDecode(response.body);
+                                var resultTask = jsonDecode(response.body);
 
                               },
                             )
@@ -133,7 +129,7 @@ class ReportState extends State<Report> {
       _foundUsers = results;
     });
   }
-  void _statusFilter(String _status) {
+  void _statusFilter(String status) {
     List<Map<String, dynamic>> results = [];
     /*switch(_status) {
 
@@ -179,24 +175,24 @@ class ReportState extends State<Report> {
             PopupMenuButton(
               onSelected:(reslust) =>_statusFilter(reslust),
               itemBuilder: (context) => [
-                PopupMenuItem(
-                    child: Text("All"),
-                    value: "All"
+                const PopupMenuItem(
+                    value: "All",
+                    child: Text("All")
                 ),
-                PopupMenuItem(
-                    child: Text("Complete"),
-                    value: "Complete"
+                const PopupMenuItem(
+                    value: "Complete",
+                    child: Text("Complete")
                 ),
-                PopupMenuItem(
-                    child: Text("Pending"),
-                    value: "Pending"
+                const PopupMenuItem(
+                    value: "Pending",
+                    child: Text("Pending")
                 ),
-                PopupMenuItem(
-                    child: Text("Over Due"),
-                    value: "Over due"
+                const PopupMenuItem(
+                    value: "Over due",
+                    child: Text("Over Due")
                 ),
               ],
-              icon: Icon(
+              icon: const Icon(
                   Icons.filter_list_alt,color: Colors.yellow
               ),
 
@@ -217,7 +213,7 @@ class ReportState extends State<Report> {
           child: ListView.separated(
             itemCount: data!.length, // Replace with your actual item count
             separatorBuilder: (BuildContext context, int index) {
-              return Divider(
+              return const Divider(
                 color: Colors.grey,
                 height: 1,
               );
@@ -240,17 +236,17 @@ class ReportState extends State<Report> {
                   child: Row(
                       children: [
 
-                        SizedBox(
+                        const SizedBox(
                           width: 5,
                         ),
                         Flexible(
-                          child: Container(
+                          child: SizedBox(
                             width: 350,
                             height: 100,
                             child: Card(
                               elevation: 5,
                               child: Padding(
-                                  padding:  EdgeInsets.fromLTRB(20.0, 10, 0, 0),
+                                  padding:  const EdgeInsets.fromLTRB(20.0, 10, 0, 0),
                                   child: Column(
                                     crossAxisAlignment:CrossAxisAlignment.start,
                                     children: [
@@ -311,7 +307,7 @@ class SingleReportState extends State<SingleReport> {
   var priority;
   var goal;
   var description;
-  List<String> _priorities = ['High', 'Medium', 'Low'];
+  final List<String> _priorities = ['High', 'Medium', 'Low'];
   Future fetchGoal(id) async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
     http.Response response = await http.get(url, headers: {
@@ -351,7 +347,7 @@ class SingleReportState extends State<SingleReport> {
                   child: Column(
                     children: [
                       TextField(
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: 'Description',
                             labelText: 'Description',
                           ),
@@ -363,8 +359,8 @@ class SingleReportState extends State<SingleReport> {
                       ),
                       Text("Current: $current"),
                       TextField(
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        decoration: InputDecoration(
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        decoration: const InputDecoration(
                           hintText: 'Enter Target',
                           labelText: 'New Target',
                         ),
@@ -374,7 +370,7 @@ class SingleReportState extends State<SingleReport> {
                           });
                         },
                       ),
-                      SizedBox(height: 8,),
+                      const SizedBox(height: 8,),
                       AppDropDown(
                           disable: true,
                           label: "Priority",
@@ -398,10 +394,10 @@ class SingleReportState extends State<SingleReport> {
                         http.Response response = await http.post(url, body: body, headers: {
                           "Content-Type": "application/json",
                         });
-                        var result_task = jsonDecode(response.body);
+                        var resultTask = jsonDecode(response.body);
 
 
-                      }, child: Text('Update')))
+                      }, child: const Text('Update')))
                     ],
                   ),
                 )
@@ -411,13 +407,13 @@ class SingleReportState extends State<SingleReport> {
         });
   }
   _taskStatus(docid)async{
-    bool _approved = false;
+    bool approved = false;
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return SingleChildScrollView(
               child: AlertDialog(
-                  content: Text('Do you approve or reject this task?'),
+                  content: const Text('Do you approve or reject this task?'),
                   actions: <Widget>[
                     Column(
                       children: [
@@ -428,7 +424,7 @@ class SingleReportState extends State<SingleReport> {
                           children: [
 
                             TextButton(
-                              child: Text('Approve'),
+                              child: const Text('Approve'),
                               onPressed: ()async{
                                 Map data = {
                                   'is_approved': 'Approved',
@@ -440,16 +436,16 @@ class SingleReportState extends State<SingleReport> {
                                   "Content-Type": "application/json",
 
                                 });
-                                var result_task = jsonDecode(response.body);
+                                var resultTask = jsonDecode(response.body);
 
-                                print(result_task);
+                                print(resultTask);
                                 Navigator.pop(context);
                                 Navigator.of(context).pop();
 
                               },
                             ),
                             TextButton(
-                              child: Text('Reject'),
+                              child: const Text('Reject'),
                               onPressed: () async{
                                 Map data = {
                                   'is_approved': 'Rejected'
@@ -459,7 +455,7 @@ class SingleReportState extends State<SingleReport> {
                                 http.Response response = await http.put(url, body: body, headers: {
                                   "Content-Type": "application/json",
                                 });
-                                var result_task = jsonDecode(response.body);
+                                var resultTask = jsonDecode(response.body);
                                 Navigator.pop(context);
                                 Navigator.of(context).pop();
 
@@ -486,7 +482,7 @@ class SingleReportState extends State<SingleReport> {
       appBar: AppBar(),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child:Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -503,42 +499,42 @@ class SingleReportState extends State<SingleReport> {
                           children: [
                             Text(
                               "Reprot Title: ${data['report_title']}",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 15,
                               ),
 
                             ),
                             Text(
                               "Task: ${data['sub_task']}",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 15,
                               ),
 
                             ),
                             Text(
                               "Region:${data['report_region']} Area: ${data['report_area']}",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 15,
                               ),
 
                             ),
                             Text(
                               "Report Detail :${data['report_details']}",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 15,
                               ),
 
                             ),
                             Text(
                               "Report Status :${data['report_status']}",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 15,
                               ),
 
                             ),
                             Text(
                               "Report Priority :${data['report_priority']}",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 15,
                               ),
 
@@ -565,20 +561,20 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Costomer Found: ${data['report_customer_found_yes_no']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "is fraud case: ${data['report_customer_found_fraud_case']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
                               ),
                                 Text(
                                   "Amount collected: ${data['report_amount_collected']}",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 15,
                                   ),
 
@@ -607,28 +603,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "is agent: ${data['report_agent_found_yes_no']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "issue found: ${data['report_agent_found_yes_issues']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Angaza ID:${data[' report_agent_angaza_Id']} Challenge: ${data['report_agent_found_no_chs']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -655,28 +651,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Issue: ${data['report_issue_to_be_reolved_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Resolution: ${data['report_resolution_to_be_reolved_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -703,14 +699,14 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Customer Visited: ${data['report_customer_count_visited']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Coustomer found: ${data['report_customer_found_yes_no']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -718,7 +714,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "Fraud Case: ${data['report_customer_found_fraud_case']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -726,7 +722,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "Account Number: ${data['report_customer_account_number']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -735,14 +731,14 @@ class SingleReportState extends State<SingleReport> {
 
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -769,14 +765,14 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Customer Visited: ${data['report_customer_count_visited']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Coustomer found: ${data['report_customer_found_yes_no']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -784,7 +780,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "Fraud Case: ${data['report_customer_found_fraud_case']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -792,7 +788,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "Account Number: ${data['report_customer_account_number']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -801,14 +797,14 @@ class SingleReportState extends State<SingleReport> {
 
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -835,14 +831,14 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Customer Visited: ${data['report_customer_count_visited']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Coustomer found: ${data['report_customer_found_yes_no']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -850,7 +846,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "Fraud Case: ${data['report_customer_found_fraud_case']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -858,7 +854,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "Account Number: ${data['report_customer_account_number']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -867,14 +863,14 @@ class SingleReportState extends State<SingleReport> {
 
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -901,14 +897,14 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Customer Visited: ${data['report_customer_count_visited']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Coustomer found: ${data['report_customer_found_yes_no']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -916,7 +912,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "Fraud Case: ${data['report_customer_found_fraud_case']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -924,7 +920,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "Account Number: ${data['report_customer_account_number']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -933,14 +929,14 @@ class SingleReportState extends State<SingleReport> {
 
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -967,28 +963,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1015,28 +1011,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1063,28 +1059,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1111,14 +1107,14 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Report Audity: ${data['report_audit_report']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "takeaways: ${data['report_key_takeaways']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1126,7 +1122,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "recommendation: ${data['report_recommendation']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1134,7 +1130,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "Account Number: ${data['report_customer_account_number']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1143,14 +1139,14 @@ class SingleReportState extends State<SingleReport> {
 
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1177,21 +1173,21 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Coordinate found: ${data['report_coordinate_lamp_found_yes_no']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Reason for moving: ${data['report_coordinate_lamp_found_yes_no_reasons_for_moving']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "takeaways: ${data['report_key_takeaways']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1199,7 +1195,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "recommendation: ${data['report_recommendation']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1207,7 +1203,7 @@ class SingleReportState extends State<SingleReport> {
                               ),
                               Text(
                                 "Account Number: ${data['report_customer_account_number']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1216,14 +1212,14 @@ class SingleReportState extends State<SingleReport> {
 
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1250,56 +1246,56 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Previous Angaza ID: ${data['report_previous_customer_angaza_ID']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "New Custoemr name: ${data['report_new_customer_customer_name']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Unit is Complete: ${data['report_repo_unit_is_complete']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "2 weeks payment: ${data[' report_repo_customer_2_weeks_pay']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Aware condition: ${data['report_repo_customer_aware_cond']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Agent: ${data[' report_repo_reselling_agent']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1326,14 +1322,14 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Customer Found: ${data['report_customer_found_yes_no']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Is Fraud Case: ${data['report_customer_found_fraud_case']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1360,28 +1356,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1408,14 +1404,14 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Agent Found: ${data['report_agent_found_yes_no']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Fraud case: ${data['report_customer_found_fraud_case']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1443,28 +1439,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1491,28 +1487,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1539,28 +1535,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1587,28 +1583,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1635,28 +1631,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1683,28 +1679,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1731,28 +1727,28 @@ class SingleReportState extends State<SingleReport> {
                             children: [
                               Text(
                                 "Reprot Title: ${data['report_title']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Task: ${data['sub_task']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Region:${data['report_region']} Area: ${data['report_area']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
                               ),
                               Text(
                                 "Report Detail :${data['report_details']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 15,
                                 ),
 
@@ -1767,7 +1763,7 @@ class SingleReportState extends State<SingleReport> {
                 ),
               ListView.builder(
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: taskgoal!.length,
                   itemBuilder: (context, index) {
                     var task = taskgoal![index];
@@ -1790,35 +1786,35 @@ class SingleReportState extends State<SingleReport> {
                                     children: [
                                       Text(
                                         "Name: ${task['account_number']}",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 15,
                                         ),
 
                                       ),
                                       Text(
                                         "Description: ${task['task_description']}",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 15,
                                         ),
 
                                       ),
                                       Text(
                                         "Priority: ${task['priority']}",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 15,
                                         ),
 
                                       ),
                                       Text(
                                         "current: ${task['previous_goal']}",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 15,
                                         ),
 
                                       ),
                                       Text(
                                         "Goal: ${task['goals']}",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 15,
                                         ),
 
@@ -1838,7 +1834,7 @@ class SingleReportState extends State<SingleReport> {
               ElevatedButton(
                   onPressed: (){
                     _taskStatus(widget.id);
-                  }, child: Text("Approve"))
+                  }, child: const Text("Approve"))
 
             ],
           ),

@@ -11,7 +11,7 @@ class PilotUpdate extends StatefulWidget {
   final id;
   final subtask;
   final taskGoalId;
-  PilotUpdate(
+  const PilotUpdate(
       {Key? key,
         required this.subtask,
         required this.taskGoalId,
@@ -53,7 +53,7 @@ class _PilotUpdateState extends State<PilotUpdate> {
 
   @override
   Widget build(BuildContext context) {
-    String? _selectedValue;
+    String? selectedValue;
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
@@ -62,14 +62,14 @@ class _PilotUpdateState extends State<PilotUpdate> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
           AppDropDown(
               disable: true,
               label: widget.title,
               hint: "hint",
               items: [widget.title],
               onChanged: (value) {}),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               AppDropDown(
                   disable: true,
                   label: widget.subtask,

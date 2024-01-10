@@ -2,17 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:fieldapp_rcm/models/db.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocationMap  extends StatefulWidget {
+  const LocationMap({super.key});
+
+  @override
   LocationMapState createState() => LocationMapState();
 }
 
@@ -41,20 +42,20 @@ class  LocationMapState extends State<LocationMap> {
       listItems("customer_location");
       if (kDebugMode) {
         print(country);
-        print("$name");
+        print(name);
       }
   }
   List? data = [];
   List<String> region= [];
   bool isLoading = true;
-  double _radius  = 30000;
+  final double _radius  = 30000;
 
   void _showPointDetailsDialog(String name, String account,String phone) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Point Details"),
+          title: const Text("Point Details"),
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -70,7 +71,7 @@ class  LocationMapState extends State<LocationMap> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("Close"),
+              child: const Text("Close"),
             ),
           ],
         );
@@ -124,13 +125,14 @@ class  LocationMapState extends State<LocationMap> {
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
     }
+    return null;
   }
   final List<dynamic> _coordinates = [];
-  List<Marker> _markers = [];
+  final List<Marker> _markers = [];
   Set<Circle> _createCircle() {
     return <Circle>{
       Circle(
-        circleId: CircleId('radius'),
+        circleId: const CircleId('radius'),
         center: _currentLocation,
         radius: _radius,
         fillColor: Colors.blue.withOpacity(0.3),
@@ -142,7 +144,7 @@ class  LocationMapState extends State<LocationMap> {
   List<LatLng> latLngList = [ ];
   bool maploading = true;
   final Completer<GoogleMapController> _controller = Completer();
-  LatLng _currentLocation = LatLng(0, 0);
+  LatLng _currentLocation = const LatLng(0, 0);
   Future<void> _getCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
@@ -161,9 +163,9 @@ class  LocationMapState extends State<LocationMap> {
       final jsonData = jsonDecode(response.body);
       print(jsonData);
 
-      var _country = country.replaceAll('"', '');
+      country = country.replaceAll('"', '');
       final List<dynamic> filteredTasks = jsonData
-          .where((task) => task['Country'] == _country).toList();
+          .where((task) => task['Country'] == country).toList();
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
@@ -178,7 +180,7 @@ class  LocationMapState extends State<LocationMap> {
             double latitude = double.parse(coordinatevalue[0]);
             double longitude = double.parse(coordinatevalue[1]);
             LatLng latLng = LatLng(latitude, longitude);
-            double distance = await Geolocator.distanceBetween(
+            double distance = Geolocator.distanceBetween(
               currentLocation.latitude,
               currentLocation.longitude,
               latLng.latitude,
@@ -222,7 +224,7 @@ class  LocationMapState extends State<LocationMap> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Customers'),
+          title: const Text('Customers'),
           elevation: 2,
         ),
         body:complete>0?
@@ -237,7 +239,7 @@ class  LocationMapState extends State<LocationMap> {
                 LatLng currentLocation = snapshot.data!;
                 _markers.add(
                   Marker(
-                    markerId: MarkerId('currentLocation'),
+                    markerId: const MarkerId('currentLocation'),
                     position: currentLocation,
                     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
                     infoWindow: InfoWindow(title: '$name current location')
@@ -269,11 +271,11 @@ class  LocationMapState extends State<LocationMap> {
               else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               }else{
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
             }
         ):
-        maploading?Center(child: Text("No Customer in your current place"),):Center(child: CircularProgressIndicator()));
+        maploading?const Center(child: Text("No Customer in your current place"),):const Center(child: CircularProgressIndicator()));
   }
 
 }

@@ -2,11 +2,9 @@ import 'dart:convert';
 
 
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:fieldapp_rcm/models/db.dart';
-import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -18,7 +16,11 @@ class DashView extends StatefulWidget {
   final country;
   final region;
   final item;
-  DashView(this.title, this.value,this.country,this.region,this.item);
+  final zone;
+  final role;
+  const DashView(
+      this.title, this.value,this.country,this.region,this.item,this.zone,this.role, {super.key});
+  @override
   DashViewState createState() => DashViewState();
 }
 
@@ -27,6 +29,7 @@ class DashViewState extends State<DashView> {
   bool isLoading = true;
   List<String> area_data= [];
   Future<StorageItem?> listItems(key) async {
+    print("dash $key");
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
       operation = await Database.listItems();
@@ -38,6 +41,13 @@ class DashViewState extends State<DashView> {
         // Sort the files by the last modified timestamp in descending order
         resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
         StorageItem latestFile = resultList.first;
+        if(widget.role == 'CCM'){
+          ZoneData(latestFile.key);
+        }else if(widget.role == 'ZCM'|| widget.role == ''){
+          RegionData(latestFile.key);
+        }else if(widget.role == 'RCM'){
+          AreaData(latestFile.key);
+        }
         AreaData(latestFile.key);
         print(latestFile.key);
         return resultList.first;
@@ -57,6 +67,87 @@ class DashViewState extends State<DashView> {
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
     }
+    return null;
+  }
+  Future<void> ZoneData(key) async {
+    List<String> uniqueRegion = [];
+    print("object: $key");
+
+    try {
+      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
+          key: key)
+          .result;
+      print(urlResult.url);
+      final response = await http.get(urlResult.url);
+      final jsonData = jsonDecode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) =>
+          task['Country'] == widget.country
+      ).toList();
+      print("${widget.country} $filteredTasks");
+      filteredTasks.sort((a,b){
+        String scoreA = a[widget.title] ?? "0";
+        String scoreB = b[widget.title] ?? "0";
+        double scoreValueA = double.tryParse(scoreA.replaceAll("%", "") ?? "0") ?? 0;
+        double scoreValueB = double.tryParse(scoreB.replaceAll("%", "") ?? "0") ?? 0;
+        if(widget.title =="Collection Score"||widget.title =="Repayment Speed Last 182 Days"||widget.title =="Repayment Speed 2"){
+          return scoreValueB.compareTo(scoreValueA);
+        }else{
+          return scoreValueA.compareTo(scoreValueB);
+        }
+
+      });
+
+      print('File_region: $filteredTasks');
+      setState(() {
+        data = filteredTasks;
+        safePrint('File_data: $area_data');
+        isLoading = false;
+      });
+    } on StorageException catch (e) {
+      safePrint('Could not retrieve properties: ${e.message}');
+      rethrow;
+    }
+  }
+  Future<void> RegionData(key) async {
+    List<String> uniqueRegion = [];
+    print("object: $key");
+
+    try {
+      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
+          key: key)
+          .result;
+      print(urlResult.url);
+      final response = await http.get(urlResult.url);
+      final jsonData = jsonDecode(response.body);
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) => task['zone'] == widget.zone &&
+          task['Country'] == widget.country
+      ).toList();
+      print("${widget.country} $jsonData");
+      filteredTasks.sort((a,b){
+        String scoreA = a[widget.title] ?? "0";
+        String scoreB = b[widget.title] ?? "0";
+        double scoreValueA = double.tryParse(scoreA.replaceAll("%", "") ?? "0") ?? 0;
+        double scoreValueB = double.tryParse(scoreB.replaceAll("%", "") ?? "0") ?? 0;
+        if(widget.title =="Collection Score"||widget.title =="Repayment Speed Last 182 Days"||widget.title =="Repayment Speed 2"){
+          return scoreValueB.compareTo(scoreValueA);
+        }else{
+          return scoreValueA.compareTo(scoreValueB);
+        }
+
+      });
+
+      print('File_region: $filteredTasks');
+      setState(() {
+        data = filteredTasks;
+        safePrint('File_data: $area_data');
+        isLoading = false;
+      });
+    } on StorageException catch (e) {
+      safePrint('Could not retrieve properties: ${e.message}');
+      rethrow;
+    }
   }
   Future<void> AreaData(key) async {
     List<String> uniqueRegion = [];
@@ -74,10 +165,10 @@ class DashViewState extends State<DashView> {
       ).toList();
       print("${widget.country} $filteredTasks");
       filteredTasks.sort((a,b){
-        String scoreA = a[widget.title]== null?"0":a[widget.title];
-        String scoreB = b[widget.title]== null?"0":b[widget.title];
-        double scoreValueA = double.tryParse(scoreA?.replaceAll("%", "") ?? "0") ?? 0;
-        double scoreValueB = double.tryParse(scoreB?.replaceAll("%", "") ?? "0") ?? 0;
+        String scoreA = a[widget.title] ?? "0";
+        String scoreB = b[widget.title] ?? "0";
+        double scoreValueA = double.tryParse(scoreA.replaceAll("%", "") ?? "0") ?? 0;
+        double scoreValueB = double.tryParse(scoreB.replaceAll("%", "") ?? "0") ?? 0;
         if(widget.title =="Collection Score"||widget.title =="Repayment Speed Last 182 Days"||widget.title =="Repayment Speed 2"){
           return scoreValueB.compareTo(scoreValueA);
         }else{
@@ -101,8 +192,16 @@ class DashViewState extends State<DashView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    listItems("dashboard");
+    if(widget.item=='zone'){
+      listItems("dashboard/Region");
+    }else if(widget.item=='country'){
+      listItems("dashboard/zone");
+    }else if(widget.item=='region'){
+      listItems("dashboard");
+    }
+
   }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(),
@@ -112,14 +211,14 @@ class DashViewState extends State<DashView> {
               radius: 120.0,
               lineWidth: 30.0,
               animation: true,
-              center: new Text(
+              center: Text(
                 widget.value,
-                style: new TextStyle(
+                style: const TextStyle(
                     fontWeight: FontWeight.bold, fontSize: 20.0),
               ),
-              footer: new Text(
+              footer: Text(
                 widget.title,
-                style: new TextStyle(
+                style: const TextStyle(
                     fontWeight: FontWeight.bold, fontSize: 24.0),
               ),
               circularStrokeCap: CircularStrokeCap.round,
@@ -133,21 +232,21 @@ class DashViewState extends State<DashView> {
                     height: 80,
                     width: 150,
                     color: Colors.white,
-                    child: isLoading?Center(child: CircularProgressIndicator()):
+                    child: isLoading?const Center(child: CircularProgressIndicator()):
                     Column(
                       children: [
 
                         Text(
-                          data!.first[widget.title]==null?"0":data!.first[widget.title],
-                          style: TextStyle(
+                          data!.first[widget.title] ?? "0",
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 24,
                               color: Colors.green),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
-                        Text("Best performance")
+                        const Text("Best performance")
                       ],
                     ),
                   ),
@@ -157,24 +256,24 @@ class DashViewState extends State<DashView> {
                     height: 80,
                     width: 150,
                     color: Colors.white,
-                    child: isLoading?Center(child: CircularProgressIndicator()):Column(
+                    child: isLoading?const Center(child: CircularProgressIndicator()):Column(
                       children: [
 
                         Text(
-                    data!.last[widget.title]==null?"0":data!.last[widget.title],
-                          style: TextStyle(
+                    data!.last[widget.title] ?? "0",
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 24,
                               color: Colors.red),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
 
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
-                        Text("Poor performance")
+                        const Text("Poor performance")
                       ],
                     ),
                   ),
@@ -190,11 +289,11 @@ class DashViewState extends State<DashView> {
 
                         Text(
 
-                          data![index][widget.title] == null ? "0" : data![index][widget.title],
-                          style: TextStyle(
+                          data![index][widget.title] ?? "0",
+                          style: const TextStyle(
                               color: Colors.green, fontSize: 15),
                         ),
-                        title: Text( data![index]['Area'],));
+                        title: Text( data![index]['Region'],));
                   }),
             )
           ],

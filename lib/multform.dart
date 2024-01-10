@@ -4,13 +4,14 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'multTeam.dart';
 class MyTaskNew extends StatefulWidget {
+  const MyTaskNew({super.key});
+
 
   @override
   _MyTaskNewState createState() => _MyTaskNewState();
@@ -38,11 +39,12 @@ class _MyTaskNewState extends State<MyTaskNew> {
       firstDate: DateTime(currentYear),
       lastDate: DateTime(currentYear+1),
     );
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         List<String> parts = picked.toString().split(" ");
         startDate = parts[0];
       });
+    }
   }
   Future<void> _endDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -51,11 +53,12 @@ class _MyTaskNewState extends State<MyTaskNew> {
       firstDate: DateTime(currentYear),
       lastDate: DateTime(currentYear+1),
     );
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         List<String> parts = picked.toString().split(" ");
         endDate = parts[0];
       });
+    }
   }
   TaskMode _taskMode = TaskMode.Task;
   List<String> keys = [];
@@ -64,7 +67,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
   bool target =true;
   String rate = '';
   int _currentPage = 0;
-  int _pageSize = 10;
+  final int _pageSize = 10;
   List getPageData() {
     final startIndex = _currentPage * _pageSize;
     final endIndex = startIndex + _pageSize;
@@ -72,8 +75,8 @@ class _MyTaskNewState extends State<MyTaskNew> {
     return taskData!.sublist(startIndex, endIndex < taskData!.length ? endIndex : taskData!.length);
   }
   Map<String, String> selectedValues = {};
-  List<String> _priorities = ['High', 'Medium', 'Low'];
-  Map<String, Map<String, String>> _actions = {};
+  final List<String> _priorities = ['High', 'Medium', 'Low'];
+  final Map<String, Map<String, String>> _actions = {};
   List<String> textFieldValues = [];
   List<String> dropdownValues = [];
   bool isLoading = true;
@@ -130,8 +133,8 @@ class _MyTaskNewState extends State<MyTaskNew> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    var result_task = jsonDecode(response.body);
-    taskActionNo(result_task["id"]);
+    var resultTask = jsonDecode(response.body);
+    taskActionNo(resultTask["id"]);
 
   }
   void _save() async{
@@ -155,10 +158,10 @@ class _MyTaskNewState extends State<MyTaskNew> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    var result_task = jsonDecode(response.body);
-    print(result_task);
-    print(result_task["id"]);
-    taskAction(result_task["id"]);
+    var resultTask = jsonDecode(response.body);
+    print(resultTask);
+    print(resultTask["id"]);
+    taskAction(resultTask["id"]);
 
   }
   void taskAction(id) async {
@@ -171,7 +174,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
       if (agentDetails != null) {
         String current = agentDetails[rate];
         String? percvalue = current.substring(0,current.length - 1);
-        double total = double.parse(entry.value['target']!)+double.parse(percvalue!);
+        double total = double.parse(entry.value['target']!)+double.parse(percvalue);
         Map data =   {
           "task": id,
           "account_number":entry.key,
@@ -179,7 +182,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
           "task_description": entry.value['action'],
           "priority": entry.value['priority'],
           "task_status": "pending",
-          "previous_goal":double.parse(percvalue!)
+          "previous_goal":double.parse(percvalue)
         };
         var body = json.encode(data);
         var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
@@ -191,7 +194,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
 
       }
     }
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Task Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -230,7 +233,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
 
       }
     }
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Task Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -297,7 +300,7 @@ Future<void> TableData() async{
   Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation = await Amplify.Storage.list(
+      operation = Amplify.Storage.list(
         options: const StorageListOptions(
           accessLevel: StorageAccessLevel.guest,
           pluginOptions: S3ListPluginOptions.listAll(),
@@ -332,6 +335,7 @@ Future<void> TableData() async{
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
     }
+    return null;
   }
   Future<void> RegionTask(key) async {
     List<String> uniqueRegion = [];
@@ -375,7 +379,7 @@ Future<void> TableData() async{
       rethrow;
     }
   }
-  int _currentStep = 0;
+  final int _currentStep = 0;
   final List<String> portfolio = [
     'Visiting unreachable welcome call clients',
     'Work with the Agents with low welcome calls to improve',
@@ -433,7 +437,7 @@ Future<void> TableData() async{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Task'),
+        title: const Text('Add Task'),
       ),
       body: Container(
         child: Column(
@@ -591,7 +595,7 @@ Future<void> TableData() async{
                             );
                           default:
                             return Container(
-                              child: Text('No option selected'),
+                              child: const Text('No option selected'),
                             );
 
 
@@ -605,7 +609,7 @@ Future<void> TableData() async{
                           setState(() {
                             _taskMode = TaskMode.Task;
                           });
-                        }, child: Text("Back")),
+                        }, child: const Text("Back")),
                         ElevatedButton(onPressed: (){
                           setState(() {
                             if(selectedOption =='Team Management'){
@@ -622,7 +626,7 @@ Future<void> TableData() async{
                             }
 
                           });
-                        }, child: Text("Next"))
+                        }, child: const Text("Next"))
                       ],
                     )
                   ],
@@ -632,7 +636,7 @@ Future<void> TableData() async{
               Expanded(
                 child: Column(
                   children: [
-                    isLoading?Center(
+                    isLoading?const Center(
                       child: Column(
                         children: [
 
@@ -641,7 +645,7 @@ Future<void> TableData() async{
                         ],
                       ),
                     ):Container(
-                      child: region.length==0?Center(child:Text("No Task under ${SelectedSubtask}")):
+                      child: region.isEmpty?Center(child:Text("No Task under $SelectedSubtask")):
                       ListView.builder(
                           shrinkWrap: true,
                           itemCount: region.length,
@@ -668,9 +672,9 @@ Future<void> TableData() async{
                             isLoading = true;
                             _taskMode = TaskMode.SubTask;
                           });
-                        }, child: Text("Back")),
+                        }, child: const Text("Back")),
                         ElevatedButton(onPressed: (){
-                          if(region.length ==0){
+                          if(region.isEmpty){
 
                           }else{
                             setState(() {
@@ -679,7 +683,7 @@ Future<void> TableData() async{
                             });
                           }
 
-                        }, child: Text("Next"))
+                        }, child: const Text("Next"))
                       ],
                     )
                   ],
@@ -689,12 +693,12 @@ Future<void> TableData() async{
               Expanded(
                 child: Column(
                   children: [
-                    isLoadingArea?Center(
+                    isLoadingArea?const Center(
                       child: CircularProgressIndicator(),
-                    ):areadata!.length==0?Center(child:Text("No Task under ${SelectedSubtask}")):
+                    ):areadata!.isEmpty?Center(child:Text("No Task under $SelectedSubtask")):
                     Expanded(
                       child: ListTileTheme(
-                        contentPadding: EdgeInsets.symmetric(vertical: 0.0,),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0.0,),
                         child: ListView.builder(
                             shrinkWrap: true,
                             itemCount: areadata?.length,
@@ -724,14 +728,14 @@ Future<void> TableData() async{
                           setState(() {
                             _taskMode = TaskMode.Region;
                           });
-                        }, child: Text("Back")),
+                        }, child: const Text("Back")),
                         ElevatedButton(onPressed: (){
                           setState(() {
                             TableData();
                             _taskMode = TaskMode.TableTask;
                           });
 
-                        }, child: Text("Next"))
+                        }, child: const Text("Next"))
                       ],
                     )
                   ],
@@ -739,7 +743,7 @@ Future<void> TableData() async{
               ),
             if(_taskMode == TaskMode.TableTask)
               Expanded(
-                child: isLoadingTable?Center(
+                child: isLoadingTable?const Center(
                   child: CircularProgressIndicator(),
                 ):
                 SingleChildScrollView(
@@ -753,7 +757,7 @@ Future<void> TableData() async{
                             searchQuery = value;
                           });
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Search',
                           prefixIcon: Icon(Icons.search),
                         ),
@@ -771,8 +775,8 @@ Future<void> TableData() async{
                                       Text(keys[index]),
                                       if (_sortColumnIndex == index)
                                         _sortAscending
-                                            ? Icon(Icons.arrow_upward)
-                                            : Icon(Icons.arrow_downward),
+                                            ? const Icon(Icons.arrow_upward)
+                                            : const Icon(Icons.arrow_downward),
                                     ],
                                   ),
                                   onSort: (columnIndex, ascending) {
@@ -792,7 +796,7 @@ Future<void> TableData() async{
                                     });
                                   },
                                 ),
-                            DataColumn(label: Text('Select')),
+                            const DataColumn(label: Text('Select')),
                           ],
                           rows: [
                             for (final item in getPageData())
@@ -806,27 +810,27 @@ Future<void> TableData() async{
                                       ),
                                   DataCell(
                                     Checkbox(
-                                      value: taskDataList!.contains(item),
+                                      value: taskDataList.contains(item),
                                       onChanged: (value) {
                                         setState(() {
-                                          if (taskDataList!.contains(item)) {
-                                            taskDataList!.remove(item);
+                                          if (taskDataList.contains(item)) {
+                                            taskDataList.remove(item);
                                           } else {
-                                            taskDataList!.add(item);
+                                            taskDataList.add(item);
                                           }
                                         });
                                       },
                                     ),
                                   ),
                                 ],
-                                selected: taskDataList!.contains(item),
+                                selected: taskDataList.contains(item),
                                 onSelectChanged: (value) {
                                   setState(() {
-                                    if (taskDataList!.contains(item)) {
-                                      taskDataList!.remove(item);
+                                    if (taskDataList.contains(item)) {
+                                      taskDataList.remove(item);
                                     } else {
-                                      taskDataList!.add(item);
-                                      if (taskDataList!.length <= 5) {
+                                      taskDataList.add(item);
+                                      if (taskDataList.length <= 5) {
                                         if (kDebugMode) {
                                           print(taskDataList);
                                         }
@@ -854,7 +858,7 @@ Future<void> TableData() async{
                                   _currentPage = _currentPage > 0 ? _currentPage - 1 : 0;
                                 });
                               },
-                              child: Text("Previous Table"
+                              child: const Text("Previous Table"
                                 ,style: TextStyle(color: Colors.black),)),
                           TextButton(
                               onPressed: (){
@@ -865,7 +869,7 @@ Future<void> TableData() async{
                                   }
                                 });
                               },
-                              child: Text("Next Table"
+                              child: const Text("Next Table"
                                 ,style: TextStyle(color: Colors.black),)),
 
                         ],
@@ -878,16 +882,16 @@ Future<void> TableData() async{
                               _taskMode = TaskMode.Area;
                               taskDataList = [];
                             });
-                          }, child: Text("Back")),
+                          }, child: const Text("Back")),
                           ElevatedButton(onPressed: (){
-                            if(taskDataList!.length<=5&&taskDataList!.length>=1){
+                            if(taskDataList.length<=5&&taskDataList.isNotEmpty){
                               setState(() {
                                 _taskMode = TaskMode.ActionPlan;
 
                               });
 
-                            }else if(taskDataList!.length>5){
-                              final snackBar = SnackBar(
+                            }else if(taskDataList.length>5){
+                              const snackBar = SnackBar(
                                 content: Text('Exceeded task selection limit!'),
                                 duration: Duration(seconds: 2),
                               );
@@ -895,14 +899,14 @@ Future<void> TableData() async{
                             }
                             else{
                               print("No task selected");
-                              final snackBar = SnackBar(
+                              const snackBar = SnackBar(
                                 content: Text('No task selected!'),
                                 duration: Duration(seconds: 2),
                               );
                               ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
                             }
-                          }, child: Text("Next"))
+                          }, child: const Text("Next"))
                         ],
                       )
                     ],
@@ -916,15 +920,15 @@ Future<void> TableData() async{
                     if (target) Expanded(
                       child: ListView.builder(
                           shrinkWrap: true,
-                          itemCount: taskDataList!.length,
+                          itemCount: taskDataList.length,
                           itemBuilder: (context, index) {
-                            Map<String, dynamic> data = taskDataList![index];
+                            Map<String, dynamic> data = taskDataList[index];
                             String agent = data[key];
                             String agentRate = data[rate];
                             if (!_actions.containsKey(agent)) {
                               _actions[agent] = {'action': '', 'priority': _priorities[0]};
-                            };
-                            String datanew = taskDataList![index].toString();
+                            }
+                            String datanew = taskDataList[index].toString();
                             return Card(
                                 child: Padding(
                                     padding: const EdgeInsets.all(16),
@@ -932,12 +936,12 @@ Future<void> TableData() async{
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '$key: ${agent} - $agentRate ',
-                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                            '$key: $agent - $agentRate ',
+                                            style: const TextStyle(fontWeight: FontWeight.bold),
                                           ),
-                                          SizedBox(height: 8),
+                                          const SizedBox(height: 8),
                                           TextField(
-                                            decoration: InputDecoration(
+                                            decoration: const InputDecoration(
                                               hintText: 'Enter action plan',
                                               labelText: 'Action Plan',
                                             ),
@@ -948,10 +952,10 @@ Future<void> TableData() async{
                                             },
                                             maxLines: 3,
                                           ),
-                                          SizedBox(height: 8),
+                                          const SizedBox(height: 8),
                                           TextField(
-                                            keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                            decoration: InputDecoration(
+                                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                            decoration: const InputDecoration(
                                               hintText: 'Enter Target',
                                               labelText: 'Target',
                                             ),
@@ -961,7 +965,7 @@ Future<void> TableData() async{
                                               });
                                             },
                                           ),
-                                          SizedBox(height: 8),
+                                          const SizedBox(height: 8),
                                           AppDropDown(
                                               disable: true,
                                               label: "Priority",
@@ -986,14 +990,14 @@ Future<void> TableData() async{
 
                         child: ListView.builder(
                             shrinkWrap: true,
-                            itemCount: taskDataList!.length,
+                            itemCount: taskDataList.length,
                             itemBuilder: (context, index) {
-                              Map<String, dynamic> data = taskDataList![index];
+                              Map<String, dynamic> data = taskDataList[index];
                               String agent = data[key];
                               if (!_actions.containsKey(agent)) {
                                 _actions[agent] = {'action': '', 'priority': _priorities[0]};
-                              };
-                              String datanew = taskDataList![index].toString();
+                              }
+                              String datanew = taskDataList[index].toString();
                               return Card(
                                   child: Padding(
                                       padding: const EdgeInsets.all(16),
@@ -1002,11 +1006,11 @@ Future<void> TableData() async{
                                           children: [
                                             Text(
                                               '$key: $agent',
-                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                              style: const TextStyle(fontWeight: FontWeight.bold),
                                             ),
-                                            SizedBox(height: 8),
+                                            const SizedBox(height: 8),
                                             TextField(
-                                              decoration: InputDecoration(
+                                              decoration: const InputDecoration(
                                                 hintText: 'Enter action plan',
                                                 labelText: 'Action Plan',
                                               ),
@@ -1018,7 +1022,7 @@ Future<void> TableData() async{
                                               },
                                               maxLines: 3,
                                             ),
-                                            SizedBox(height: 8),
+                                            const SizedBox(height: 8),
                                             AppDropDown(
                                                 disable: true,
                                                 label: "Priority",
@@ -1047,12 +1051,12 @@ Future<void> TableData() async{
                           setState(() {
                             _taskMode = TaskMode.TableTask;
                           });
-                        }, child: Text("Back")),
+                        }, child: const Text("Back")),
                         ElevatedButton(onPressed: (){
                           setState(() {
                             _taskMode = TaskMode.Date;
                           });
-                        }, child: Text("Next"))
+                        }, child: const Text("Next"))
                       ],
                     )
                   ],
@@ -1063,10 +1067,10 @@ Future<void> TableData() async{
                 children: [
                   ElevatedButton(onPressed: (){
                     _selectDate(context);
-                  }, child: Text("Date start")),
+                  }, child: const Text("Date start")),
                   ElevatedButton(onPressed: (){
                     _endDate(context);
-                  }, child: Text("Date End")),
+                  }, child: const Text("Date End")),
 
                   Text("Start: $startDate"),
                   Text("End: $endDate"),
@@ -1079,12 +1083,12 @@ Future<void> TableData() async{
                         setState(() {
                           _taskMode = TaskMode.ActionPlan;
                         });
-                      }, child: Text("Back")),
+                      }, child: const Text("Back")),
                       ElevatedButton(onPressed: (){
                         setState(() {
                           _taskMode = TaskMode.Preview;
                         });
-                      }, child: Text("Next"))
+                      }, child: const Text("Next"))
                     ],
                   )
                 ],
@@ -1093,65 +1097,65 @@ Future<void> TableData() async{
               Expanded(
                 child: Column(
                   children: [
-                    Text("Preveiw"),
+                    const Text("Preveiw"),
                     Text(
-                      'Region: ${singleRegion}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      'Region: $singleRegion',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
-                      'Area: ${selectedArea}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      'Area: $selectedArea',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
-                      'Task: ${selectedOption}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      'Task: $selectedOption',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
-                      'Sub Task: ${SelectedSubtask}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      'Sub Task: $SelectedSubtask',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
-                      'Task start date: ${startDate}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      'Task start date: $startDate',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
-                      'Task End date: ${endDate}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      'Task End date: $endDate',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 16),
-                    Text(
+                    const SizedBox(height: 16),
+                    const Text(
                       'Task Action:',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     target?Column(
                       children: [
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: taskDataList!.map((task) {
+                          children: taskDataList.map((task) {
                             String taskName = task[key];
                             String current = task[rate];
                             Map<String, String>? actions = _actions[taskName];
                             String? percvalue = current.substring(0,current.length - 1);
-                            double total = double.parse(actions!['target']!)+double.parse(percvalue!);
+                            double total = double.parse(actions!['target']!)+double.parse(percvalue);
 
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Name: $taskName '),
-                                SizedBox(height: 8),
-                                Text("Priority: ${actions!['priority']}"),
-                                Text("Action Plan: ${actions!['action']}"),
+                                const SizedBox(height: 8),
+                                Text("Priority: ${actions['priority']}"),
+                                Text("Action Plan: ${actions['action']}"),
                                 Text('Current: $percvalue'),
-                                Text('Target: ${actions!['target']}'),
+                                Text('Target: ${actions['target']}'),
                                 Text('Goal: $total'),
 
-                                SizedBox(height: 8),
+                                const SizedBox(height: 8),
                               ],
                             );
                           }).toList(),)
@@ -1162,18 +1166,18 @@ Future<void> TableData() async{
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: taskDataList!.map((task) {
+                          children: taskDataList.map((task) {
                             String taskName = task[key];
                             Map<String, String>? actions = _actions[taskName];
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Name: ${taskName} '),
-                                SizedBox(height: 8),
+                                Text('Name: $taskName '),
+                                const SizedBox(height: 8),
                                 Text("Priority: ${actions!['priority']}"),
-                                Text("Action Plan: ${actions!['action']}"),
+                                Text("Action Plan: ${actions['action']}"),
 
-                                SizedBox(height: 8),
+                                const SizedBox(height: 8),
                               ],
                             );
                           }).toList(),)
@@ -1188,11 +1192,11 @@ Future<void> TableData() async{
                           setState(() {
                             _taskMode = TaskMode.Date;
                           });
-                        }, child: Text("Back")),
+                        }, child: const Text("Back")),
                         ElevatedButton(onPressed: (){
                           print(target);
                           target?_save():_saveNo();
-                        }, child: Text("Submit"))
+                        }, child: const Text("Submit"))
                       ],
                     )
                   ],

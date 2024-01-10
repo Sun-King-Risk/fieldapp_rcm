@@ -2,27 +2,17 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
-import 'package:fieldapp_rcm/step_form.dart';
-import 'package:fieldapp_rcm/task.dart';
-import 'package:fieldapp_rcm/task/collection.dart';
-import 'package:fieldapp_rcm/task/customer.dart';
-import 'package:fieldapp_rcm/task/pilot_process.dart';
-import 'package:fieldapp_rcm/task/portfolio.dart';
-import 'package:fieldapp_rcm/task/team.dart';
-import 'package:fieldapp_rcm/widget/drop_down.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:http/http.dart' as http;
-import 'package:postgres/postgres.dart';
 import 'package:postgres_dart/postgres_dart.dart';
 
-import 'http_online.dart';
 import 'models/db.dart';
 
 
 class Bucket extends StatefulWidget {
   var connection = PostgreSQLConnection("localhost", 5432, "dart_test", username: "dart", password: "dart");
+
+  Bucket({super.key});
   /*final Function(String) onTask;
 
   //final Function(String) onSubTask;
@@ -40,7 +30,7 @@ class Bucket extends StatefulWidget {
       //required this.taskResult});**/
 
   @override
-  BucketState createState() => new BucketState();
+  BucketState createState() => BucketState();
 }
 
 class BucketState extends State<Bucket> {
@@ -101,6 +91,7 @@ class BucketState extends State<Bucket> {
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
     }
+    return null;
   }
   final _formKey = GlobalKey<FormState>();
   late String selectedTask = '';
@@ -121,12 +112,13 @@ class BucketState extends State<Bucket> {
 
 
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add new task"),
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Text("dennis"),
       )
     );
@@ -147,7 +139,7 @@ class PostgreSQLHelper{
   }
 
   Future<void> closeConnection() async {
-    await connection;
+    connection;
   }
 
   Future<List<PostgreSQLResultRow>> executeQuery(String query) async {
@@ -160,19 +152,22 @@ class PostgreSQLHelper{
 
 
 class TaskAdd extends StatefulWidget{
+  const TaskAdd({super.key});
+
   @override
-  TaskAddState createState() => new TaskAddState();
+  TaskAddState createState() => TaskAddState();
 
 }
 class TaskAddState extends State<TaskAdd>{
   List data = [];
+  @override
   initState() {
     listItems("welcome_calls".replaceAll(" ", "_"));
   }
   Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation = await Amplify.Storage.list(
+      operation = Amplify.Storage.list(
         options: const StorageListOptions(
           accessLevel: StorageAccessLevel.guest,
           pluginOptions: S3ListPluginOptions.listAll(),
@@ -205,6 +200,7 @@ class TaskAddState extends State<TaskAdd>{
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
     }
+    return null;
   }
   Future<void> getTask(key) async {
     List<Map<String, dynamic>>  uniqueAgentList = [];
@@ -231,7 +227,7 @@ class TaskAddState extends State<TaskAdd>{
           'display': '$agent - $unreachabilityRate',
           'value': '$agent - $unreachabilityRate',
         };
-        data?.add(dataItem);
+        data.add(dataItem);
         uniqueAgentList.add(dataItem);
       }
 
@@ -250,7 +246,7 @@ class TaskAddState extends State<TaskAdd>{
       appBar: AppBar(),
       body: Row(
         children: [
-          Text("Visiting unreachable welcome call clients"),
+          const Text("Visiting unreachable welcome call clients"),
           Text("Visiting unreachable welcome call clients".replaceAll(" ", "_")),
           Text("Visiting unreachable welcome call clients".replaceAll(" ", "_")),
         ],

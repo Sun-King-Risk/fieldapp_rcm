@@ -28,7 +28,7 @@ class Database {
   }
   static Future<StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>> listItems() async {
     StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-    operation = await Amplify.Storage.list(
+    operation = Amplify.Storage.list(
       options: const StorageListOptions(
         accessLevel: StorageAccessLevel.guest,
         pluginOptions: S3ListPluginOptions.listAll(),

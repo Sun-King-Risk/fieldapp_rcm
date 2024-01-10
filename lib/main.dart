@@ -2,37 +2,24 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:fieldapp_rcm/aws_bucket.dart';
-import 'package:fieldapp_rcm/step_form.dart';
+
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:fieldapp_rcm/routing/nav_page.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:googleapis/servicecontrol/v2.dart';
 import 'package:http/http.dart' as http;
-import 'package:aws_s3_private_flutter/aws_s3_private_flutter.dart';
 import 'package:aws_s3_private_flutter/export.dart';
-import 'package:postgres/postgres.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'add_task.dart';
 import 'amplifyconfiguration.dart';
-import 'dashboard.dart';
-import 'firebase_options.dart';
 import 'models/db.dart';
-import 'multTeam.dart';
-import 'multform.dart';
-import 'new_design.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await _configureAmplify();
 
   runApp(
-      MyApp());
+      const MyApp()
+  );
 }
 Future<void> _configureAmplify() async {
   try {
@@ -63,19 +50,21 @@ class _MyAppState extends State<MyApp> {
   void getUserAuth() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? auth = prefs.getBool('isLogin');
-    setState(() {
       if(auth != null){
-        isLogin = auth!;
+        setState(() {
+          isLogin = auth;
+        });
+
       }
 
-    });
+
 
   }
   @override
   void initState() {
     super.initState();
     getUserAuth();
-    print(isLogin);
+    //print(isLogin);
   }
 
 
@@ -88,11 +77,11 @@ class _MyAppState extends State<MyApp> {
     late String agentselected= '';
     late String priority = '';
     late String target;
-    List? _myActivities;
+    List? myActivities;
     return MaterialApp(
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
-      home: isLogin?NavPage():LoginSignupApp(),
+      home: isLogin?const NavPage():const LoginSignupApp(),
     );
     /*return Authenticator(
         signUpForm: SignUpForm.custom(
@@ -306,7 +295,7 @@ class _LoginSignUpState extends State<LoginSignUp> {
         theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
         builder: Authenticator.builder(),
-        home: NavPage(),
+        home: const NavPage(),
       ),
     );
   }
@@ -335,7 +324,7 @@ class CustomScaffold extends StatelessWidget {
             children: [
               // App logo
               Padding(
-                padding: EdgeInsets.only(top: 32),
+                padding: const EdgeInsets.only(top: 32),
                 child: Center(child:Image.asset(
                   'assets/logo/sk.png',
                 )),
@@ -355,6 +344,8 @@ class CustomScaffold extends StatelessWidget {
 
 
 class LoginSignupApp extends StatelessWidget {
+  const LoginSignupApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -362,16 +353,19 @@ class LoginSignupApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.yellow,
       ),
-      home: LoginSignupPage(),
+      home: const LoginSignupPage(),
     );
   }
 }
 
 class LoginSignupPage extends StatefulWidget {
+  const LoginSignupPage({super.key});
+
   @override
   _LoginSignupPageState createState() => _LoginSignupPageState();
 }
 enum AuthMode { Login, Signup }
+
 class _LoginSignupPageState extends State<LoginSignupPage> {
   final _formKey = GlobalKey<FormState>();
 
@@ -422,13 +416,13 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
           prefs.setString('email', _email);
           prefs.setBool('isLogin',true);
           print(prefs.get('name'));
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavPage()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const NavPage()));
         }else{
           final Map<String, dynamic> responseData = jsonDecode(response.body);
           String successMessage = responseData['error'];
           final snackBar = SnackBar(
             content: Text(successMessage),
-            duration: Duration(seconds: 3),
+            duration: const Duration(seconds: 3),
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
@@ -457,7 +451,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
             final snackBar = SnackBar(
 
               content: Text(successMessage),
-              duration: Duration(seconds: 3),
+              duration: const Duration(seconds: 3),
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
             setState(() {
@@ -469,7 +463,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
             String successMessage = responseData['error'];
             final snackBar = SnackBar(
               content: Text(successMessage),
-              duration: Duration(seconds: 3),
+              duration: const Duration(seconds: 3),
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
             print(successMessage);
@@ -485,7 +479,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
   Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation = await Amplify.Storage.list(
+      operation = Amplify.Storage.list(
         options: const StorageListOptions(
           accessLevel: StorageAccessLevel.guest,
           pluginOptions: S3ListPluginOptions.listAll(),
@@ -510,10 +504,11 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
     }
+    return null;
   }
   Future<void> CoutryData(key) async {
     List<String> uniqueCountry = [];
-    print("data Object: $key");
+    //print("data Object: $key");
 
 
     try {
@@ -523,9 +518,9 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
 
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
-      print('File_team: $jsonData');
+      //print('File_team: $jsonData');
 
-      print(jsonData.length);
+      //print(jsonData.length);
 
       for (var item in jsonData) {
         uniqueCountry.add(item['Country']);
@@ -579,26 +574,26 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Forgot Password'),
+          title: const Text('Forgot Password'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Text('Please enter your email to reset your password.'),
+              const Text('Please enter your email to reset your password.'),
               TextFormField(
                 controller: emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
               ),
             ],
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             ElevatedButton(
-              child: Text('Reset Password'),
+              child: const Text('Reset Password'),
               onPressed: () {
                 // Add your password reset logic here, e.g., send a password reset email
                 // You can use the emailController.text to get the user's email
@@ -631,7 +626,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    listItems("country");
+    //listItems("country");
 
   }
   @override
@@ -640,7 +635,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
 
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.fromLTRB(10,100.0,0,0),
+          padding: const EdgeInsets.fromLTRB(10,100.0,0,0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -651,7 +646,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                 if(_authMode == AuthMode.Signup)
                   Column(children: [
                     TextFormField(
-                      decoration: InputDecoration(labelText: 'First Name'),
+                      decoration: const InputDecoration(labelText: 'First Name'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your First Name';
@@ -663,7 +658,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                       },
                     ),
                     TextFormField(
-                      decoration: InputDecoration(labelText: 'Last Name'),
+                      decoration: const InputDecoration(labelText: 'Last Name'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your Last Name';
@@ -674,7 +669,34 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                         lastname = value;
                       },
                     ),
-                    SizedBox(height: 10,),
+                    AppDropDown(
+                        disable: false,
+                        label: "Role",
+                        hint: "Role",
+                        items: const [
+
+                          "Country Credit Manager",
+                          "Zonal Credit Manager",
+                          "Senior Credit Analyst",
+                          "Regional Collections Manager"
+                        ],
+                        validator: (value){
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your Role';
+                          }
+                          return null;
+                        },
+                        onChanged: (value){
+                          if(value == 'Country Credit Manager'){
+                            role = "CCM";
+                          }else if(value =='Zonal Credit Manager'||value =='Senior Credit Analyst'){
+                            role = "Credit Analyst";
+                          }else if(value =='Regional Collections Manager'){
+                            role = "RCM";
+                          }
+                          print(role);
+                        }),
+                    const SizedBox(height: 10,),
                     AppDropDown(
                         disable: false,
                         label: "Country",
@@ -694,8 +716,9 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                           });
                           Zone();
                         }),
-                    SizedBox(height: 10,),
-                    AppDropDown(
+                    const SizedBox(height: 10,),
+                    if(role=='Credit Analyst'|| role=='RCM')
+                      AppDropDown(
                         disable: false,
                         label: "Zone",
                         hint: "Zone",
@@ -711,9 +734,10 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                           regiondata=[];
                           Region();
                         }),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
 
-                    AppDropDown(
+                    if(role=='RCM')
+                      AppDropDown(
                         disable: false,
                         label: "Region",
                         hint: "Region",
@@ -728,48 +752,15 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                           region = value;
                           Area();
                         }),
-                    SizedBox(height: 10,),
-                    AppDropDown(
-                        disable: false,
-                        label: "Area",
-                        hint: "Area",
-                        items: areadata,
-                        validator: (value){
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your Area';
-                          }
-                          return null;
-                        },
-                        onChanged: (value){
-                          area = value;
-                        }),
-                    SizedBox(height: 10,),
-                    AppDropDown(
-                        disable: false,
-                        label: "Role",
-                        hint: "Role",
-                        items: const [
-                          "Area Collection Executive",
-                          "Country Credit Manager",
-                          "Zonal Credit Manager",
-                          "Senior Credit Analyst",
-                          "Regional Collections Manager"
-                        ],
-                        validator: (value){
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your Role';
-                          }
-                          return null;
-                        },
-                        onChanged: (value){
-                          role = value;
-                        }),
+                    const SizedBox(height: 10,),
+                    const SizedBox(height: 10,),
+
 
                   ],),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
 
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Email'),
+                  decoration: const InputDecoration(labelText: 'Email'),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
@@ -781,7 +772,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                   },
                 ),
                 TextFormField(
-                  decoration: InputDecoration(labelText: 'Password'),
+                  decoration: const InputDecoration(labelText: 'Password'),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -796,7 +787,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                 if (_authMode == AuthMode.Signup)
 
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Confirm Password'),
+                    decoration: const InputDecoration(labelText: 'Confirm Password'),
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -812,10 +803,10 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                       });
                     },
                   ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 ElevatedButton(
-                  child: Text(_authMode == AuthMode.Login ? 'Login' : 'Sign Up'),
                   onPressed: _submitForm,
+                  child: Text(_authMode == AuthMode.Login ? 'Login' : 'Sign Up'),
                 ),
 
                 TextButton(
@@ -827,8 +818,8 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                   },
                 ),
                 TextButton(
-                  child: Text('Forgot Password?'),
-                  onPressed: _showForgotPasswordDialog, // Create this function
+                  onPressed: _showForgotPasswordDialog,
+                  child: const Text('Forgot Password?'), // Create this function
                 ),
               ],
             ),

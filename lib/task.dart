@@ -1,14 +1,11 @@
 import 'dart:convert';
-
-import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:fieldapp_rcm/report.dart';
+import 'package:fieldapp_rcm/step_form.dart';
 import 'package:fieldapp_rcm/task_table.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'location.dart';
-import 'multform.dart';
 import 'pending_task.dart';
 import 'team_task.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +13,7 @@ import 'package:intl/intl.dart';
 
 class TaskData {
   Future<int> countTask(String taskTitle, String name) async {
-    final url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    final url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/tasks');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -34,7 +31,7 @@ class TaskData {
 
   Future<int> countByStatus(
       String taskTitle, String status, String name) async {
-    final url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    final url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/tasks');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -55,6 +52,8 @@ class TaskData {
 }
 
 class Task extends StatefulWidget {
+  const Task({super.key});
+
   @override
   State<Task> createState() => _TaskState();
 }
@@ -96,7 +95,7 @@ class _TaskState extends State<Task> {
   }
 
   void CompleteRate(String name) async {
-    final url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    final url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/tasks');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -107,14 +106,14 @@ class _TaskState extends State<Task> {
           .where((task) =>
               task['task_status'] == 'Completed' && task['submited_by'] == name)
           .toList();
-      int _totalTask = Tasks.length ;
-      int _completeTask = completeTasks.length ;
-      var TaskcompleteRate = (_completeTask / _totalTask) * 100;
-      print("_completeTask $_completeTask");
-      print("_totalTask $_totalTask");
+      int totalTask = Tasks.length ;
+      int completeTask = completeTasks.length ;
+      var TaskcompleteRate = (completeTask / totalTask) * 100;
+      print("_completeTask $completeTask");
+      print("_totalTask $totalTask");
       print("TaskcompleteRate $TaskcompleteRate");
       setState(() {
-        totaltask = _totalTask;
+        totaltask = totalTask;
         completeRate = TaskcompleteRate;
 
       });
@@ -132,8 +131,8 @@ class _TaskState extends State<Task> {
         child: Column(
           children: <Widget>[
             Container(
-              constraints: BoxConstraints.expand(height: 40),
-              child: TabBar(tabs: [
+              constraints: const BoxConstraints.expand(height: 40),
+              child: const TabBar(tabs: [
                 Tab(
                   text: "My Task",
                 ),
@@ -146,7 +145,7 @@ class _TaskState extends State<Task> {
             ),
             Expanded(
               child: Container(
-                margin: EdgeInsets.all(15),
+                margin: const EdgeInsets.all(15),
                 child: TabBarView(children: [
                   SingleChildScrollView(
                     child: Column(
@@ -154,30 +153,30 @@ class _TaskState extends State<Task> {
                       children: [
                         ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              minimumSize: Size.fromHeight(
+                              minimumSize: const Size.fromHeight(
                                   40), // fromHeight use double.infinity as width and 40 is the height
                             ),
                             onPressed: () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => LocationMap(),
+                                    builder: (context) => const LocationMap(),
                                   ));
                             },
-                            child: Text("Map")),
+                            child: const Text("Map")),
                         ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              minimumSize: Size.fromHeight(
+                              minimumSize: const Size.fromHeight(
                                   40), // fromHeight use double.infinity as width and 40 is the height
                             ),
                             onPressed: () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => MyTaskNew(),
+                                    builder: (context) => const TaskAddDrop(),
                                   ));
                             },
-                            child: Text("Add New Task")),
+                            child: const Text("Add New Task")),
                         Card(
                           shadowColor: Colors.amber,
                           color: Colors.black,
@@ -185,7 +184,7 @@ class _TaskState extends State<Task> {
                             title: Center(
                                 child: Text(
                                     "Overrall Task Complete Rate $completeRate%",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 15, color: Colors.yellow))),
                             dense: true,
                           ),
@@ -214,13 +213,13 @@ class _TaskState extends State<Task> {
                     ),
                   ),
                   Container(
-                    child: TeamTask(),
+                    child: const TeamTask(),
                   ),
                   Container(
-                    child: PendingTask(),
+                    child: const PendingTask(),
                   ),
                   Container(
-                    child: Report(),
+                    child: const Report(),
                   ),
                 ]),
               ),
@@ -245,7 +244,7 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
   List? data = [];
   void fetchData() async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    var url = Uri.parse('https://https://sun-kingfieldapp.herokuapp.com/api/tasks');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
@@ -275,8 +274,8 @@ class _TaskListState extends State<TaskList> {
       },
       child: Container(
         height: 70,
-        padding: EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 5),
-        margin: EdgeInsets.only(left: 5, right: 5, bottom: 10, top: 5),
+        padding: const EdgeInsets.only(left: 5, right: 5, bottom: 0, top: 5),
+        margin: const EdgeInsets.only(left: 5, right: 5, bottom: 10, top: 5),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: Colors.black),
@@ -286,9 +285,9 @@ class _TaskListState extends State<TaskList> {
           children: [
             Text(
               widget.task_title,
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -298,16 +297,16 @@ class _TaskListState extends State<TaskList> {
                       .asStream(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     } else if (snapshot.hasData) {
                       return Text(
-                        snapshot.data.toString() + " Total",
-                        style: TextStyle(color: Colors.green),
+                        "${snapshot.data} Total",
+                        style: const TextStyle(color: Colors.green),
                       );
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
-                      return Text('No data available');
+                      return const Text('No data available');
                     }
                   },
                 ),
@@ -318,16 +317,16 @@ class _TaskListState extends State<TaskList> {
                       .asStream(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     } else if (snapshot.hasData) {
                       return Text(
-                        snapshot.data.toString() + " Completed",
-                        style: TextStyle(color: Colors.yellow),
+                        "${snapshot.data} Completed",
+                        style: const TextStyle(color: Colors.yellow),
                       );
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
-                      return Text('No data available');
+                      return const Text('No data available');
                     }
                   },
                 ),
@@ -337,16 +336,16 @@ class _TaskListState extends State<TaskList> {
                       .asStream(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     } else if (snapshot.hasData) {
                       return Text(
-                        snapshot.data.toString() + " Pending",
-                        style: TextStyle(color: Colors.red),
+                        "${snapshot.data} Pending",
+                        style: const TextStyle(color: Colors.red),
                       );
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
-                      return Text('No data available');
+                      return const Text('No data available');
                     }
                   },
                 ),

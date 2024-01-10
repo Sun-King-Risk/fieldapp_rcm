@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -50,8 +48,8 @@ class ProfileState extends State<Profile> {
           ClipOval(
                       child: Material(
                         color:Colors.grey.withOpacity(0.3),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                        child: const Padding(
+                          padding: EdgeInsets.all(16.0),
                           child: Icon(
                             Icons.person,
                             size: 60,
@@ -65,8 +63,8 @@ class ProfileState extends State<Profile> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        TextButton(onPressed: (){},child: Text('$role',style: TextStyle(color: Colors.black),)),
-                        TextButton(onPressed: (){},child:Text('Region: $userRegion',style: TextStyle(color: Colors.black))),
+                        TextButton(onPressed: (){},child: Text(role,style: const TextStyle(color: Colors.black),)),
+                        TextButton(onPressed: (){},child:Text('Region: $userRegion',style: const TextStyle(color: Colors.black))),
 
                       ],
 
@@ -74,7 +72,7 @@ class ProfileState extends State<Profile> {
 
 
 
-          Card(
+          const Card(
             shadowColor: Colors.amber,
             color: Colors.black,
             child: ListTile(
@@ -86,7 +84,7 @@ class ProfileState extends State<Profile> {
           ),
           ElevatedButton(onPressed: (){
 
-          }, child: Text("Update detail"))
+          }, child: const Text("Update detail"))
 
 
         ],

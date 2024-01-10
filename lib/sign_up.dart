@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
+
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
@@ -98,10 +100,10 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
   return Scaffold(
   appBar: AppBar(
-  title: Text('Sign up'),
+  title: const Text('Sign up'),
   ),
   body: Padding(
-  padding: EdgeInsets.all(16.0),
+  padding: const EdgeInsets.all(16.0),
   child: SingleChildScrollView(
     child: Form(
     key: _formKey,
@@ -110,7 +112,7 @@ class _SignUpPageState extends State<SignUpPage> {
     children: [
     TextFormField(
     controller: _usernameController,
-    decoration: InputDecoration(
+    decoration: const InputDecoration(
     labelText: 'Username',
     ),
     validator: (value) {
@@ -120,10 +122,10 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
     },
     ),
-    SizedBox(height: 16.0),
+    const SizedBox(height: 16.0),
     TextFormField(
     controller: _emailController,
-    decoration: InputDecoration(
+    decoration: const InputDecoration(
     labelText: 'Email',
     ),
     validator: (value) {
@@ -133,23 +135,24 @@ class _SignUpPageState extends State<SignUpPage> {
     return null;
     },
     ),
-    SizedBox(height: 16.0),
+    const SizedBox(height: 16.0),
     TextFormField(
     controller: _passwordController,
     obscureText: true,
-    decoration: InputDecoration(
+    decoration: const InputDecoration(
     labelText: 'Password',
     ),
     validator: (value) {
     if (value!.isEmpty) {
     return 'Please enter your password';
     }
+    return null;
     },
     ),
       TextFormField(
         controller: _confirmPasswordController,
         obscureText: true,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Confirm Password',
         ),
         validator: (value) {
@@ -164,7 +167,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
       TextFormField(
         controller: _firstnameController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Firstname',
         ),
         validator: (value) {
@@ -176,7 +179,7 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       TextFormField(
         controller: _lastnameController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Lastname',
         ),
         validator: (value) {
@@ -188,7 +191,7 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       TextFormField(
         controller: _countryController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Country',
         ),
         validator: (value) {
@@ -200,7 +203,7 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       TextFormField(
         controller: _regionController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Region',
         ),
         validator: (value) {
@@ -212,7 +215,7 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       TextFormField(
         controller: _areaController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Area',
         ),
         validator: (value) {
@@ -224,7 +227,7 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       TextFormField(
         controller: _roleController,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Role',
         ),
         validator: (value) {
@@ -234,10 +237,10 @@ class _SignUpPageState extends State<SignUpPage> {
           return null;
         },
       ),
-    SizedBox(height: 32.0),
+    const SizedBox(height: 32.0),
     ElevatedButton(
     onPressed:_submitForm,
-    child: Text('Sign up'),
+    child: const Text('Sign up'),
     ),
     ],
     ),

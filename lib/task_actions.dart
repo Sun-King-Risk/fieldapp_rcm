@@ -1,14 +1,11 @@
 import 'dart:convert';
 
 import 'package:fieldapp_rcm/routing/bottom_nav.dart';
-import 'package:fieldapp_rcm/task.dart';
 import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -25,7 +22,7 @@ class Visiting extends StatefulWidget {
   final report_priority;
   final report_details;
 
-  Visiting({
+  const Visiting({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -47,8 +44,8 @@ class _Visiting extends State<Visiting> {
   void initState() {
     super.initState();
   }
-  List<String> _data = [];
-  List<DocumentSnapshot> _result = [];
+  final List<String> _data = [];
+  final List<DocumentSnapshot> _result = [];
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
@@ -149,7 +146,7 @@ class _Visiting extends State<Visiting> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
 
@@ -229,7 +226,7 @@ class _Visiting extends State<Visiting> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
 
@@ -265,12 +262,12 @@ class _Visiting extends State<Visiting> {
               onChanged: (value){
 
               }),
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           DropdownButtonFormField(
               decoration: InputDecoration(
                 filled: true,
                 labelText: "Did we find the right customer?",
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 hintStyle: TextStyle(color: Colors.grey[800]),
                 hintText: "Did we find the right customer?",
               ),
@@ -281,16 +278,16 @@ class _Visiting extends State<Visiting> {
                 );
               }).toList(),
               onChanged: taskAction),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           if (selectedaction == 'No')
             Column(
               children: [
-                Text("If it related to frud please rise it through fraud App"),
+                const Text("If it related to frud please rise it through fraud App"),
                 TextFormField(
                     maxLines: 5,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
                       ),
@@ -301,7 +298,7 @@ class _Visiting extends State<Visiting> {
                     )),
                 ElevatedButton(onPressed:(){
 
-                }, child: Text("Update"))
+                }, child: const Text("Update"))
 
               ],
             ),
@@ -310,20 +307,20 @@ class _Visiting extends State<Visiting> {
           if (selectedaction == 'Yes')
             Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
-                Icon(Icons.camera_alt),
-                SizedBox(
+                const Icon(Icons.camera_alt),
+                const SizedBox(
                   height: 10,
                 ),
-                Icon(Icons.location_on),
-                SizedBox(
+                const Icon(Icons.location_on),
+                const SizedBox(
                   height: 10,
                 ),
                 ElevatedButton(onPressed:(){
 
-                }, child: Text("Update"))
+                }, child: const Text("Update"))
               ],
             ),
 
@@ -346,7 +343,7 @@ class Work extends StatefulWidget {
   final report_title;
   final report_priority;
   final report_details;
-  Work({
+  const Work({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -365,8 +362,8 @@ class Work extends StatefulWidget {
 
 class _Work extends State<Work> {
 
-  String _data = '';
-  List<DocumentSnapshot> _result = [];
+  final String _data = '';
+  final List<DocumentSnapshot> _result = [];
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
@@ -464,7 +461,7 @@ class _Work extends State<Work> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -472,7 +469,7 @@ class _Work extends State<Work> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
     print(response.body);
@@ -549,7 +546,7 @@ class _Work extends State<Work> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -557,7 +554,7 @@ class _Work extends State<Work> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
     print(response.body);
@@ -593,16 +590,16 @@ AppDropDown(
       hint: "Did you manage to work with the Agent?",
       items: taskaction,
       onChanged: taskAction),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           if (selectedaction == 'No')
           Column(
             children: [
-              Text("If it related to frud please rise it through fraud App"),
+              const Text("If it related to frud please rise it through fraud App"),
               TextFormField(
                   maxLines: 5,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
                     ),
@@ -613,7 +610,7 @@ AppDropDown(
                   )),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50)
+                    minimumSize: const Size(double.infinity, 50)
                 ),
                 onPressed:(){
                   print("demm");
@@ -623,7 +620,7 @@ AppDropDown(
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                }, child: Text("Update"), )
+                }, child: const Text("Update"), )
             ],
           ),
           if (selectedaction == 'Yes')
@@ -637,28 +634,28 @@ AppDropDown(
                     onChanged: (value){
 
                     }),
-                SizedBox(height: 10,),
-                TextField(
+                const SizedBox(height: 10,),
+                const TextField(
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'More Feedback',
                   ),
 
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
-                Icon(Icons.camera_alt),
-                SizedBox(
+                const Icon(Icons.camera_alt),
+                const SizedBox(
                   height: 10,
                 ),
-                Icon(Icons.location_on),
-                SizedBox(
+                const Icon(Icons.location_on),
+                const SizedBox(
                   height: 10,
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50)
+                      minimumSize: const Size(double.infinity, 50)
                   ),
                   onPressed:(){
                     _YesUpdate(32, 23);
@@ -668,7 +665,7 @@ AppDropDown(
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                  }, child: Text("Update"), )
+                  }, child: const Text("Update"), )
               ],
             ),
 
@@ -692,7 +689,7 @@ class RedZone extends StatefulWidget {
   final report_title;
   final report_priority;
   final report_details;
-  RedZone({
+  const RedZone({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -729,18 +726,18 @@ class _RedZone extends State<RedZone> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TextField(
+        const TextField(
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             hintText: 'Issues highlighted',
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         TextFormField(
             maxLines: 5,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
               ),
@@ -753,7 +750,7 @@ class _RedZone extends State<RedZone> {
 
 
 
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
       ],
@@ -773,7 +770,7 @@ class Fraud extends StatefulWidget {
   final report_title;
   final report_priority;
   final report_details;
-  Fraud({
+  const Fraud({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -796,18 +793,18 @@ class _Fraud extends State<Fraud> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TextField(
+        const TextField(
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             hintText: 'Issues highlighted',
           ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
         TextFormField(
             maxLines: 5,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
               ),
@@ -820,7 +817,7 @@ class _Fraud extends State<Fraud> {
 
 
 
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
       ],
@@ -839,7 +836,7 @@ class Audity extends StatefulWidget {
   final report_title;
   final report_priority;
   final report_details;
-  Audity({
+  const Audity({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -862,7 +859,7 @@ class _Audity extends State<Audity>{
       children: [
         TextFormField(
             maxLines: 5,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               focusedBorder: OutlineInputBorder(
                 borderSide:
                 BorderSide(color: AppColor.mycolor, width: 1.0),
@@ -873,10 +870,10 @@ class _Audity extends State<Audity>{
               ),
               labelText: 'Takeaway',
             )),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         TextFormField(
             maxLines: 5,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               focusedBorder: OutlineInputBorder(
                 borderSide:
                 BorderSide(color: AppColor.mycolor, width: 1.0),
@@ -887,8 +884,8 @@ class _Audity extends State<Audity>{
               ),
               labelText: 'Recommendation',
             )),
-        SizedBox(height: 10,),
-        Icon(Icons.attach_file),
+        const SizedBox(height: 10,),
+        const Icon(Icons.attach_file),
 
       ],
     );
@@ -906,7 +903,7 @@ class FieldVisit extends StatefulWidget {
   final report_title;
   final report_priority;
   final report_details;
-  FieldVisit({
+  const FieldVisit({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -924,8 +921,8 @@ class FieldVisit extends StatefulWidget {
 }
 class _FieldVisit extends State<FieldVisit> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  String _data = '';
-  List<DocumentSnapshot> _result = [];
+  final String _data = '';
+  final List<DocumentSnapshot> _result = [];
   _YesUpdate(String doc,String id) async {
     Map data = {
       "report_title":widget.report_title,
@@ -996,7 +993,7 @@ class _FieldVisit extends State<FieldVisit> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -1004,7 +1001,7 @@ class _FieldVisit extends State<FieldVisit> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
 
@@ -1079,7 +1076,7 @@ class _FieldVisit extends State<FieldVisit> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -1087,7 +1084,7 @@ class _FieldVisit extends State<FieldVisit> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
 
@@ -1119,24 +1116,24 @@ class _FieldVisit extends State<FieldVisit> {
     return Form(
       child: Column(
         children: [
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           AppDropDown(
               disable: false,
               label: "Did you manage to work with the Agent?",
               hint: "Did you manage to work with the Agent?",
               items: taskaction,
               onChanged: taskAction),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           if (selectedaction == 'No')
             Column(
               children: [
-                Text("If it related to frud please rise it through fraud App"),
+                const Text("If it related to frud please rise it through fraud App"),
                 TextFormField(
                     controller: feedbackController,
                     maxLines: 5,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
                       ),
@@ -1147,7 +1144,7 @@ class _FieldVisit extends State<FieldVisit> {
                     )),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50)
+                      minimumSize: const Size(double.infinity, 50)
                   ),
                   onPressed:(){
                     //_getDocuments();
@@ -1158,7 +1155,7 @@ class _FieldVisit extends State<FieldVisit> {
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                  }, child: Text("No"), )
+                  }, child: const Text("No"), )
               ],
             ),
           if (selectedaction == 'Yes')
@@ -1173,32 +1170,32 @@ class _FieldVisit extends State<FieldVisit> {
                       onChanged: (value){
 
                       }),
-                  SizedBox(height: 10,),
+                  const SizedBox(height: 10,),
                   TextField(
                     controller: feedbackController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: 'More Feedback',
                     ),
                   ),
 
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Icon(Icons.camera_alt),
-                  SizedBox(
+                  const Icon(Icons.camera_alt),
+                  const SizedBox(
                     height: 10,
                   ),
-                  Icon(Icons.location_on),
-                  SizedBox(
+                  const Icon(Icons.location_on),
+                  const SizedBox(
                     height: 10,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50)
+                        minimumSize: const Size(double.infinity, 50)
                     ),
                     onPressed:(){
                       //_getDocuments();
@@ -1208,7 +1205,7 @@ class _FieldVisit extends State<FieldVisit> {
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                    }, child: Text("Update Yes"), )
+                    }, child: const Text("Update Yes"), )
                 ])
         ],
       ),
@@ -1227,7 +1224,7 @@ class Accuracy extends StatefulWidget {
   final report_title;
   final report_priority;
   final report_details;
-  Accuracy({
+  const Accuracy({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -1314,7 +1311,7 @@ class _Accuracy extends State<Accuracy>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -1345,7 +1342,7 @@ class _Accuracy extends State<Accuracy>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -1366,7 +1363,7 @@ class _Accuracy extends State<Accuracy>{
             decoration: InputDecoration(
               filled: true,
               labelText: "Did we find the location?",
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               hintStyle: TextStyle(color: Colors.grey[800]),
               hintText: "Did we find the location?",
             ),
@@ -1377,9 +1374,9 @@ class _Accuracy extends State<Accuracy>{
               );
             }).toList(),
             onChanged: taskAction),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         if(selectedaction == 'Correct location')
-          Column(
+          const Column(
             children: [
               Icon(Icons.camera_alt_rounded),
               Icon(Icons.location_on),
@@ -1389,13 +1386,13 @@ class _Accuracy extends State<Accuracy>{
         if(selectedaction == 'Wrong location' )
           Column(
             children: [
-              Icon(Icons.camera_alt_rounded),
-              Icon(Icons.location_on),
+              const Icon(Icons.camera_alt_rounded),
+              const Icon(Icons.location_on),
               DropdownButtonFormField(
                   decoration: InputDecoration(
                     filled: true,
                     labelText: "Does it relate with froud?",
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     hintStyle: TextStyle(color: Colors.grey[800]),
                     hintText: "Does it relate with froud?",
                   ),
@@ -1409,7 +1406,7 @@ class _Accuracy extends State<Accuracy>{
               if(selectedfroud == 'No')
                 TextFormField(
                     maxLines: 5,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
                         borderSide:
                         BorderSide(color: AppColor.mycolor, width: 1.0),
@@ -1422,7 +1419,7 @@ class _Accuracy extends State<Accuracy>{
                     )),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50)
+                    minimumSize: const Size(double.infinity, 50)
                 ),
                 onPressed:(){
                   //_getDocuments();
@@ -1433,15 +1430,15 @@ class _Accuracy extends State<Accuracy>{
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                }, child: Text("No"), ),
-              SizedBox(height: 10,),
+                }, child: const Text("No"), ),
+              const SizedBox(height: 10,),
               if(selectedfroud == 'Yes')
                 Column(
                   children: [
-                    Text("Please record the case to the froud app"),
+                    const Text("Please record the case to the froud app"),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 50)
+                          minimumSize: const Size(double.infinity, 50)
                       ),
                       onPressed:(){
                         //_getDocuments();
@@ -1452,15 +1449,15 @@ class _Accuracy extends State<Accuracy>{
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                      }, child: Text("No"), )
+                      }, child: const Text("No"), )
                   ],
                 )
 
             ],
           ),
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
         if(selectedaction == 'Not found' )
-          Column(
+          const Column(
             children: [
               Text("Please rise a froud case")
             ],
@@ -1484,7 +1481,7 @@ class Repo extends StatefulWidget {
   final report_title;
   final report_priority;
   final report_details;
-  Repo({
+  const Repo({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -1576,7 +1573,7 @@ class _Repo extends State<Repo>{
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
 
@@ -1651,7 +1648,7 @@ class _Repo extends State<Repo>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -1659,7 +1656,7 @@ class _Repo extends State<Repo>{
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
 
@@ -1689,24 +1686,24 @@ class _Repo extends State<Repo>{
     return Form(
       child: Column(
         children: [
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           AppDropDown(
               disable: false,
               label: "Did you manage to visit customer?",
               hint: "Did you manage to visit customer?",
               items: taskaction,
               onChanged: taskAction),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           if (selectedaction == 'No')
             Column(
               children: [
-                Text("If it related to frud please rise it through fraud App"),
+                const Text("If it related to frud please rise it through fraud App"),
                 TextFormField(
                     controller: feedbackController,
                     maxLines: 5,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
                       ),
@@ -1717,7 +1714,7 @@ class _Repo extends State<Repo>{
                     )),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50)
+                      minimumSize: const Size(double.infinity, 50)
                   ),
                   onPressed:(){
                     //_getDocuments();
@@ -1728,7 +1725,7 @@ class _Repo extends State<Repo>{
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                  }, child: Text("No"), )
+                  }, child: const Text("No"), )
               ],
             ),
           if (selectedaction == 'Yes')
@@ -1742,32 +1739,32 @@ class _Repo extends State<Repo>{
                       onChanged: (value){
 
                       }),
-                  SizedBox(height: 10,),
+                  const SizedBox(height: 10,),
                   TextField(
                     controller: feedbackController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: 'More Feedback',
                     ),
                   ),
 
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Icon(Icons.camera_alt),
-                  SizedBox(
+                  const Icon(Icons.camera_alt),
+                  const SizedBox(
                     height: 10,
                   ),
-                  Icon(Icons.location_on),
-                  SizedBox(
+                  const Icon(Icons.location_on),
+                  const SizedBox(
                     height: 10,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50)
+                        minimumSize: const Size(double.infinity, 50)
                     ),
                     onPressed:(){
                       _YesUpdate(widget.submited_by,widget.report_area);
@@ -1782,7 +1779,7 @@ class _Repo extends State<Repo>{
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                    }, child: Text("Update Yes"), )
+                    }, child: const Text("Update Yes"), )
                 ])
         ],
       ),
@@ -1801,7 +1798,7 @@ class TVcostomers extends StatefulWidget {
   final report_title;
   final report_priority;
   final report_details;
-  TVcostomers({
+  const TVcostomers({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -1917,7 +1914,7 @@ class _TVcostomers extends State<TVcostomers>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -1925,7 +1922,7 @@ class _TVcostomers extends State<TVcostomers>{
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
     print(response.body);
@@ -2003,7 +2000,7 @@ class _TVcostomers extends State<TVcostomers>{
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -2011,7 +2008,7 @@ class _TVcostomers extends State<TVcostomers>{
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
 
@@ -2030,7 +2027,7 @@ class _TVcostomers extends State<TVcostomers>{
             decoration: InputDecoration(
               filled: true,
               labelText: "Did you get the customers, Yes?",
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               hintStyle: TextStyle(color: Colors.grey[800]),
               hintText: "Did you get the customers, Yes?",
             ),
@@ -2041,15 +2038,15 @@ class _TVcostomers extends State<TVcostomers>{
               );
             }).toList(),
             onChanged: taskAction),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         if(selectedaction == 'Yes')
           Column(
             children: [
-              Icon(Icons.camera_alt_rounded),
-              Icon(Icons.location_on),
+              const Icon(Icons.camera_alt_rounded),
+              const Icon(Icons.location_on),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50)
+                    minimumSize: const Size(double.infinity, 50)
                 ),
                 onPressed:(){
                   //_getDocuments();
@@ -2060,17 +2057,17 @@ class _TVcostomers extends State<TVcostomers>{
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                }, child: Text("No"), )
+                }, child: const Text("No"), )
             ],
           ),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         if(selectedaction == 'No' )
           Column(
             children: [
-              Text("Please rise a froud case"),
+              const Text("Please rise a froud case"),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50)
+                    minimumSize: const Size(double.infinity, 50)
                 ),
                 onPressed:(){
                   //_getDocuments();
@@ -2081,7 +2078,7 @@ class _TVcostomers extends State<TVcostomers>{
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                }, child: Text("No"), )
+                }, child: const Text("No"), )
             ],
           ),
 
@@ -2093,8 +2090,8 @@ class _TVcostomers extends State<TVcostomers>{
 }
 
 class Campaign extends StatefulWidget {
-  Campaign(
-      {
+  const Campaign(
+      {super.key, 
         required this.sub,
         required this.id,
         required this.report_area,
@@ -2137,7 +2134,7 @@ class _Campaign extends State<Campaign>{
             decoration: InputDecoration(
               filled: true,
               labelText: "Did you get the customers?",
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               hintStyle: TextStyle(color: Colors.grey[800]),
               hintText: "Did you get the customers, Yes?",
             ),
@@ -2148,17 +2145,17 @@ class _Campaign extends State<Campaign>{
               );
             }).toList(),
             onChanged: taskAction),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         if(selectedaction == 'I Will do by myself')
-          Column(
+          const Column(
             children: [
               Icon(Icons.camera_alt_rounded),
               Icon(Icons.location_on),
             ],
           ),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         if(selectedaction == 'I will assign someone' )
-          Column(
+          const Column(
             children: [
               Text("Please rise a froud case")
             ],
@@ -2172,8 +2169,8 @@ class _Campaign extends State<Campaign>{
 }
 
 class TableMeeting extends StatefulWidget {
-  TableMeeting(
-      {
+  const TableMeeting(
+      {super.key, 
         required this.sub,
         required this.id,
         required this.report_area,
@@ -2217,7 +2214,7 @@ class _TableMeeting extends State<TableMeeting>{
             decoration: InputDecoration(
               filled: true,
               labelText: "Did you get the customers?",
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               hintStyle: TextStyle(color: Colors.grey[800]),
               hintText: "Did you get the customers, Yes?",
             ),
@@ -2228,17 +2225,17 @@ class _TableMeeting extends State<TableMeeting>{
               );
             }).toList(),
             onChanged: taskAction),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         if(selectedaction == 'I Will do by myself')
-          Column(
+          const Column(
             children: [
               Icon(Icons.camera_alt_rounded),
               Icon(Icons.location_on),
             ],
           ),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         if(selectedaction == 'I will assign someone' )
-          Column(
+          const Column(
             children: [
               Text("Please rise a froud case")
             ],
@@ -2262,7 +2259,7 @@ class WorkUpdate extends StatefulWidget {
   final report_title;
   final report_priority;
   final report_details;
-  WorkUpdate({
+  const WorkUpdate({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -2350,7 +2347,7 @@ class _WorkUpdate extends State<WorkUpdate> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -2358,7 +2355,7 @@ class _WorkUpdate extends State<WorkUpdate> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
 
@@ -2434,7 +2431,7 @@ class _WorkUpdate extends State<WorkUpdate> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -2442,7 +2439,7 @@ class _WorkUpdate extends State<WorkUpdate> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
 
@@ -2473,24 +2470,24 @@ class _WorkUpdate extends State<WorkUpdate> {
     return Form(
       child: Column(
         children: [
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           AppDropDown(
               disable: false,
               label: "Did you manage to work with the Agent?",
               hint: "Did you manage to work with the Agent?",
               items: taskaction,
               onChanged: taskAction),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           if (selectedaction == 'No')
             Column(
               children: [
-                Text("If it related to frud please rise it through fraud App"),
+                const Text("If it related to frud please rise it through fraud App"),
                 TextFormField(
                     controller: feedbackController,
                     maxLines: 5,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
                       ),
@@ -2501,7 +2498,7 @@ class _WorkUpdate extends State<WorkUpdate> {
                     )),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50)
+                      minimumSize: const Size(double.infinity, 50)
                   ),
                   onPressed:(){
                     //_getDocuments();
@@ -2512,7 +2509,7 @@ class _WorkUpdate extends State<WorkUpdate> {
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                  }, child: Text("No"), )
+                  }, child: const Text("No"), )
               ],
             ),
           if (selectedaction == 'Yes')
@@ -2523,36 +2520,36 @@ class _WorkUpdate extends State<WorkUpdate> {
                       disable: false,
                       label: 'Select user',
                       hint: 'Select a user',
-                      items: ["_data"],
+                      items: const ["_data"],
                       onChanged: (value){
 
                       }),
-                  SizedBox(height: 10,),
+                  const SizedBox(height: 10,),
                   TextField(
                     controller: feedbackController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: 'More Feedback',
                     ),
                   ),
 
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Icon(Icons.camera_alt),
-                  SizedBox(
+                  const Icon(Icons.camera_alt),
+                  const SizedBox(
                     height: 10,
                   ),
-                  Icon(Icons.location_on),
-                  SizedBox(
+                  const Icon(Icons.location_on),
+                  const SizedBox(
                     height: 10,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50)
+                        minimumSize: const Size(double.infinity, 50)
                     ),
                     onPressed:(){
                       //_getDocuments();
@@ -2562,7 +2559,7 @@ class _WorkUpdate extends State<WorkUpdate> {
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                    }, child: Text("Update Yes"), )
+                    }, child: const Text("Update Yes"), )
                 ])
         ],
       ),
@@ -2582,7 +2579,7 @@ class Agent extends StatefulWidget {
   final report_title;
   final report_priority;
   final report_details;
-  Agent({
+  const Agent({super.key, 
     required this.sub,
     required this.id,
     required this.report_area,
@@ -2600,9 +2597,9 @@ class Agent extends StatefulWidget {
 }
 class _Agent extends State<Agent> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  String _data = '';
+  final String _data = '';
   File? imageFile;
-  List<DocumentSnapshot> _result = [];
+  final List<DocumentSnapshot> _result = [];
   void getImage() async{
     final file  = await ImagePicker().pickImage(source: ImageSource.camera);
     if(file?.path != null){
@@ -2708,7 +2705,7 @@ class _Agent extends State<Agent> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -2716,7 +2713,7 @@ class _Agent extends State<Agent> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
 
@@ -2793,7 +2790,7 @@ class _Agent extends State<Agent> {
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    final snackBar = SnackBar(
+    const snackBar = SnackBar(
       content: Text('Report Created Successful'),
       duration: Duration(seconds: 3),
     );
@@ -2801,7 +2798,7 @@ class _Agent extends State<Agent> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) => NavPage(),
+        builder: (BuildContext context) => const NavPage(),
       ),
     );
   }
@@ -2831,24 +2828,24 @@ class _Agent extends State<Agent> {
     return Form(
       child: Column(
         children: [
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           AppDropDown(
               disable: false,
               label: "Did you manage to work with the Agent?",
               hint: "Did you manage to work with the Agent?",
               items: taskaction,
               onChanged: taskAction),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           if (selectedaction == 'No')
             Column(
               children: [
-                Text("If it related to frud please rise it through fraud App"),
+                const Text("If it related to frud please rise it through fraud App"),
                 TextFormField(
                     controller: feedbackController,
                     maxLines: 5,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
                       ),
@@ -2859,7 +2856,7 @@ class _Agent extends State<Agent> {
                     )),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50)
+                      minimumSize: const Size(double.infinity, 50)
                   ),
                   onPressed:(){
                     //_getDocuments();
@@ -2870,7 +2867,7 @@ class _Agent extends State<Agent> {
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                  }, child: Text("No"), )
+                  }, child: const Text("No"), )
               ],
             ),
           if (selectedaction == 'Yes')
@@ -2885,19 +2882,19 @@ class _Agent extends State<Agent> {
                       onChanged: (value){
 
                       }),
-                  SizedBox(height: 10,),
+                  const SizedBox(height: 10,),
                   TextField(
                     controller: feedbackController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: 'More Feedback',
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
 
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   SizedBox(
@@ -2917,19 +2914,19 @@ class _Agent extends State<Agent> {
                     Image.file(File(imageFile!.path), height: 300,),
                     //display captured image
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Icon(Icons.location_on),
-                  SizedBox(
+                  const Icon(Icons.location_on),
+                  const SizedBox(
                     height: 10,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50)
+                        minimumSize: const Size(double.infinity, 50)
                     ),
                     onPressed:(){
                       //_getDocuments();
@@ -2940,7 +2937,7 @@ class _Agent extends State<Agent> {
                                     MaterialPageRoute(
                                     builder: (context) =>
                                     FormScreenUpdate()));*/
-                    }, child: Text("Update Yes"), )
+                    }, child: const Text("Update Yes"), )
                 ])
         ],
       ),

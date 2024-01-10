@@ -11,7 +11,7 @@ class CustomerUpdate extends StatefulWidget {
   final id;
   final subtask;
   final taskGoalId;
-  CustomerUpdate(
+  const CustomerUpdate(
       {Key? key,
         required this.subtask,
 
@@ -54,7 +54,7 @@ class _CustomerUpdateState extends State<CustomerUpdate> {
 
   @override
   Widget build(BuildContext context) {
-    String? _selectedValue;
+    String? selectedValue;
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
@@ -62,14 +62,14 @@ class _CustomerUpdateState extends State<CustomerUpdate> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
             AppDropDown(
                 disable: true,
                 label: widget.title,
                 hint: "hint",
                 items: [widget.title],
                 onChanged: (value) {}),
-            SizedBox(height: 10,),
+            const SizedBox(height: 10,),
             AppDropDown(
                 disable: true,
                 label: widget.subtask,

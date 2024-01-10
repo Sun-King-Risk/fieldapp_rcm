@@ -10,13 +10,14 @@ class AppDropDown extends StatefulWidget{
   final String? Function(String?)? validator;
   final bool disable;
 
-  AppDropDown({ Key? key,this.validator,required this.disable,required this.label,required this.hint, this.items =const [],required this.onChanged,this.onSave}): super(key: key);
+  const AppDropDown({ Key? key,this.validator,required this.disable,required this.label,required this.hint, this.items =const [],required this.onChanged,this.onSave}): super(key: key);
   @override
   _AppDropDownState createState()=> _AppDropDownState();
 }
 class _AppDropDownState extends State<AppDropDown>{
   String? selectedValue;
 
+  @override
   Widget build(BuildContext context) {
     return  DropdownButtonFormField<String>(
       value: selectedValue,
@@ -26,8 +27,8 @@ class _AppDropDownState extends State<AppDropDown>{
         filled: true,
         fillColor: Colors.white,
         labelText:widget.label,
-        labelStyle: TextStyle(color: Colors.black),
-        border: OutlineInputBorder(),
+        labelStyle: const TextStyle(color: Colors.black),
+        border: const OutlineInputBorder(),
         hintStyle: TextStyle(color: Colors.grey[800]),
         hintText: widget.hint,
       ),
@@ -55,7 +56,7 @@ class MultiSelectField extends StatefulWidget {
   final List<String?> options;
   void Function(dynamic)? onSave;
 
-  MultiSelectField({
+  MultiSelectField({super.key, 
     required this.label,
     required this.options,
     this.onSave,
@@ -66,7 +67,7 @@ class MultiSelectField extends StatefulWidget {
 }
 
 class _MultiSelectFieldState extends State<MultiSelectField> {
-  List<String> _selectedValues = [];
+  final List<String> _selectedValues = [];
 
   @override
   void initState() {
@@ -83,7 +84,7 @@ class _MultiSelectFieldState extends State<MultiSelectField> {
           children: <Widget>[
             Text(widget.label),
             InputDecorator(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Select options',
                 border: OutlineInputBorder(),
               ),
@@ -112,7 +113,7 @@ class _MultiSelectFieldState extends State<MultiSelectField> {
                 ),
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Wrap(
               children: _selectedValues
                   .map<Widget>((String value) => Chip(
@@ -130,7 +131,7 @@ class _MultiSelectFieldState extends State<MultiSelectField> {
                 ? Text(
               state.errorText!,
               style: TextStyle(
-                color: Theme.of(context).errorColor,
+                color: Theme.of(context).colorScheme.error,
                 fontSize: 12,
               ),
             )
@@ -157,24 +158,26 @@ class AppMultselect extends StatefulWidget{
 
   AppMultselect({Key? key, this.items = const[],required this.title,required this.onSave, this.onChange}): super(key: key);
 
+  @override
   _AppMultselectState createState()=> _AppMultselectState();
 }
 class _AppMultselectState extends State<AppMultselect>{
   String? selectedValue;
   late String _selectedResult;
+  @override
   Widget build(BuildContext context) {
     return MultiSelectFormField(
         autovalidate: AutovalidateMode.onUserInteraction,
         chipBackGroundColor: Colors.blue,
-        chipLabelStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        dialogTextStyle: TextStyle(fontWeight: FontWeight.bold),
+        chipLabelStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        dialogTextStyle: const TextStyle(fontWeight: FontWeight.bold),
         checkBoxActiveColor: Colors.blue,
         checkBoxCheckColor: Colors.white,
-        dialogShapeBorder: RoundedRectangleBorder(
+        dialogShapeBorder: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(12.0))),
         title: Text(
          widget.title,
-          style: TextStyle(fontSize: 16),
+          style: const TextStyle(fontSize: 16),
         ),
         validator: (value) {
           if (value == null || value.length == 0) {
@@ -188,7 +191,7 @@ class _AppMultselectState extends State<AppMultselect>{
         okButtonLabel: 'OK',
         cancelButtonLabel: 'CANCEL',
         change:widget.onSave,
-        hintWidget: Text('Please choose one or more'),
+        hintWidget: const Text('Please choose one or more'),
         onSaved:widget.onSave,
     );
   }
