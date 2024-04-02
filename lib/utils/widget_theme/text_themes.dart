@@ -3,10 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class TTextTheme {
   static TextTheme lightTextTheme = TextTheme(
-    headline2:GoogleFonts.robotoSerif(
+    displayMedium:GoogleFonts.robotoSerif(
       color: Colors.black87,
     ),
-    subtitle2: GoogleFonts.robotoSerif(
+    titleSmall: GoogleFonts.robotoSerif(
       color: Colors.black54,
       fontSize: 24,
 
@@ -14,7 +14,7 @@ class TTextTheme {
 
 
   );
-  static TextTheme darkTextTheme = TextTheme(
+  static TextTheme darkTextTheme = const TextTheme(
   );
 
 }

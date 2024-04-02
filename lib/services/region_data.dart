@@ -7,8 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class RegionData{
   var currentUser = FirebaseAuth.instance.currentUser!.uid;
-  var _region = FirebaseFirestore.instance.collection('TZ_region');
-  var _area = FirebaseFirestore.instance.collection('TZ_area');
+  final _region = FirebaseFirestore.instance.collection('TZ_region');
+  final _area = FirebaseFirestore.instance.collection('TZ_area');
 
   Future<QuerySnapshot> getData() async {
     var region = await UserDetail().getUserRegion();
@@ -21,7 +21,7 @@ class RegionData{
 
 }
 class TaskData{
-  var _taskregion = FirebaseFirestore.instance.collection('task');
+  final _taskregion = FirebaseFirestore.instance.collection('task');
 
   Future<int> CountTask(String value) async {
     var region = await UserDetail().getUserRegion();

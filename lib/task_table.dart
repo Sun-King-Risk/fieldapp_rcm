@@ -1,27 +1,32 @@
+
 import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fieldapp_rcm/update/collection_update.dart';
 import 'package:fieldapp_rcm/update/customer_update.dart';
 import 'package:fieldapp_rcm/update/pilot_update.dart';
 import 'package:fieldapp_rcm/update/portfolio_update.dart';
-import 'package:fieldapp_rcm/services/region_data.dart';
 import 'package:fieldapp_rcm/update/team_update.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:percent_indicator/percent_indicator.dart';
-import 'dart:core';
 import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
+
+import 'models/task_detail.dart';
 
 class MyTaskView extends StatefulWidget {
-  MyTaskView({Key? key, required this.endPoint,required this.title}) : super(key: key);
+  const MyTaskView({Key? key, required this.endPoint,required this.title,required this.name}) : super(key: key);
   final title;
   final endPoint;
+  final name;
   @override
   MyTaskViewState createState() => MyTaskViewState();
 }
 class MyTaskViewState extends State<MyTaskView> {
   List<DocumentSnapshot> _data = [];
-  List<DocumentSnapshot> _action = [];
+  final List<DocumentSnapshot> _action = [];
   bool decoration = false;
+  var complete = 0;
+  var total = 0;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   List? data = [];
@@ -30,7 +35,9 @@ class MyTaskViewState extends State<MyTaskView> {
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
-        data = jsonDecode(response.body);
+        var jsonData = jsonDecode(response.body);
+        data = jsonData.where((task)=>
+        task['is_approved'] == 'Pending' && task['submited_by'] == widget.name).toList();
       });
     }else{
       print('Request failed with status: ${response.statusCode}');
@@ -76,7 +83,7 @@ class MyTaskViewState extends State<MyTaskView> {
       builder: (BuildContext context) {
         return SingleChildScrollView(
           child: AlertDialog(
-            title: Text('Task Details '),
+            title: const Text('Task Details'),
             content: Column(
               children: [
                 TextField(
@@ -84,7 +91,7 @@ class MyTaskViewState extends State<MyTaskView> {
                   decoration: const InputDecoration(
                       labelText: 'Search', suffixIcon: Icon(Icons.search)),
                 ),
-                Container(
+                SizedBox(
                   height: 400,
                   child: ListView.builder(
                     itemCount: taskgoal!.length,
@@ -94,66 +101,71 @@ class MyTaskViewState extends State<MyTaskView> {
                       double perc = percentvalue/_dataaction["Goal"];*/
                       return  GestureDetector(
                         onTap: () {
-                          if(widget.title == "Portfolio Quality")
+                          if(widget.title == "Portfolio Quality") {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => PortfolioUpdate(
-                                    task: id,
-                                    id: taskdetail["id"],
+                                    taskGoalId: taskdetail["id"],
+                                    id: id,
                                     title: widget.title,
                                     subtask: subtask,
 
                                   ),
                                 ));
-                          if(widget.title == "Collection Drive")
+                          }
+                          if(widget.title == "Collection Drive") {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => CollectionUpdate(
-                                    task: id,
+                                    taskGoalId: taskdetail["id"],
                                     id: id,
                                     title: widget.title,
                                     subtask: subtask,
 
                                   ),
                                 ));
-                          if(widget.title == "Pilot/Process Management")
+                          }
+                          if(widget.title == "Pilot/Process Management") {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => PilotUpdate(
-                                    task: id,
+                                    taskGoalId: taskdetail["id"],
                                     id: id,
                                     title: widget.title,
                                     subtask: subtask,
 
                                   ),
                                 ));
-                          if(widget.title == "Customer Management")
+                          }
+                          if(widget.title == "Customer Management") {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => CustomerUpdate(
-                                    task: id,
+                                    taskGoalId: taskdetail["id"],
                                     id: id,
                                     title: widget.title,
                                     subtask: subtask,
 
                                   ),
                                 ));
-                          if(widget.title == "Team Management")
+                          }
+                          if(widget.title == "Team Management") {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => TeamUpdate(
-                                    task: id,
+                                    taskGoalId: taskdetail["id"],
                                     id: id,
                                     title: widget.title,
                                     subtask: subtask,
 
                                   ),
                                 ));
+                          }
                         },
                         child: Row(
                           children: [
@@ -170,38 +182,37 @@ class MyTaskViewState extends State<MyTaskView> {
                                     children: [
                                       decoration?
                                       Text(
-                                        "Name: ${taskdetail["account_number"]}",
-                                        style: TextStyle(
+                                        "Dennis: ${taskdetail["account_number"]} ${taskdetail["id"]}  $id",
+                                        style: const TextStyle(
                                           fontSize: 18,
                                           decoration: TextDecoration.lineThrough,
                                         ),
 
                                       ):Text(
-                                        "Name: ${taskdetail["account_number"]}",
-                                        style: TextStyle(
+                                        "Name: ${taskdetail["account_number"]} ${taskdetail["id"]}  $id",
+                                        style: const TextStyle(
                                             fontSize: 18),
 
                                       ),
                                       Text(
                                         "Current: ${taskdetail["previous_goal"]}",
-                                        style: TextStyle(fontSize: 18),
+                                        style: const TextStyle(fontSize: 18),
                                       ),
                                       Text(
                                         "Goal: ${taskdetail["goals"]}",
-                                        style: TextStyle(fontSize: 18),
+                                        style: const TextStyle(fontSize: 18),
                                       ),
-                                      SizedBox(height: 5),
+                                      const SizedBox(height: 5),
 
                                       LinearPercentIndicator(
-
                                         animation: true,
                                         animationDuration: 1000,
                                         lineHeight: 15.0,
-                                        percent:double.parse(taskdetail["previous_goal"]==null?"0":taskdetail["previous_goal"])/
-                                            double.parse(taskdetail["goals"]==null?"0":taskdetail["goals"]),
+                                        percent:double.parse(taskdetail["previous_goal"] ?? "0")/
+                                            double.parse(taskdetail["goals"] ?? "0"),
                                         progressColor: Colors.green,
-                                        center: Text('${((double.parse(taskdetail["previous_goal"]==null?"0":taskdetail["previous_goal"])/
-                                            double.parse(taskdetail["goals"]==null?"0":taskdetail["goals"]))*100).toStringAsFixed(0)}%'),
+                                        center: Text('${((double.parse(taskdetail["previous_goal"] ?? "0")/
+                                            double.parse(taskdetail["goals"] ?? "0"))*100).toStringAsFixed(0)}%'),
                                       )
 
                                     ],
@@ -219,7 +230,7 @@ class MyTaskViewState extends State<MyTaskView> {
             ),
             actions: <Widget>[
               TextButton(
-                child: Text('Close'),
+                child: const Text('Close'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -243,7 +254,7 @@ class MyTaskViewState extends State<MyTaskView> {
       _foundUsers = results;
     });
   }
-  void _statusFilter(String _status) {
+  void _statusFilter(String status) {
     List<Map<String, dynamic>> results = [];
 
 
@@ -253,18 +264,17 @@ class MyTaskViewState extends State<MyTaskView> {
     });
   }
   List data2 =[];
-  var _key=GlobalKey();
+  final _key=GlobalKey();
 
   Future<String> getData(title) async {
     const apiUrl = 'https://sun-kingfieldapp.herokuapp.com/api/tasks';
     final response = await http.get(Uri.parse(apiUrl,),headers:{
       "Content-Type": "application/json",});
     final List<dynamic> jsonData = json.decode(response.body);
-    final List<dynamic> filteredTasks = jsonData
-        .where((task) => task['task_title'] == title)
-        .where((task) => task['is_approved'] == 'Approved')
-        .where((task) => task['task_status'] == 'Pending')
-        .toList();
+    final List<dynamic> filteredTasks = jsonData.where((task)=>
+    task['is_approved'] == 'Approved' &&
+        task['submited_by'] == widget.name &&
+        task['task_title'] == title && task['task_status'] == 'Pending').toList();
 
     setState(() {
       data = filteredTasks;
@@ -275,16 +285,18 @@ class MyTaskViewState extends State<MyTaskView> {
   }
   @override
   void initState(){
+    //complete = TaskData().countByStatus(widget.title, "Complete", widget.name) as int;
+    //total = TaskData().countTask(widget.title, widget.name) as int;
     getData(widget.title);
     _statusFilter("All");
     _searchFilter(widget.title);
   }
 
 
-
+  final TaskData taskData = TaskData();
   @override
   Widget build(BuildContext context) {
-    var _key=GlobalKey();
+    var key=GlobalKey();
     Color taskcolor;
     // TODO: implement build
     return Scaffold(
@@ -296,12 +308,12 @@ class MyTaskViewState extends State<MyTaskView> {
           Container(
             height: 200,
 
-            padding:EdgeInsets.only(left: 10,right: 10,bottom: 5,top: 5),
-            margin: EdgeInsets.only(left: 10,right: 10,bottom: 0,top: 5),
+            padding:const EdgeInsets.only(left: 10,right: 10,bottom: 5,top: 5),
+            margin: const EdgeInsets.only(left: 10,right: 10,bottom: 0,top: 5),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.white,
-                boxShadow: <BoxShadow>[
+                boxShadow: const <BoxShadow>[
                   BoxShadow(
                       color: Color.fromRGBO(0, 0, 0, 0.57), //shadow for button
                       blurRadius: 5) //blur radius of shadow
@@ -310,44 +322,44 @@ class MyTaskViewState extends State<MyTaskView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text("Task Summary",
+                const Text("Task Summary",
                   style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
-                SizedBox(height: 5,),
+                const SizedBox(height: 5,),
                 LinearPercentIndicator(
                   animation: true,
                   animationDuration: 1000,
                   lineHeight: 15.0,
                   percent:2/2,
                   progressColor: Colors.green,
-                  center: Text(((2/2)*100).toString()+"% completed"),
+                  center: const Text("${(2/2)*100}% completed"),
                 ),
 
-                SizedBox(height: 10,),
-                SizedBox(
+                const SizedBox(height: 10,),
+                const SizedBox(
                   height: 5,
                 ),
-                Text("Task Status",
+                const Text("Task Status",
                   style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
-                SizedBox(height:10),
+                const SizedBox(height:10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     StreamBuilder(
-                      stream: TaskData().CountByStatus(widget.title,'Complete').asStream(),
+                      stream: taskData.countByStatus(widget.title,'Complete',widget.name).asStream(),
                       builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Complete",style: TextStyle(color: Colors.orange));
+                        return  Text("${snapshot.data} Complete",style: const TextStyle(color: Colors.orange));
                       },
                     ),
                     StreamBuilder(
-                      stream: TaskData().CountByStatus(widget.title,'Pending').asStream(),
+                      stream: taskData.countByStatus(widget.title,'Pending',widget.name).asStream(),
                       builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Pending",style: TextStyle(color: Colors.red));
+                        return  Text("${snapshot.data} Pending",style: const TextStyle(color: Colors.red));
                       },
                     ),
                     StreamBuilder(
-                      stream: TaskData().CountTask(widget.title).asStream(),
+                      stream: taskData.countTask(widget.title,widget.name).asStream(),
                       builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Total",style: TextStyle(color: Colors.green));
+                        return  Text("${snapshot.data} Total",style: const TextStyle(color: Colors.green));
                       },
                     ),
 
@@ -355,31 +367,31 @@ class MyTaskViewState extends State<MyTaskView> {
 
                   ],
                 ),
-                SizedBox(height: 10,),
-                Text("Priority",
+                const SizedBox(height: 10,),
+                const Text("Priority",
                   style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
 
-                SizedBox(height:10),
+                const SizedBox(height:10),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     FutureBuilder(
-                      future: TaskData().CountPriority(widget.title,'high'),
+                      future: taskData.countByPriority(widget.title,'high',widget.name),
                       builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" High",style: TextStyle(color: Colors.green));
+                        return  Text("${snapshot.data} High",style: const TextStyle(color: Colors.green));
                       },
                     ),
                     FutureBuilder(
-                      future: TaskData().CountPriority(widget.title,'normal'),
+                      future: taskData.countByPriority(widget.title,'normal',widget.name),
                       builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Normal",style: TextStyle(color: Colors.orange));
+                        return  Text("${snapshot.data} Normal",style: const TextStyle(color: Colors.orange));
                       },
                     ),
                     FutureBuilder(
-                      future: TaskData().CountPriority(widget.title,'low'),
+                      future: taskData.countByPriority(widget.title,'low',widget.name),
                       builder: (context, snapshot){
-                        return  Text(snapshot.data.toString()+" Low",style: TextStyle(color: Colors.red));
+                        return  Text("${snapshot.data} Low",style: const TextStyle(color: Colors.orange));
                       },
                     ),
 
@@ -390,10 +402,10 @@ class MyTaskViewState extends State<MyTaskView> {
               ],
             ),
           ),
-          SizedBox(height: 20,),
+          const SizedBox(height: 20,),
           Container(
-              padding:EdgeInsets.only(left: 10,right: 10,bottom: 5,top: 5),
-              margin: EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
+              padding:const EdgeInsets.only(left: 10,right: 10,bottom: 5,top: 5),
+              margin: const EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
               height: 30,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -401,24 +413,24 @@ class MyTaskViewState extends State<MyTaskView> {
                   PopupMenuButton(
                     onSelected:(reslust) =>_statusFilter(reslust),
                     itemBuilder: (context) => [
-                      PopupMenuItem(
-                          child: Text("All"),
-                          value: "All"
+                      const PopupMenuItem(
+                          value: "All",
+                          child: Text("All")
                       ),
-                      PopupMenuItem(
-                          child: Text("High"),
-                          value: "high"
+                      const PopupMenuItem(
+                          value: "high",
+                          child: Text("High")
                       ),
-                      PopupMenuItem(
-                          child: Text("normal"),
-                          value: "normal"
+                      const PopupMenuItem(
+                          value: "normal",
+                          child: Text("normal")
                       ),
-                      PopupMenuItem(
-                          child: Text("Low"),
-                          value: "low"
+                      const PopupMenuItem(
+                          value: "low",
+                          child: Text("Low")
                       ),
                     ],
-                    icon: Icon(
+                    icon: const Icon(
                         Icons.filter_list_alt,color: Colors.yellow
                     ),
 
@@ -446,38 +458,37 @@ class MyTaskViewState extends State<MyTaskView> {
                         onTap: () {
                           _getAction(task["id"],task['sub_task']);
                           //_TaskList(task['id'],task['sub_task']);
-                          print(task["id"]);
 
                         },
                         child: Row(
                           children: [
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Card(
                                 elevation: 5,
                                 child: Padding(
-                                  padding:EdgeInsets.only(left: 5,right: 5,bottom: 5,top: 5),
+                                  padding:const EdgeInsets.only(left: 5,right: 5,bottom: 5,top: 5),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Task: ${task['sub_task']} ${task["id"]}",
-                                        style: TextStyle(fontSize: 18),
+                                        "Task: ${task['sub_task']}",
+                                        style: const TextStyle(fontSize: 18),
                                       ),
-                                      SizedBox(height: 5),
+                                      const SizedBox(height: 5),
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Row(
                                             children: [
-                                              Icon(Icons.location_on),
+                                              const Icon(Icons.location_on),
                                               Text(
                                                 "${task['task_area']}",
-                                                style: TextStyle(fontSize: 14, color: Colors.grey),
+                                                style: const TextStyle(fontSize: 14, color: Colors.grey),
                                               ),
                                             ],
                                           ),
-                                          Row(
+                                          const Row(
                                             children: [
                                               Icon(Icons.task_outlined),
                                               Text(
@@ -488,10 +499,10 @@ class MyTaskViewState extends State<MyTaskView> {
                                           ),
                                           Row(
                                             children: [
-                                              Icon(Icons.access_time),
+                                              const Icon(Icons.access_time),
                                               Text(
                                                 "${task['task_end_date']}",
-                                                style: TextStyle(fontSize: 14, color: Colors.grey),
+                                                style: const TextStyle(fontSize: 14, color: Colors.grey),
                                               ),
                                             ],
                                           )
@@ -507,7 +518,7 @@ class MyTaskViewState extends State<MyTaskView> {
                         ),
                       );
                   },
-                  separatorBuilder: (BuildContext context, int index) { return  Divider();}))
+                  separatorBuilder: (BuildContext context, int index) { return  const Divider();}))
         ],
       ),
     );

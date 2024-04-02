@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class LoginInput extends StatefulWidget {
+  const LoginInput({super.key});
+
   @override
   _LoginState createState() => _LoginState();
 }
@@ -19,7 +21,7 @@ class _LoginState extends State<LoginInput> {
     // You can add your navigation logic here to go to the sign-up page.
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => SignUpPage()),
+      MaterialPageRoute(builder: (context) => const SignUpPage()),
     );
   }
   Future _loginPressed()  async{
@@ -63,29 +65,29 @@ class _LoginState extends State<LoginInput> {
                 children: [
                   TextField(
                     controller: _emailController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Email',
                     ),
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Password',
                     ),
                   ),
-                  SizedBox(height: 32.0),
+                  const SizedBox(height: 32.0),
                   ElevatedButton(
                     onPressed: _loginPressed,
-                    child: Text('Login'),
+                    child: const Text('Login'),
                   ),
                 ],
               )),
-              GoogleSignInButton(),
+              const GoogleSignInButton(),
               TextButton(
                 onPressed: _signupPressed,
-                child: Text('Don\'t have an account? Sign up',style:TextStyle(color:Colors.red),),
+                child: const Text('Don\'t have an account? Sign up',style:TextStyle(color:Colors.red),),
               ),
             ],
           ),
@@ -95,6 +97,8 @@ class _LoginState extends State<LoginInput> {
   }
 }
 class GoogleSignInButton extends StatefulWidget {
+  const GoogleSignInButton({super.key});
+
   @override
   _GoogleSignInButtonState createState() => _GoogleSignInButtonState();
 }
@@ -133,7 +137,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
             Navigator.of(context).pushReplacement(
 
               MaterialPageRoute(
-                builder: (context) => NavPage(
+                builder: (context) => const NavPage(
 
                 ),
               ),
@@ -144,19 +148,19 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
           }else{
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => LoginInput(
+                builder: (context) => const LoginInput(
 
                 ),
               ),
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+        child: const Padding(
+          padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const <Widget>[
+            children: <Widget>[
               Image(
                 image: AssetImage("assets/logo/google.png"),
                 height: 35.0,

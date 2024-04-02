@@ -9,8 +9,8 @@ class Pilot extends StatefulWidget {
   final String? area;
   final List? data;
 
-  Pilot(
-      {required this.data,
+  const Pilot(
+      {super.key, required this.data,
       required this.area,
       required this.subtask,
       required this.onSave});
@@ -105,8 +105,8 @@ class _PilotState extends State<Pilot> {
       for (var item in jsonData!) {
         String agent = item['Agent'];
         Map<String, dynamic> dataItem = {
-          'display': '$agent',
-          'value': '$agent',
+          'display': agent,
+          'value': agent,
         };
         dataTask?.add(dataItem);
         uniqueAgentList.add(dataItem);
@@ -115,8 +115,8 @@ class _PilotState extends State<Pilot> {
       for (var item in jsonData!) {
         String agent = item['Agent'];
         Map<String, dynamic> dataItem = {
-          'display': '$agent',
-          'value': '$agent',
+          'display': agent,
+          'value': agent,
         };
         dataTask?.add(dataItem);
         uniqueAgentList.add(dataItem);

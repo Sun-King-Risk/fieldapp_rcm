@@ -2,12 +2,11 @@
 import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:fieldapp_rcm/services/region_data.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PendingTask extends StatefulWidget {
   const PendingTask({Key? key}) : super(key: key);
@@ -16,51 +15,15 @@ class PendingTask extends StatefulWidget {
   PendingTaskState createState() => PendingTaskState();
 }
 class PendingTaskState extends State<PendingTask> {
-  Future<void> sendFCMNotification(String deviceToken, String title, String body) async {
-    final String serverKey = 'AAAAya62xSc:APA91bGUjqUqPuBqFbrUPgknT3BEnYmQs1b2iRuzdJcS5etSbMgDvDjQocvCmMSnlcRwdrKxHTwfsPSlU0tbtTqiH5ZIkAoiZZmkeNIRTkMCvDJRTsEd_-adCFji2utZHAPgGKhO3byd'; // Replace with your server key
-    final String url = 'https://fcm.googleapis.com/fcm/send';
-    final Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'key=$serverKey',
-    };
-    final Map<String, dynamic> data = {
-      'notification': {
-        title: 'Your request has been approved',
-        body: 'You can now proceed with your task',
-      },
-      'priority':'high',
-      'to':deviceToken
-    };
-    final String encodedData = json.encode(data);
-
-    final http.Response response = await http.post(
-      Uri.parse(url),
-      headers: headers,
-      body: encodedData,
-    );
-
-    if (response.statusCode == 200) {
-      print('Notification sent successfully.');
-    } else {
-      print('Error sending notification.');
-      print('HTTP status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    }
-  }
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-
-
-
-  bool isDescending = false;
+   bool isDescending = false;
 _taskStatus(docid)async{
-  bool _approved = false;
+  bool approved = false;
   showDialog(
     context: context,
       builder: (BuildContext context) {
         return SingleChildScrollView(
             child: AlertDialog(
-        content: Text('Do you approve or reject this action?'),
+        content: const Text('Do you approve or reject this action?'),
                 actions: <Widget>[
                   Column(
                     children: [
@@ -71,7 +34,7 @@ _taskStatus(docid)async{
                         children: [
 
                           TextButton(
-                            child: Text('Approve'),
+                            child: const Text('Approve'),
                             onPressed: ()async{
                               Map data = {
                                 'is_approved': 'Approved',
@@ -83,14 +46,14 @@ _taskStatus(docid)async{
                                 "Content-Type": "application/json",
 
                               });
-                              var result_task = jsonDecode(response.body);
+                              var resultTask = jsonDecode(response.body);
 
-                              print(result_task);
+                              print(resultTask);
 
                             },
                           ),
                           TextButton(
-                            child: Text('Reject'),
+                            child: const Text('Reject'),
                             onPressed: () async{
                               Map data = {
                                 'is_approved': 'Rejected'
@@ -100,7 +63,7 @@ _taskStatus(docid)async{
                               http.Response response = await http.put(url, body: body, headers: {
                                 "Content-Type": "application/json",
                               });
-                              var result_task = jsonDecode(response.body);
+                              var resultTask = jsonDecode(response.body);
 
                             },
                           )
@@ -122,35 +85,86 @@ _taskStatus(docid)async{
 
 
   // This list holds the data for the list view
-  List<Map<String, dynamic>> _foundUsers = [];
+  List<Map<String, dynamic>> _filtertask = [];
 List? data = [];
   List? singledata = [];
   @override
   initState() {
     // at the beginning, all users are shown
     super.initState();
-    fetchData();
+    getUserAttributes();
+    print("nee $name");
+
 
   }
 
-  void singleTask(){
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
 
-  }
+  List<String> attributeList = [];
+  String name ="";
+  String region = '';
+   String userRegion = '';
+  String country ='';
+   String zone ='';
+  String role = '';
+   void getUserAttributes() async {
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+       setState(() {
+       });
+       name = prefs.getString("name")!;
+     region =  prefs.getString("region")!;
+       country =  prefs.getString("country")!;
+       role = prefs.getString("role")!;
+       zone =  prefs.getString("zone")!;
+       fetchData();
+       if (kDebugMode) {
+         print("object kd");
+       }
+       // Process the user attributes
 
+
+   }
   void fetchData() async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
     var response = await http.get(url);
+    print("Sdsf $name");
+    print(response.statusCode);
     if (response.statusCode == 200) {
-      setState(() {
-        data = jsonDecode(response.body).where((approval){
-          return approval['is_approved'] == 'Pending';
-        }).toList();
-      });
+
+        var jsonData = jsonDecode(response.body);
+        if(role == 'Regional Collections Manager'){
+            data = jsonData.where((task)=>
+            task['is_approved'] == 'Pending'
+                && task['submited_role'] == 'ACE'
+                && task['country'] == country
+                && task['task_region'] == region
+            ).toList();
+        }else if(role == 'Zonal Credit Manager'){
+          setState(() {
+            data = jsonData.where((task)=>
+            task['is_approved'] == 'Pending'
+                && task['submited_role'] == 'Regional Collections Manager'
+                && task['task_country'] == country
+                && task['task_region'] == region
+            ).toList();
+          });
+
+
+        }else if(role == 'Country Credit Manager'){
+            data = jsonData.where((task)=>
+            task['is_approved'] == 'Pending'
+                && task['submited_role'] == 'ACE'
+                && task['country'] == country
+                && task['task_region'] == region
+            ).toList();
+
+        }
+
     }else{
       print('Request failed with status: ${response.statusCode}');
     }
+
   }
+
 
 
 // Use the function to retrieve filtered data
@@ -158,14 +172,12 @@ List? data = [];
   // This function is called whenever the text field changes
   void _searchFilter(String enteredKeyword) {
     List<Map<String, dynamic>> results = [];
-
-
     // Refresh the UI
     setState(() {
-      _foundUsers = results;
+      _filtertask = results;
     });
   }
-  void _statusFilter(String _status) {
+  void _statusFilter(String status) {
     List<Map<String, dynamic>> results = [];
     /*switch(_status) {
 
@@ -211,24 +223,24 @@ List? data = [];
                 PopupMenuButton(
                 onSelected:(reslust) =>_statusFilter(reslust),
                   itemBuilder: (context) => [
-                    PopupMenuItem(
-                        child: Text("All"),
-                        value: "All"
+                    const PopupMenuItem(
+                        value: "All",
+                        child: Text("All")
                     ),
-                    PopupMenuItem(
-                        child: Text("Complete"),
-                        value: "Complete"
+                    const PopupMenuItem(
+                        value: "Complete",
+                        child: Text("Complete")
                     ),
-                    PopupMenuItem(
-                        child: Text("Pending"),
-                        value: "Pending"
+                    const PopupMenuItem(
+                        value: "Pending",
+                        child: Text("Pending")
                     ),
-                    PopupMenuItem(
-                        child: Text("Over Due"),
-                        value: "Over due"
+                    const PopupMenuItem(
+                        value: "Over due",
+                        child: Text("Over Due")
                     ),
                   ],
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.filter_list_alt,color: Colors.yellow
                   ),
 
@@ -245,17 +257,19 @@ List? data = [];
             const SizedBox(
               height: 20,
             ),
+    //Text(data.toString()),
     Expanded(
-      child: ListView.separated(
+      child: data!.isEmpty?Center(child: Text("No new request task $data"),):ListView.separated(
         itemCount: data!.length, // Replace with your actual item count
         separatorBuilder: (BuildContext context, int index) {
-          return Divider(
+          return const Divider(
             color: Colors.grey,
             height: 1,
           );
         },
         itemBuilder: (BuildContext context, int index) {
           var task = data![index];
+          print(data);
           return InkWell(
               onTap: () {
                 Navigator.push(
@@ -274,17 +288,17 @@ List? data = [];
               child: Text(task["id"].toString()),
 
             ),
-                SizedBox(
+                const SizedBox(
                   width: 5,
                 ),
               Flexible(
-                child: Container(
+                child: SizedBox(
                   width: 350,
                   height: 100,
                   child: Card(
                     elevation: 5,
                     child: Padding(
-                      padding:  EdgeInsets.fromLTRB(20.0, 10, 0, 0),
+                      padding:  const EdgeInsets.fromLTRB(20.0, 10, 0, 0),
                       child: Column(
                         crossAxisAlignment:CrossAxisAlignment.start,
                           children: [
@@ -341,8 +355,9 @@ class SinglePendingState extends State<SinglePending> {
   List? taskgoal = [];
   var priority;
   var goal;
+  var task_id;
   var description;
-  List<String> _priorities = ['High', 'Medium', 'Low'];
+  final List<String> _priorities = ['High', 'Medium', 'Low'];
   Future fetchGoal(id) async {
     var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
     http.Response response = await http.get(url, headers: {
@@ -356,6 +371,7 @@ class SinglePendingState extends State<SinglePending> {
           .toList();
       setState(() {
         print(response.body);
+        task_id = filteredTasks[0]['id'];
         taskgoal = filteredTasks;
       });
       safePrint(data);
@@ -363,6 +379,25 @@ class SinglePendingState extends State<SinglePending> {
       print('Request failed with status: ${response.statusCode}');
     }
   }
+  Future<void> TaskUpdate(id)async {
+    var task = Uri.parse('https://www.sun-kingfieldapp.com/api/$id/taskgoals');
+    var goalUrl = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    Map data = {
+      "goals": goal ?? taskgoal![0]['goals'],
+      "account_number":taskgoal![0]['account_number'],
+      "task_description": description ?? taskgoal![0]['task_description'],
+      "priority": priority ?? taskgoal![0]['priority'],
+      "task":taskgoal![0]['task']
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/$task_id/update/');
+    http.Response response = await http.put(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    Navigator.pop(context);
+    var resultTask = jsonDecode(response.body);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -381,8 +416,9 @@ class SinglePendingState extends State<SinglePending> {
             Form(
               child: Column(
                 children: [
+                  Text(taskgoal.toString()),
                   TextField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         hintText: 'Description',
                         labelText: 'Description',
                       ),
@@ -394,8 +430,8 @@ class SinglePendingState extends State<SinglePending> {
                   ),
                   Text("Current: $current"),
                   TextField(
-                    keyboardType: TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(
                       hintText: 'Enter Target',
                       labelText: 'New Target',
                     ),
@@ -405,7 +441,7 @@ class SinglePendingState extends State<SinglePending> {
                       });
                     },
                   ),
-                  SizedBox(height: 8,),
+                  const SizedBox(height: 8,),
                   AppDropDown(
                       disable: true,
                       label: "Priority",
@@ -418,21 +454,12 @@ class SinglePendingState extends State<SinglePending> {
 
                         print(value);
                       }),
-                  Center(child: ElevatedButton(onPressed: () async {
-          Map data = {
-            "goals": goal,
-            "task_description": description,
-            "priority": priority,
-          };
-          var body = json.encode(data);
-          var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/$id/update/');
-          http.Response response = await http.post(url, body: body, headers: {
-            "Content-Type": "application/json",
-          });
-          var result_task = jsonDecode(response.body);
+                  Center(child: ElevatedButton(onPressed: () {
+                    TaskUpdate(widget.id);
 
 
-                  }, child: Text('Update')))
+
+                  }, child: const Text('Update')))
                 ],
               ),
             )
@@ -442,13 +469,13 @@ class SinglePendingState extends State<SinglePending> {
         });
   }
   _taskStatus(docid)async{
-    bool _approved = false;
+    bool approved = false;
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return SingleChildScrollView(
               child: AlertDialog(
-                  content: Text('Do you approve or reject this task?'),
+                  content: const Text('Do you approve or reject this task?'),
                   actions: <Widget>[
                     Column(
                       children: [
@@ -459,7 +486,7 @@ class SinglePendingState extends State<SinglePending> {
                           children: [
 
                             TextButton(
-                              child: Text('Approve'),
+                              child: const Text('Approve'),
                               onPressed: ()async{
                                 Map data = {
                                   'is_approved': 'Approved',
@@ -471,16 +498,16 @@ class SinglePendingState extends State<SinglePending> {
                                   "Content-Type": "application/json",
 
                                 });
-                                var result_task = jsonDecode(response.body);
+                                var resultTask = jsonDecode(response.body);
 
-                                print(result_task);
+                                print(resultTask);
                                 Navigator.pop(context);
                                 Navigator.of(context).pop();
 
                               },
                             ),
                             TextButton(
-                              child: Text('Reject'),
+                              child: const Text('Reject'),
                               onPressed: () async{
                                 Map data = {
                                   'is_approved': 'Rejected'
@@ -490,7 +517,7 @@ class SinglePendingState extends State<SinglePending> {
                                 http.Response response = await http.put(url, body: body, headers: {
                                   "Content-Type": "application/json",
                                 });
-                                var result_task = jsonDecode(response.body);
+                                var resultTask = jsonDecode(response.body);
                                 Navigator.pop(context);
                                 Navigator.of(context).pop();
 
@@ -517,7 +544,7 @@ class SinglePendingState extends State<SinglePending> {
       appBar: AppBar(),
       body: SingleChildScrollView(
         child: Padding(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child:Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -534,28 +561,28 @@ class SinglePendingState extends State<SinglePending> {
                         children: [
                           Text(
                             "Title: ${data['task_title']}",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 15,
                             ),
 
                           ),
                           Text(
                             "Task: ${data['sub_task']}",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 15,
                             ),
 
                           ),
                           Text(
                             "Region:${data['task_region']} Area: ${data['task_area']}",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 15,
                             ),
 
                           ),
                           Text(
                             "Start:${data['task_start_date']}  End:${data['task_end_date']} ",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 15,
                             ),
 
@@ -570,7 +597,7 @@ class SinglePendingState extends State<SinglePending> {
             ),
             ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: taskgoal!.length,
               itemBuilder: (context, index) {
                 var task = taskgoal![index];
@@ -594,35 +621,35 @@ class SinglePendingState extends State<SinglePending> {
                                 children: [
                                   Text(
                                     "Name: ${task['account_number']}",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 15,
                                     ),
 
                                   ),
                                   Text(
                                     "Description: ${task['task_description']}",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 15,
                                     ),
 
                                   ),
                                   Text(
                                     "Priority: ${task['priority']}",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 15,
                                     ),
 
                                   ),
                                   Text(
                                     "current: ${task['previous_goal']}",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 15,
                                     ),
 
                                   ),
                                   Text(
                                     "Goal: ${task['goals']}",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 15,
                                     ),
 
@@ -642,7 +669,7 @@ class SinglePendingState extends State<SinglePending> {
             ElevatedButton(
                 onPressed: (){
                   _taskStatus(widget.id);
-                }, child: Text("Approve"))
+                }, child: const Text("Approve"))
 
           ],
         ),

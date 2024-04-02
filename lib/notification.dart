@@ -1,12 +1,11 @@
 
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 
 class UserNotification extends StatefulWidget {
+  const UserNotification({super.key});
+
 
 
 
@@ -27,15 +26,15 @@ class _UserNotificationState extends State<UserNotification> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Notification"),
+        title: const Text("Notification"),
 
       ),
       body: ListView.builder(
           itemCount: 3,
           itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-                leading: const Icon(Icons.list),
-                trailing: const Text(
+            return const ListTile(
+                leading: Icon(Icons.list),
+                trailing: Text(
                   "notificationAlert",
                   style: TextStyle(color: Colors.green, fontSize: 15),
                 ),

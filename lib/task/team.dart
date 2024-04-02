@@ -1,15 +1,8 @@
-import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fieldapp_rcm/task_actions.dart';
-import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
-import '../task.dart';
 
 
 class Team extends StatefulWidget {
@@ -17,7 +10,7 @@ class Team extends StatefulWidget {
   final String? subtask;
   final String? area;
   final List? data;
-  Team({required this.data,required this.area,required this.subtask,required this.onSave});
+  const Team({super.key, required this.data,required this.area,required this.subtask,required this.onSave});
   @override
   State<Team> createState() => _TeamState();
 }
@@ -25,6 +18,7 @@ class Team extends StatefulWidget {
 class _TeamState extends State<Team> {
   String? selectedSubTask;
   List<Map<String, dynamic>> agentList = [];
+  @override
   initState() {
     getTaskList();
   }
@@ -107,8 +101,8 @@ class _TeamState extends State<Team> {
         String agent = item['Agent'];
         String unreachabilityRate = item['%Unreachabled rate within SLA'];
         Map<String, dynamic> dataItem = {
-          'display': '$agent',
-          'value': '$agent',
+          'display': agent,
+          'value': agent,
         };
         dataTask?.add(dataItem);
         uniqueAgentList.add(dataItem);
@@ -130,10 +124,10 @@ class _TeamState extends State<Team> {
 
   @override
   Widget build(BuildContext context) {
-    String? _selectedValue;
+    String? selectedValue;
     return Column(
         children: [
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           AppMultselect(
             title: widget.subtask!,
             onSave: (value) {

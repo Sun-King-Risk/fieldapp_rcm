@@ -10,8 +10,8 @@ class CustomerManagement extends StatefulWidget {
   final String? area;
   final List? data;
 
-  CustomerManagement(
-      {required this.data,
+  const CustomerManagement(
+      {super.key, required this.data,
     required this.area,
     required this.subtask,
     required this.onSave});

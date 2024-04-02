@@ -1,572 +1,1071 @@
-import 'dart:ffi';
-
-import 'package:fieldapp_rcm/http_online.dart';
-import 'package:fieldapp_rcm/routing/bottom_nav.dart';
-import 'package:fieldapp_rcm/task/collection.dart';
-import 'package:fieldapp_rcm/task/pilot_process.dart';
-import 'package:fieldapp_rcm/task/portfolio.dart';
-import 'package:fieldapp_rcm/task/team.dart';
-import 'package:fieldapp_rcm/utils/themes/theme.dart';
+import 'dart:convert';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:multiselect_dropdown_flutter/multiselect_dropdown_flutter.dart';
-import 'package:multiselect_formfield/multiselect_formfield.dart';
-import 'task/customer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'models/db.dart';
+import 'multTeam.dart';
+class TaskAddDrop extends StatefulWidget {
+  const TaskAddDrop({super.key});
 
-class StepAddTask extends StatefulWidget {
+
   @override
-  _StepAddTaskState createState() => _StepAddTaskState();
+  _TaskAddState createState() => _TaskAddState();
 }
+enum TaskMode {
+  Task, SubTask, Region, Area, TableTask, ActionPlan, Date, Preview ,TeamCountry,
+  TeamZone,TeamRegion,TeamArea,TeamRole,
 
-class _StepAddTaskState extends State<StepAddTask> {
- late String _region;
-  Future<void> _getRegion() async {
+}
+class _TaskAddState extends State<TaskAddDrop> {
+  TaskMode _taskMode = TaskMode.Task;
+  final Map<String, Map<String, String>> _actions = {};
+  List<String> textFieldValues = [];
+  List<String> dropdownValues = [];
+  bool isLoading = true;
+  bool isLoadingArea = true;
+  List<String> attributeList = [];
+  String name ="";
+  String task_zone ="";
+  String submited_role ="";
+  String singleRegion = '';
+  String country ='';
+  String userRegion = '';
+  List? data = [];
+  String selectedArea = '';
+  String selectedRegion = '';
+  List<String> areadata = [];
+  String zone ='';
+  String role = '';
+  String email = "";
+  List<String> region= [];
+  List<String> taskTitle =[];
+  List<String> SubTaskTitle =[];
+  String selectedOption = '';
+  String SelectedSubtask = '';
+  bool istaskLoding = true;
+  bool subvisibility = false;
+  bool areaVisibility = false;
+  bool regionVisibility = false;
+  bool isSubLoading = true;
+  bool isRegionLoad = true;
+  var taskResult= [];
+  var regionResult = [];
+  bool isLoadingTable = true;
+  List? taskData = [];
+  List<Map<String, dynamic>> taskDataList = [];
+  List<Map<String, dynamic>> selectedItems = [];
+  String key= 'Agent';
+  List<String> keys = [];
+  String rate = '';
+  String searchQuery = '';
+  int _sortColumnIndex = 2;
+  bool _sortAscending = true;
+  int _currentPage = 0;
+  final int _pageSize = 10;
+  bool target =true;
+  bool loadVisibility = false;
+  String filetext = '';
+  bool buttonVisibility= false;
+  final List<String> _priorities = ['High', 'Medium', 'Low'];
+  DateTime selectedDate = DateTime.now();
+  int currentYear = DateTime.now().year;
+  String endDate =  "";
+  String startDate = "";
+  void _saveNo() async{
+    Map data = {
+      'task_title': selectedOption,
+      'sub_task': SelectedSubtask,
+      'task_region': selectedRegion,
+      'task_area':selectedArea,
+      "task_start_date": startDate,
+      "timestamp": 1683282979,
+      "task_end_date": endDate,
+      "submited_by":name,
+      'is_approved': 'Pending',
+      'task_status':'Pending',
+      "task_zone": task_zone,
+      "submited_role": submited_role,
+      "task_country": country,
+    };
 
-    var  query = await firestore.collection('Users').where("UID", isEqualTo: currentUser).get();
-    var snapshot = query.docs[0];
-    var data = snapshot.data();
-    setState(() {
-      _region = data['Region'];
+    var body = json.encode(data);
+    var url = Uri.parse('https:/sun-kingfieldapp.herokuapp.com/api/create');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
     });
-    return ;
+    var resultTask = jsonDecode(response.body);
+    taskActionNo(resultTask["id"]);
+
   }
-  var caseselected;
-  var customerselected;
-  List<TextEditingController> _controllers = [];
-  formPost() async {
-    CollectionReference task = firestore.collection("task");
-    var currentUser = FirebaseAuth.instance.currentUser;
-    await task.add({
-      "task_title": selectedTask,
-      "User UID": currentUser?.uid,
-      "sub_task": selectedSubTask,
-      "task_description": _text.text.toString(),
-      "process_audit":"",
-      "task_start_date":  DateTime.now(),
-      "task_end_date": DateTime.now(),
-      "task_status": "Pending",
-      "task_with": agentselected,
-      "task_area": areaselected.toString(),
-      "task_region": regionselected,
-      "submited_by":currentUser?.displayName ,
-      "case_name":caseselected,
-      "Customer": customerselected,
-      "submited_role": null,
-      "task_country": "Tanzania",
-      "priority": priority,
-      "timestamp": DateTime.now(),
-      "is_approved": "pending"
+  void _save() async{
+    Map data = {
+      'task_title': selectedOption,
+      'sub_task': SelectedSubtask,
+      'task_region': selectedRegion,
+      'task_area':selectedArea,
+      "task_start_date": startDate,
+      "timestamp": 1683282979,
+      "task_end_date": endDate,
+      "submited_by":name,
+      'is_approved': 'Pending',
+      'task_status':'Pending',
+      "task_zone": task_zone,
+      "submited_role": submited_role,
+      "task_country": country,
+    };
+    var body = json.encode(data);
+    var url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/create');
+    http.Response response = await http.post(url, body: body, headers: {
+      "Content-Type": "application/json",
+    });
+    var resultTask = jsonDecode(response.body);
+    print(resultTask);
+    print(resultTask["id"]);
+    taskAction(resultTask["id"]);
+
+  }
+  void taskAction(id) async {
+    for (final entry in _actions.entries) {
+      String agentName = entry.key;
+      Map<String, dynamic>? agentDetails = taskData!.firstWhere(
+              (agent) => agent['Agent'] == agentName
+      );
+
+      if (agentDetails != null) {
+        String current = agentDetails[rate];
+        String? percvalue = current.substring(0,current.length - 1);
+        double total = double.parse(entry.value['target']!)+double.parse(percvalue);
+        Map data =   {
+          "task": id,
+          "account_number":entry.key,
+          "goals": total,
+          "task_description": entry.value['action'],
+          "priority": entry.value['priority'],
+          "task_status": "pending",
+          "previous_goal":double.parse(percvalue)
+        };
+        var body = json.encode(data);
+        var url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/taskgoal/create/');
+        http.Response response = await http.post(url, body: body, headers: {
+          "Content-Type": "application/json",
+        });
+        print(response.body);
+
+
+      }
     }
+    const snackBar = SnackBar(
+      content: Text('Task Created Successful'),
+      duration: Duration(seconds: 3),
     );
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => NavPage()),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pop(context);
 
-    /* Map data = {
-        'task_title': _myActivitiesResult.toString().replaceAll("(^\\[|\\]", ""),
-        'sub_task': _subtaskResult,
-        'task_region': _regionResult,
-        'task_area': _areaResult,
-        'priority': priority.toString(),
-        'task_with': _userRoleResult,
-        'task_description': 'Testing',
-        'task_start_date': '2022-11-04',
-        'task_end_date': '2022-11-09',
-        'task_status': 'Pending',
-        'submited_by': 'Dennis',
-        'timestamp': '23454',
-        'is_approved': 'No'
-      };
-      var body = json.encode(data);
-      var url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/create');
-      http.Response response = await http.post(url, body: body, headers: {
-        "Content-Type": "application/json",
+
+
+
+
+
+  }
+  void taskActionNo(id) async {
+    for (final entry in _actions.entries) {
+      String taskName = entry.key;
+      Map<String, dynamic>? taskDetails =taskData!.firstWhere(
+              (task) => task[key] == taskName
+      );
+      if (taskDetails != null) {
+        Map data =   {
+          "task": id,
+          "account_number":entry.key,
+          "goals": 0,
+          "task_description": entry.value['action'],
+          "priority": entry.value['priority'],
+          "task_status": "pending",
+          "previous_goal":0
+        };
+        var body = json.encode(data);
+        var url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/taskgoal/create/');
+        http.Response response = await http.post(url, body: body, headers: {
+          "Content-Type": "application/json",
+        });
+        print(response.body);
+
+
+      }
+    }
+    const snackBar = SnackBar(
+      content: Text('Task Created Successful'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    Navigator.pop(context);
+  }
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(currentYear),
+      lastDate: DateTime(currentYear+1),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        List<String> parts = picked.toString().split(" ");
+        startDate = parts[0];
       });
-      print(response.body);*/
+    }
+  }
+  Future<void> _endDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(currentYear),
+      lastDate: DateTime(currentYear+1),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        List<String> parts = picked.toString().split(" ");
+        endDate = parts[0];
+      });
+    }
+  }
+  List getPageData() {
+    final startIndex = _currentPage * _pageSize;
+    final endIndex = startIndex + _pageSize;
+
+    return taskData!.sublist(startIndex, endIndex < taskData!.length ? endIndex : taskData!.length);
+  }
+  TaskData()async{
+    var connection = await Database.connect();
+    var results = await connection.query( "SELECT * FROM myfieldapp_title");
+    for (var title in results) {
+      taskTitle.add(title[1]);
+    }
+    setState(() {
+      istaskLoding = false;
+      taskResult =results;
+    });
+  }
+  SubTaskData(id)async{
+    var connection = await Database.connect();
+    var results = await connection.query( "SELECT * FROM myfieldapp_sub_title WHERE kpititleid_id = @kpititleid_id",
+        substitutionValues: {"kpititleid_id":id});
+    for (var title in results) {
+      SubTaskTitle.add(title[1]);
+      print(SubTaskTitle);
+    }
+    setState(() {
+      isSubLoading = false;
+    });
+    print(results);
+  }
+  regionData()async{
+    var connection = await Database.connect();
+    var results = await connection.query("SELECT * FROM myfieldapp_region WHERE country = @country",
+        substitutionValues: {"country":country});
+    for (var title in results) {
+      region.add(title[1]);
+      print(region);
+    }
+    setState(() {
+      isRegionLoad = false;
+      regionResult = results;
+    });
+    print(results);
+  }
+  AreaData(id)async{
+    var connection = await Database.connect();
+    var results = await connection.query( "SELECT * FROM myfieldapp_area WHERE regionameid_id = @regionameid_id",
+        substitutionValues: {"regionameid_id":id});
+    for (var area in results) {
+      areadata.add(area[1]);
+      print(areadata);
+    }
+    setState(() {
+      isLoadingArea = false;
+    });
+    print(results);
+  }
+  Future<StorageItem?> listItems(key) async {
+    print("dennis $key");
+    try {
+      StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
+      operation = Amplify.Storage.list(
+        options: const StorageListOptions(
+          accessLevel: StorageAccessLevel.guest,
+          pluginOptions: S3ListPluginOptions.listAll(),
+        ),
+      );
+
+      Future<StorageListResult<StorageItem>> result = operation.result;
+      List<StorageItem> resultList = (await operation.result).items;
+      resultList = resultList.where((file) => file.key.contains(key)).toList();
+      if (resultList.isNotEmpty) {
+        // Sort the files by the last modified timestamp in descending order
+        resultList.sort((a, b) => b.lastModified!.compareTo(a.lastModified!));
+        StorageItem latestFile = resultList.first;
+
+        RegionTask(latestFile.key);
+        print(latestFile.key);
+        if(
+        SelectedSubtask== 'Work with the Agents with low welcome calls to improve'||
+            SelectedSubtask=='Increase the Kazi Visit Percentage' ||
+            SelectedSubtask == 'Field Visits with low-performing Agents in Collection Score'
+        ){
+          target = true;
+        }else{
+          target = false;
+        }
+        return resultList.first;
+      } else {
+       setState(() {
+          loadVisibility = true;
+          isLoading = false;
+       });
+        return null;
+      }
+      safePrint('Got items: ${resultList.length}');
+    } on StorageException catch (e) {
+      safePrint('Error listing items: $e');
+    }
+    return null;
+  }
+  Future<void> RegionTask(key) async {
+    List<String> uniqueRegion = [];
+    print("object: $key");
+
+
+    try {
+
+      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
+          key: key)
+          .result;
+
+      final response = await http.get(urlResult.url);
+      final jsonData = jsonDecode(response.body);
+      print('File Data: $jsonData');
+      final List<dynamic> filteredTasks = jsonData
+          .where((task) =>
+          task['Country'] == country
+      ).toList();
+      print("county: $country $filteredTasks");
+      print(filteredTasks.length);
+      if(filteredTasks.isEmpty){
+        setState(() {
+          isLoading = false;
+        });
+
+
+
+      }else{
+        setState(() {
+          data = filteredTasks;
+          isLoading = false;
+          TableData();
+          _taskMode = TaskMode.TableTask;
+        });
+      }
+
+    } on StorageException catch (e) {
+      safePrint('Could not retrieve properties: ${e.message}');
+      rethrow;
+    }
+  }
+  Future<void> TableData() async{
+    setState(() {
+      taskData =  data?.where((item) => item['Region'] == selectedRegion && item['Area']== selectedArea).toList();
+      keys = taskData!.isNotEmpty ?taskData![0].keys.toList() : [];
+      //key
+      if(keys.contains('Agent')){
+        key = 'Agent';
+      }else if(keys.contains('Angaza ID')){
+        key = 'Angaza ID';
+      }else if(keys.contains('Account Number')){
+        key = 'Account Number';
+      }else if(keys.contains('Customer')){
+        key = 'Customer';
+      }else if(keys.contains('Customer Name')){
+        key = 'Customer Name';
+      }
+      //rate
+      if(keys.contains('Success Rate')){
+        rate = 'Success Rate';
+      }
+      else if(keys.contains('%Unreachabled rate within SLA')){
+        rate = '%Unreachabled rate within SLA';
+      }else if(keys.contains('Collection Score')){
+        rate = 'Collection Score';
+      }
+      isLoadingTable = false;
+
+    });
+
   }
 
 
-  late String _myActivitiesResult;
-  bool _validate = false;
-  List? _myActivities;
-  late bool laststep;
-  final _text = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
-    _getRegion();
-    _myActivities = [];
-    _myActivitiesResult = '';
-    laststep = false;
+    getUserAttributes();
+    TaskData();
   }
+  void getUserAttributes() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
 
-  _saveForm() {
-    var form = _formKey.currentState!;
-    if (form.validate()) {
-      print(_myActivities);
-      form.save();
-      setState(() {
-        _myActivitiesResult = _myActivities.toString();
-        items1 = _myActivities!.toList();
-        int? num = _myActivities?.toList().length;
-        print(items1?.length);
-        for (int i = 0; i < items1!.toString().length; i++) {
-          print(items1?[i]);
-        }
-      });
+      singleRegion = prefs.getString("region")!;
+      name = prefs.getString("name")!;
+      userRegion = prefs.getString("region")!;
+      country = prefs.getString("country")!;
+      submited_role = prefs.getString("role")!;
+      task_zone = prefs.getString("zone")!;
+    });
+    if (kDebugMode) {
+      print(submited_role);
+      print(name);
+      print( task_zone);
     }
+    // Process the user attributes
+
+
   }
-
-  int _currentStep = 0;
-  late String selectedTask='';
-  late String selectedSubTask='';
-  late String regionselected ='';
-  late String areaselected ='';
-  late String agentselected= '';
-  late String priority = '';
-  late String target;
-  List? items1;
-  List<String> priortySelected = [];
-  StepperType stepperType = StepperType.vertical;
-  bool _isSelected = false;
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  var currentUser = FirebaseAuth.instance.currentUser;
-
+  @override
   Widget build(BuildContext context) {
-    List<Step> stepList() => [
-      /*Step(title: Text('Location'), content: TaskForm(
-        onregionselected: (value) {
-          regionselected = value;
-        },
-        onareaselected: (value) {
-          areaselected = value;
-        },) ),*/
-      Step(title: Text('Task'),content: TaskForm(
-    onregionselected: (value) {
-    regionselected = value;
-    },
-    onareaselected: (value) {
-    areaselected = value!;
-    },
-        onTask: (value) {
-          selectedTask = value;
-        },
-        taskResult: (value){
-          _myActivities = value;
-        },
-        onSubTask: (value) {
-          selectedSubTask = value;
-        },
-      ),),
-
-      Step(title: Text('Confirm details'),content: Column(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add Task'),
+      ),
+    body: Container(
+      padding: const EdgeInsets.all(10),
+      child: Column(
         children: [
-          Text(regionselected??""),
-          Text(areaselected??''),
-          Text(selectedTask??''),
-          Text(selectedSubTask??''),
-          Text(_myActivities.toString()),
-          Text(target??'')
+          if(_taskMode == TaskMode.Task)
+            Expanded(
+              child: Column(
+                children: [
+                  istaskLoding?const Center(
+                    child: CircularProgressIndicator(),
+                  ):
+                  AppDropDown(
+                      disable: true,
+                      label: "Task Title",
+                      hint: "hint",
+                      items: taskTitle,
+                      onChanged: (value){
 
-        ],
-      ))
-    ];
-    return Column(
-      children: [
-        SizedBox(
-          height: 10,
-        ),
-        TaskForm(
-          onregionselected: (value) {
-            regionselected = value;
-          },
-          onareaselected: (value) {
-            areaselected = value!;
-          },
-          onTask: (value) {
-            selectedTask = value;
-          },
-          taskResult: (value){
-            _myActivities = value;
-          },
-          onSubTask: (value) {
-            selectedSubTask = value;
-          },
-        ),
-        ElevatedButton(
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ActionScreen(
-                        customers: _myActivities, onChange:
-                          (value) {
-                      }, Area: areaselected,
-                        region: regionselected,
-                        task: selectedTask,
-                        subtask: selectedSubTask,)));
-            }, child: Text('Next'))
-      ],
-    );
-  }
+                        setState(() {
+                          isSubLoading =true;
+                          SubTaskTitle =[];
+                          selectedOption =value;
+                          subvisibility = true;
+                          loadVisibility =  false;
+                          buttonVisibility= false;
+                        });
+                          var id = taskResult.firstWhere((taskid) => taskid[1]==selectedOption)[0];
+                        SubTaskData(id);
+                        print(isSubLoading);
+                      }),
+                  const SizedBox(height: 10,),
+                  Visibility(
+                    visible: subvisibility,
+                    child: isSubLoading?const Center(
+                      child: CircularProgressIndicator(),
+                    ):AppDropDown(
+                        disable: true,
+                        label: "Sub Task",
+                        hint: "Select option",
+                        items: SubTaskTitle,
+                        onChanged: (value){
+                          setState(() {
+                            isRegionLoad =true;
+                            region = [];
 
-
-}
-/*
-class LocationForm extends StatefulWidget {
-  final Function(String) onregionselected;
-  final Function(String) onareaselected;
-  const LocationForm({super.key, required this.onregionselected,required this.onareaselected});
-
-  @override
-  _LocationFormState createState() => _LocationFormState();
-}
-
-class _LocationFormState extends State<LocationForm> {
+                            SelectedSubtask =value;
+                            regionVisibility= true;
+                            areaVisibility = false;
+                            areadata = [];
+                            loadVisibility =  false;
+                            buttonVisibility= false;
+                          });
+                            regionData();
 
 
-  String? regionselected;
-  String? areaselected;
-  Widget build(BuildContext context) {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    var currentUser = FirebaseAuth.instance.currentUser;
-    return Column(children: <Widget>[
-      SizedBox(
-        height: 10,
-      ),
-      StreamBuilder(
-          stream: firestore
-              .collection("Users")
-              .where('UID', isEqualTo: currentUser!.uid)
-              .get()
-              .asStream(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            List<String> region = List.generate(snapshot.data!.size, (index) {
-              DocumentSnapshot data = snapshot.data!.docs[index];
-              return data['Region'].toString();
-            }).toSet().toList();
-            if (snapshot.hasData) {
-              return AppDropDown(
-                label: 'Region',
-                hint: 'Select Region',
-                items: region ?? [],
-                onChanged: (String value) {
-                  widget.onregionselected(value!);
-                },
-                onSave: (value) {
-                  widget.onregionselected(value!);
-                },
-              );
-            } else {
-              return CircularProgressIndicator();
-            }
-          }),
-      SizedBox(
-        height: 10,
-      ),
-      StreamBuilder(
-          stream: firestore
-              .collection("TZ_agent_welcome_call")
-              .where('Region', isEqualTo: "Lake Zone")
-              .get()
-              .asStream(),
-          builder: (BuildContext context, snapshot) {
-            if (snapshot.hasData) {
-              List<String> area = List.generate(snapshot.data!.size, (index) {
-                DocumentSnapshot data = snapshot.data!.docs[index];
-                return data['Area'].toString();
-              }).toSet().toList();
-              return AppDropDown(
-                label: 'Area',
-                hint: 'Select Area',
-                items: area ?? [],
-                onChanged: (String value) {
-                  widget.onareaselected(value!);
-                },
-                onSave: (value) {
-                  widget.onareaselected(value!);
-                },
-              );
-            }
-            return CircularProgressIndicator();
-          }),
-    ]);
-  }
-}
-*/
-class TaskForm extends StatefulWidget {
-  final Function(String) onTask;
-  final Function(String) onSubTask;
-  final Function(List?) taskResult;
-  final Function(String) onregionselected;
-  final Function(String?) onareaselected;
+                        }),
+                  ),
+                  const SizedBox(height: 10,),
+                  Visibility(
+                    visible: regionVisibility,
+                    child:  isRegionLoad?const Center(
+                      child: CircularProgressIndicator(),
+                    ):AppDropDown(
+                        disable: true,
+                        label: "Region",
+                        hint: "Select Region",
+                        items: region,
+                        onChanged: (value){
+                          setState(() {
+                            areadata = [];
+                            isLoadingArea = true;
+                            selectedRegion =value;
+                            areaVisibility =true;
+                            buttonVisibility= false;
+                            loadVisibility =  false;
 
-  TaskForm({required this.onregionselected, required this.onareaselected,required this.onTask,required this.onSubTask, required this.taskResult});
+                          });
+                          var id = regionResult.firstWhere((regionname) => regionname[1]==selectedRegion)[0];
+                          print("region selected $selectedRegion");
+                          AreaData(id);
 
-  @override
-  State<TaskForm> createState() => _TaskFormState();
-}
+                        }),
+                  ),
+                  const SizedBox(height: 10,),
+                  Visibility(
+                    visible: areaVisibility,
+                    child:  isLoadingArea?const Center(
+                      child: CircularProgressIndicator(),
+                    ):AppDropDown(
+                        disable: true,
+                        label: "Area",
+                        hint: "Select Area",
+                        items: areadata,
+                        onChanged: (value){
+                          setState(() {
+                            selectedArea =value;
+                            loadVisibility =  false;
+                            buttonVisibility= true;
+                          });
 
-class _TaskFormState extends State<TaskForm> {
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  var currentUser = FirebaseAuth.instance.currentUser!.uid;
-  String _region ="";
-  initState() {
-    // at the beginning, all users are shown
+                        }),
+                  ),
+                  Visibility(
+                    visible: buttonVisibility,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
 
-  // _getRegion();
-   //_getArea();
-    super.initState();
-  }
-  void _getRegion() async {
+                            onPressed: () {
+                              if(selectedOption=='Team Management'){
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (context) => TeamTaskCreate(
+                                    title: selectedOption,
+                                    sub: SelectedSubtask,
+                                  )),
+                                );
+                              }else{
+                                if(country == "Kenya"){
+                                  print("Kenya");
+                                  listItems("KE/${SelectedSubtask.replaceAll(' ', '_')}");
+                                }else if(country == "Nigeria"){
+                                  print("Nigeria");
+                                  listItems("NG/${SelectedSubtask.replaceAll(' ', '_')}");
+                                }else if(country == "Tanzania"){
+                                  print("Tanzania");
+                                  listItems("TZ/${SelectedSubtask.replaceAll(' ', '_')}");
+                                }else{
+                                  print("other");
+                                  listItems("other/${SelectedSubtask.replaceAll(' ', '_')}");
+                                }
+                                setState(() {
+                                  loadVisibility =  true;
+                                  isLoading = true;
+                                });
+                              }
 
-    var  query = await firestore.collection('Users').where("UID", isEqualTo: currentUser).get();
-    var snapshot = query.docs[0];
-    var data = snapshot.data();
-    setState(() {
-      _region = data['Region'];
+                            },
+                            child: const Text("Next"),
 
-    });
-    return ;
-  }
-  List<String> _area = [];
-  Future<void> _getArea() async {
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Visibility(
+                    visible: loadVisibility,
+                    child: Center(
+                      child: isLoading?const Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text("Please wait data is loding.."),
+                        ],
+                      ):Column(children: [
+                        Text("No task: $SelectedSubtask for the selected Area: $selectedArea")
+                      ],),
+                    ),
+                  )
+                ],
+              ),),
+          if(_taskMode == TaskMode.TableTask)
+            Expanded(
+              child: isLoadingTable?const Center(
+                child: CircularProgressIndicator(),
+              ):
+              SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          searchQuery = value;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Search',
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
 
-    QuerySnapshot querySnapshot =
-    await firestore.collection("TZ_agent_welcome_call")
-        .where("Region", isEqualTo:await _region)
-        .get();
-    setState(() {
-      _area =querySnapshot.docs.map((doc) => doc["Area"].toString()).toSet().toList();
-      print(_area);
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columns: [
+                          for (int index = 0; index < keys.length; index++)
+                            if (keys[index] != 'Country' && keys[index] != 'Region' && keys[index] != 'Area')
+                              DataColumn(
+                                label: Row(
+                                  children: [
+                                    Text(keys[index]),
+                                    if (_sortColumnIndex == index)
+                                      _sortAscending
+                                          ? const Icon(Icons.arrow_upward)
+                                          : const Icon(Icons.arrow_downward),
+                                  ],
+                                ),
+                                onSort: (columnIndex, ascending) {
+                                  setState(() {
+                                    if (_sortColumnIndex == columnIndex) {
+                                      // Toggle the sorting direction if the same column is selected
+                                      _sortAscending = !_sortAscending;
+                                    } else {
+                                      _sortAscending = true;
+                                      _sortColumnIndex = columnIndex;
+                                    }
+                                    taskData!.sort((a, b) {
+                                      var aValue = a[keys[columnIndex]].toString();
+                                      var bValue = b[keys[columnIndex]].toString();
+                                      return _sortAscending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
+                                    });
+                                  });
+                                },
+                              ),
+                          const DataColumn(label: Text('Select')),
+                        ],
+                        rows: [
+                          for (final item in getPageData())
+                            DataRow(
+                              cells: [
+                                for (int cellIndex = 0; cellIndex < keys.length; cellIndex++)
+                                  if (keys[cellIndex] != 'Country' && keys[cellIndex] != 'Region' && keys[cellIndex] != 'Area')
 
-    });
-  }
-  String? selectedTask;
+                                    DataCell(
+                                      Text(item[keys[cellIndex]].toString()),
+                                    ),
+                                DataCell(
+                                  Checkbox(
+                                    value: taskDataList.contains(item),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        if (taskDataList.contains(item)) {
+                                          taskDataList.remove(item);
+                                        } else {
+                                          taskDataList.add(item);
+                                        }
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
+                              selected: taskDataList.contains(item),
+                              onSelectChanged: (value) {
+                                setState(() {
+                                  if (taskDataList.contains(item)) {
+                                    taskDataList.remove(item);
+                                  } else {
+                                    taskDataList.add(item);
+                                    if (taskDataList.length <= 5) {
+                                      if (kDebugMode) {
+                                        print(taskDataList);
+                                      }
+                                    } else {
+                                      safePrint('Only 5 tasks allowed');
+                                    }
+                                  }
+                                });
+                              },
+                            ),
+                        ],
+                      )
 
-  String? selectedSubTask;
-
-  bool _isSelected = false;
-  onTaskChanged(value) {
-    setState(() {
-      print(value);
-      selectedTask= value;
-      _isSelected = true;
-    });
-  }
-
-  late Map<String, List<String>> dataTask = {
-    'Portfolio Quality': portfolio,
-    'Team Management': team,
-    'Collection Drive': collection,
-    'Pilot/Process Management': pilot,
-    'Customer Management': customer,
-  };
+                      ,
+                    ),
 
 
-  final List<String> Task = [
-    'Portfolio Quality',
-    'Team Management',
-    'Collection Drive',
-    'Pilot/Process Management',
-    'Customer Management',
-  ];
+                    // Pagination buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                            onPressed: (){
+                              setState(() {
+                                _currentPage = _currentPage > 0 ? _currentPage - 1 : 0;
+                              });
+                            },
+                            child: const Text("Previous Table"
+                              ,style: TextStyle(color: Colors.black),)),
+                        TextButton(
+                            onPressed: (){
+                              setState(() {
+                                final nextPageStartIndex = (_currentPage + 1) * _pageSize;
+                                if (nextPageStartIndex < taskData!.length) {
+                                  _currentPage++;
+                                }
+                              });
+                            },
+                            child: const Text("Next Table"
+                              ,style: TextStyle(color: Colors.black),)),
 
-  final List<String> portfolio = [
-    'Visiting unreachable welcome call clients',
-    'Work with the Agents with low welcome calls to improve',
-    'Change a red zone CSAT area to orange',
-    'Attend to Fraud Cases',
-    'Visit at-risk accounts',
-    'Visits FPD/SPDs',
-    'Other'
-  ];
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(onPressed: (){
+                          setState(() {
+                            _taskMode = TaskMode.Task;
+                            taskDataList = [];
+                          });
+                        }, child: const Text("Back")),
+                        ElevatedButton(onPressed: (){
+                          if(taskDataList.length<=5&&taskDataList.isNotEmpty){
+                            setState(() {
+                              _taskMode = TaskMode.ActionPlan;
 
-  final List<String> customer = [
-    'Visiting of issues raised',
-    'Repossession of customers needing repossession',
-    'Look at the number of replacements pending at the shops',
-    'Look at the number of repossession pending at the shops',
-    'Other - Please Expound'
-  ];
+                            });
 
-  final List<String> pilot = [
-    'Conduct the process audit',
-    'Conduct a pilot audit',
-    'Testing the GPS accuracy of units submitted',
-    'Reselling of repossessed units',
-    'Repossessing qualified units for Repo and Resale',
-    'Increase the Kazi Visit Percentage',
-    'Other'
-  ];
+                          }else if(taskDataList.length>5){
+                            const snackBar = SnackBar(
+                              content: Text('Exceeded task selection limit!'),
+                              duration: Duration(seconds: 2),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          }
+                          else{
+                            print("No task selected");
+                            const snackBar = SnackBar(
+                              content: Text('No task selected!'),
+                              duration: Duration(seconds: 2),
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-  final List<String> collection = [
-    'Field Visits with low-performing Agents in Collection Score',
-    'Repossession of accounts above 180',
-    'Visits Tampering Home 400',
-    'Work with restricted Agents',
-    'Calling of special book',
-    'Sending SMS to clients',
-    'Table Meeting/ Collection Sensitization Training',
-    'Others'
-  ];
-
-  final List<String> team = [
-    'Assist a team member to improve the completion rate',
-    'Raise a reminder to a team member',
-    'Raise a warning to a team member',
-    'Raise a new task to a team member',
-    'Inform the team member of your next visit to his area, and planning needed',
-    'Other'
-  ];
-  List _myActivities = [];
-  String? selectedarea;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child:
-      Column(
-        children: <Widget>[
-          AppDropDown(
-            disable: true,
-              label: "Region",
-              hint: "Region",
-              items: ["Region 1", "Region 2"],
-              onChanged: (value){
-                widget.onregionselected(value!);
-                _getArea();
-              }),
-          SizedBox(
-            height: 8,
-          ),
-          AppDropDown(
-            disable: true,
-              label: "Area",
-              hint: "Area",
-              items: ["Area 1"],
-              onChanged: (value){
-              setState(() {
-                selectedarea = value;
-              });
-                widget.onareaselected(value!);
-              }),
-          SizedBox(
-            height: 8,
-          ),
-
-          DropdownButtonFormField<String?>(
-            value: selectedTask,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white,
-              labelText: "Task Title",
-              border: OutlineInputBorder(),
-              hintStyle: TextStyle(color: Colors.white),
-              hintText: "Task Title",
-            ),
-            items: dataTask.keys.map((e) {
-              return DropdownMenuItem<String?>(
-                value: e,
-                child: Text(
-                  '$e',
-                  overflow: TextOverflow.ellipsis,
+                          }
+                        }, child: const Text("Next"))
+                      ],
+                    )
+                  ],
                 ),
-              );
-            }).toList(),
-            onChanged: (value){
-              widget.onTask(value!);
-              setState(() {
-                selectedTask = value;
-
-              });
-              widget.onTask(value!);},
-            onSaved:(value) {
-              widget.onTask(value!);
-
-            } ,
-          ),
-          SizedBox(
-            height: 8,
-          ),
-          DropdownButtonFormField<String?>(
-            value: selectedSubTask,
-            isExpanded: true,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white,
-              labelText: "Sub Task",
-              border: OutlineInputBorder(),
-              hintStyle: TextStyle(color: Colors.grey[800]),
-              hintText: "Name",
+              ),
             ),
-            items: (dataTask[selectedTask] ?? []).map((e) {
-              return DropdownMenuItem<String?>(
-                value: e,
-                child: Text(
-                  '$e',
-                  overflow: TextOverflow.ellipsis,
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedSubTask = value;
-              });
-              widget.onSubTask!(value!);},
-            onSaved: (value) {widget.onSubTask!(value!);},
-          ),
-          if (selectedTask ==  'Portfolio Quality' && selectedSubTask != null)
-            Portfolio(
-              data: [],
-              area: selectedarea,
-                subtask: selectedSubTask,
-                onSave: (value) {
-                  widget.taskResult(value);
-                })
-          else if (
-          selectedTask == 'Team Management')
-            Team(
-              data: [],
-              area: selectedarea,
-              subtask: selectedSubTask,
-              onSave: (value) {
-                widget.taskResult(value);
-              },)
-          else if (selectedTask == 'Collection Drive')
-              Collection(
-                data: [],
-                onSave: (value) {
-                  widget.taskResult(value);
-                },
-                subtask: selectedSubTask??'',
-                area: selectedarea,
-              )
-            else if (selectedTask == 'Pilot/Process Management')
-                Pilot(
-                  data: [],
-                  onSave: (value) {
-                    widget.taskResult(value);
-                  },
-                  subtask: selectedSubTask??'',
-                  area: selectedarea,
+          if(_taskMode == TaskMode.ActionPlan)
+            Expanded(
+              child: Column(
+                children: [
+                  if (target) Expanded(
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: taskDataList.length,
+                        itemBuilder: (context, index) {
+                          Map<String, dynamic> data = taskDataList[index];
+                          String agent = data[key];
+                          String agentRate = data[rate];
+                          if (!_actions.containsKey(agent)) {
+                            _actions[agent] = {'action': '', 'priority': _priorities[0]};
+                          }
+                          String datanew = taskDataList[index].toString();
+                          return Card(
+                              child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '$key: $agent - $agentRate ',
+                                          style: const TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        TextField(
+                                          decoration: const InputDecoration(
+                                            hintText: 'Enter action plan',
+                                            labelText: 'Action Plan',
+                                          ),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _actions[agent]!['action'] = value;
+                                            });
+                                          },
+                                          maxLines: 3,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        TextField(
+                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                          decoration: const InputDecoration(
+                                            hintText: 'Enter Target',
+                                            labelText: 'Target',
+                                          ),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _actions[agent]!['target'] = value;
+                                            });
+                                          },
+                                        ),
+                                        const SizedBox(height: 8),
+                                        AppDropDown(
+                                            disable: true,
+                                            label: "Priority",
+                                            items: _priorities,
+                                            hint: "Priority",
+                                            onChanged: (value){
+                                              setState(() {
+                                                _actions[agent]!['priority'] = value;
+                                              });
+                                            })
+
+                                      ]
+
+                                  )
+                              )
+                          );
+
+                        }),
+                  ) else
+
+                    Expanded(
+
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: taskDataList.length,
+                          itemBuilder: (context, index) {
+                            Map<String, dynamic> data = taskDataList[index];
+                            String agent = data[key];
+                            if (!_actions.containsKey(agent)) {
+                              _actions[agent] = {'action': '', 'priority': _priorities[0]};
+                            }
+                            String datanew = taskDataList[index].toString();
+                            return Card(
+                                child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '$key: $agent',
+                                            style: const TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          TextField(
+                                            decoration: const InputDecoration(
+                                              hintText: 'Enter action plan',
+                                              labelText: 'Action Plan',
+                                            ),
+                                            onChanged: (value) {
+                                              print(value);
+                                              setState(() {
+                                                _actions[agent]!['action'] = value;
+                                              });
+                                            },
+                                            maxLines: 3,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          AppDropDown(
+                                              disable: true,
+                                              label: "Priority",
+                                              items: _priorities,
+                                              hint: "Priority",
+                                              onChanged: (value){
+                                                setState(() {
+                                                  _actions[agent]!['priority'] = value;
+                                                });
+                                              })
+
+
+                                        ]
+
+                                    )
+                                )
+                            );
+
+                          }),
+                    ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      ElevatedButton(onPressed: (){
+                        setState(() {
+                          _taskMode = TaskMode.TableTask;
+                        });
+                      }, child: const Text("Back")),
+                      ElevatedButton(onPressed: (){
+                        setState(() {
+                          _taskMode = TaskMode.Date;
+                        });
+                      }, child: const Text("Next"))
+                    ],
+                  )
+                ],
+              ),
+            ),
+          if(_taskMode == TaskMode.Date)
+            Expanded(child: Column(
+              children: [
+                ElevatedButton(onPressed: (){
+                  _selectDate(context);
+                }, child: const Text("Date start")),
+                ElevatedButton(onPressed: (){
+                  _endDate(context);
+                }, child: const Text("Date End")),
+
+                Text("Start: $startDate"),
+                Text("End: $endDate"),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+
+                    ElevatedButton(onPressed: (){
+                      setState(() {
+                        _taskMode = TaskMode.ActionPlan;
+                      });
+                    }, child: const Text("Back")),
+                    ElevatedButton(onPressed: (){
+                      setState(() {
+                        _taskMode = TaskMode.Preview;
+                      });
+                    }, child: const Text("Next"))
+                  ],
                 )
-              else if (selectedTask == 'Customer Management')
-                  CustomerManagement(
-                    data: [],
-                    onSave: (value) {
-                      widget.taskResult(value);
-                    },
-                    subtask: selectedSubTask??'',
-                    area: selectedarea,)
+              ],
+            )),
+          if(_taskMode == TaskMode.Preview)
+            Expanded(
+              child: Column(
+                children: [
+                  const Text("Preveiw"),
+                  Text(
+                    'Region: $singleRegion',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Area: $selectedArea',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Task: $selectedOption',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Sub Task: $SelectedSubtask',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Task start date: $startDate',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Task End date: $endDate',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Task Action:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  target?Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: taskDataList.map((task) {
+                          String taskName = task[key];
+                          String current = task[rate];
+                          Map<String, String>? actions = _actions[taskName];
+                          String? percvalue = current.substring(0,current.length - 1);
+                          double total = double.parse(actions!['target']!)+double.parse(percvalue);
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Name: $taskName '),
+                              const SizedBox(height: 8),
+                              Text("Priority: ${actions['priority']}"),
+                              Text("Action Plan: ${actions['action']}"),
+                              Text('Current: $percvalue'),
+                              Text('Target: ${actions['target']}'),
+                              Text('Goal: $total'),
+
+                              const SizedBox(height: 8),
+                            ],
+                          );
+                        }).toList(),)
+                    ],
+                  ):Column(
+
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: taskDataList.map((task) {
+                          String taskName = task[key];
+                          Map<String, String>? actions = _actions[taskName];
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Name: $taskName '),
+                              const SizedBox(height: 8),
+                              Text("Priority: ${actions!['priority']}"),
+                              Text("Action Plan: ${actions['action']}"),
+
+                              const SizedBox(height: 8),
+                            ],
+                          );
+                        }).toList(),)
+
+
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      ElevatedButton(onPressed: (){
+                        setState(() {
+                          _taskMode = TaskMode.Date;
+                        });
+                      }, child: const Text("Back")),
+                      ElevatedButton(onPressed: (){
+                        print(target);
+                        target?_save():_saveNo();
+                      }, child: const Text("Submit"))
+                    ],
+                  )
+                ],
+              ),
+            ),
+
+
+
         ],
       ),
+    )
     );
   }
+
 }
