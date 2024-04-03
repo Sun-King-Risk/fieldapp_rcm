@@ -40,3 +40,6 @@ class Database {
 
   }
 }
+class AppUrl {
+  static const String baseUrl = 'https://sunkingfieldtool.com/api';
+}

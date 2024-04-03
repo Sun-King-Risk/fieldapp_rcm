@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           isLogin = auth;
         });
-
+        print(isLogin);
       }
 
 
@@ -64,7 +64,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     getUserAuth();
-    //print(isLogin);
+    print("init $isLogin");
   }
 
 
@@ -81,7 +81,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
-      home: isLogin?const NavPage():const LoginSignupApp(),
+      home: isLogin?const NavPage():const LoginSignupPage(),
     );
     /*return Authenticator(
         signUpForm: SignUpForm.custom(
@@ -160,204 +160,6 @@ class _MyAppState extends State<MyApp> {
 
 }
 
-
-class LoginSignUp extends StatefulWidget {
-  const LoginSignUp({super.key});
-
-  @override
-  State<LoginSignUp> createState() => _LoginSignUpState();
-}
-
-class _LoginSignUpState extends State<LoginSignUp> {
-  @override
-  void initState() {
-    super.initState();
-    CoutryData("country");
-    _configureAmplify();
-  }
-  Future<void> CoutryData(key) async {
-    List<String> uniqueCountry = [];
-    print("object: $key");
-
-    try {
-
-      StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
-          key: key)
-          .result;
-
-      final response = await http.get(urlResult.url);
-      final jsonData = jsonDecode(response.body);
-      print('File_team: $jsonData');
-
-      print(jsonData.length);
-
-      for (var item in jsonData) {
-        uniqueCountry.add(item['Region']);
-
-      }
-      setState(() {
-        countrydata = uniqueCountry.toSet().toList();
-        data = jsonData;
-        isLoading = false;
-
-      });
-    } on StorageException catch (e) {
-      safePrint('Could not retrieve properties: ${e.message}');
-      rethrow;
-    }
-  }
-  bool isLoading = true;
-  List? data = [];
-  List<String> countrydata = [];
-  List<String> region= [];
-
-  @override
-  Widget build(BuildContext context) {
-    return Authenticator(
-      // `authenticatorBuilder` is used to customize the UI for one or more steps
-      authenticatorBuilder: (BuildContext context, AuthenticatorState state) {
-        switch (state.currentStep) {
-          case AuthenticatorStep.signIn:
-            return CustomScaffold(
-              state: state,
-              // A prebuilt Sign In form from amplify_authenticator
-              body: SignInForm(
-              ),
-              // A custom footer with a button to take the user to sign up
-              footer: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Don\'t have an account?'),
-                  TextButton(
-                    onPressed: () => state.changeStep(
-                      AuthenticatorStep.signUp,
-                    ),
-                    child: const Text('Sign Up'),
-                  ),
-                ],
-              ),
-            );
-          case AuthenticatorStep.signUp:
-            return CustomScaffold(
-              state: state,
-              // A prebuilt Sign Up form from amplify_authenticator
-              body: Container(
-                  child: AppDropDown(
-                    disable: false,
-                    label: 'Country',
-                    hint: 'COuntry',
-                    items: region,
-                    onChanged: (value ) {
-                      setState(() {
-
-                      });
-                    },),
-
-              ),
-              // A custom footer with a button to take the user to sign in
-              footer: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Already have an account?'),
-                  TextButton(
-                    onPressed: () => state.changeStep(
-                      AuthenticatorStep.signIn,
-                    ),
-                    child: const Text('Sign In'),
-                  ),
-                ],
-              ),
-            );
-          case AuthenticatorStep.confirmSignUp:
-            return CustomScaffold(
-              state: state,
-              // A prebuilt Confirm Sign Up form from amplify_authenticator
-              body: ConfirmSignUpForm(),
-            );
-          case AuthenticatorStep.resetPassword:
-            return CustomScaffold(
-              state: state,
-              // A prebuilt Reset Password form from amplify_authenticator
-              body: ResetPasswordForm(),
-            );
-          case AuthenticatorStep.confirmResetPassword:
-            return CustomScaffold(
-              state: state,
-              // A prebuilt Confirm Reset Password form from amplify_authenticator
-              body: const ConfirmResetPasswordForm(),
-            );
-          default:
-          // Returning null defaults to the prebuilt authenticator for all other steps
-            return null;
-        }
-      },
-      child: MaterialApp(
-        theme: AppTheme.lightTheme,
-        debugShowCheckedModeBanner: false,
-        builder: Authenticator.builder(),
-        home: const NavPage(),
-      ),
-    );
-  }
-}
-
-/// A widget that displays a logo, a body, and an optional footer.
-class CustomScaffold extends StatelessWidget {
-  const CustomScaffold({
-    super.key,
-    required this.state,
-    required this.body,
-    this.footer,
-  });
-
-  final AuthenticatorState state;
-  final Widget body;
-  final Widget? footer;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // App logo
-              Padding(
-                padding: const EdgeInsets.only(top: 32),
-                child: Center(child:Image.asset(
-                  'assets/logo/sk.png',
-                )),
-              ),
-              Container(
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: body,
-              ),
-            ],
-          ),
-        ),
-      ),
-      persistentFooterButtons: footer != null ? [footer!] : null,
-    );
-  }
-}
-
-
-class LoginSignupApp extends StatelessWidget {
-  const LoginSignupApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-
-      theme: ThemeData(
-        primarySwatch: Colors.yellow,
-      ),
-      home: const LoginSignupPage(),
-    );
-  }
-}
-
 class LoginSignupPage extends StatefulWidget {
   const LoginSignupPage({super.key});
 
@@ -375,44 +177,45 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
    String role ='';
    String zone ='';
    String region ='';
+
    String area ='';
    String country ='';
    String firstname ='';
    String lastname ='';
+  List<String> _selectedValues = [];
 
   bool isLoading = true;
   List? data = [];
   List<String> zonedata = [];
   List<String> regiondata = [];
+  List<String> regionug = [];
   List<String> countrydata = [];
   List<String> areadata = [];
   AuthMode _authMode = AuthMode.Login;
 
   Future<void> _submitForm() async {
-    print(_authMode);
+
     if (_formKey.currentState!.validate()) {
-      var connection = await Database.connect();
       if(_authMode == AuthMode.Login){
         final response = await http.post(
-          Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/auth/signin'), // Replace with your API endpoint URL.
+          Uri.parse('${AppUrl.baseUrl}/auth/signin'), // Replace with your API endpoint URL.
           body: {
             'email': _email,
             'pass1': _password,
           },
         );
         SharedPreferences prefs = await SharedPreferences.getInstance();
-
         if (response.statusCode== 200) {
-          var results = await connection.query( "SELECT * FROM fieldappusers_feildappuser WHERE email = @email",
+          /*var results = await connection.query( "SELECT * FROM fieldappusers_feildappuser WHERE email = @email",
               substitutionValues: {"email":_email});
-          var Row = results[0];
-          prefs.setString('email', Row[4]);
-          prefs.setString('name', Row[6] + ' ' + Row[7]);
-          prefs.setString('country', Row[8]);
-          prefs.setString('zone', Row[14]);
-          prefs.setString('region', Row[9]);
-          prefs.setString('area', Row[10]);
-          prefs.setString('role', Row[11]);
+          var Row = results[0];*/
+          prefs.setString('email',_email);
+          prefs.setString('name', "Dennis Juma");
+          prefs.setString('country','Tanzania');
+          prefs.setString('zone', "East");
+          prefs.setString('region',"Northern");
+          prefs.setString('area', "Arusha");
+          prefs.setString('role', 'CCM');
           prefs.setString('email', _email);
           prefs.setBool('isLogin',true);
           print(prefs.get('name'));
@@ -428,8 +231,9 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
         }
       }else {
         try{
+
           final response = await http.post(
-            Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/auth/signup'),
+            Uri.parse('${AppUrl.baseUrl}/auth/signup'),
             body: {
               'username' : _email,
               'fname' :firstname ,
@@ -470,13 +274,12 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
           }
         }catch (e) {
           print('Error executing query: $e');
-        } finally {
-          await connection.close();
         }
         }
     }
   }
-  Future<StorageItem?> listItems(key) async {
+  Future<StorageItem?> listCountry(key) async {
+    print("init# $key");
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
       operation = Amplify.Storage.list(
@@ -495,6 +298,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
         StorageItem latestFile = resultList.first;
 
         CoutryData(latestFile.key);
+        print("latest ${latestFile.key}");
         return resultList.first;
       } else {
         print('No files found in the S3 bucket with key containing "$key".');
@@ -518,7 +322,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
 
       final response = await http.get(urlResult.url);
       final jsonData = jsonDecode(response.body);
-      //print('File_team: $jsonData');
+      print('File_country: $jsonData');
 
       //print(jsonData.length);
 
@@ -548,7 +352,6 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
     setState(() {
 
       zonedata = uniqueZone.toSet().toList();
-      safePrint('File_team: $data');
     });
     //safePrint('Area: $area');
   }
@@ -564,6 +367,21 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
 
       regiondata = uniqueRegion.toSet().toList();
       safePrint('File_team: $regiondata');
+    });
+    //safePrint('Area: $area');
+  }
+  Future<void> UGregion() async {
+    List<String> uniqueRegion= [];
+    final jsonArea = data?.where((item) => item['Country']== country).toList();
+    for (var RegionList in jsonArea!) {
+      String region = RegionList['Region'];
+      //region?.add(region);
+      uniqueRegion.add(region);
+    }
+    setState(() {
+
+      regionug = uniqueRegion.toSet().toList();
+
     });
     //safePrint('Area: $area');
   }
@@ -626,7 +444,7 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    //listItems("country");
+    listCountry("country_login");
 
   }
   @override
@@ -714,11 +532,75 @@ class _LoginSignupPageState extends State<LoginSignupPage> {
                             zone = "";
                             zonedata = [];
                           });
-                          Zone();
+                          if(value =='Uganda'){
+                            UGregion();
+                          }else{
+                            Zone();
+                          }
+
                         }),
                     const SizedBox(height: 10,),
                     if(role=='Credit Analyst'|| role=='RCM')
-                      AppDropDown(
+                      if(country== 'Uganda')
+                        FormField(builder: (
+                            FormFieldState<dynamic> field) {
+                          return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+
+                              children: <Widget>[
+                                Text("Region"),
+                                InputDecorator(
+                                  decoration: InputDecoration(
+                                    hintText: 'Select options',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      value: null,
+                                      isDense: true,
+                                      isExpanded: true,
+                                      onChanged: (String? value) {
+                                        setState(() {
+                                          if (_selectedValues.contains(value!)) {
+                                            _selectedValues.remove(value);
+                                          } else {
+                                            _selectedValues.add(value);
+                                            zone = _selectedValues.toString();
+                                            print(zone);
+                                          }
+                                          //state.didChange(_selectedValues);
+                                        });
+                                      },
+
+                                      items:regionug
+                                          .map<DropdownMenuItem<String>>((String? value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(value!),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Wrap(
+                                  children: _selectedValues
+                                      .map<Widget>((String value) => Chip(
+                                    label: Text(value),
+                                    onDeleted: () {
+                                      setState(() {
+                                        _selectedValues.remove(value);
+                                        // state.didChange(_selectedValues);
+                                      });
+                                    },
+                                  ))
+                                      .toList(),
+                                ),
+                              ]
+                          );
+                        },),
+                      if(country!= 'Uganda')
+                        AppDropDown(
                         disable: false,
                         label: "Zone",
                         hint: "Zone",

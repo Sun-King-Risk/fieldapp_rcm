@@ -69,7 +69,7 @@ class NavPagePageState extends State<NavPage> {
  }
   int _selectedIndex = 0;
   final List<Widget> _tabs = <Widget>[
-      const Home(),
+      Home(),
       const Task(),
 
     /*AreaDashboard(),

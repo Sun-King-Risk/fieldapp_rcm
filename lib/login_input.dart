@@ -8,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'models/db.dart';
+
 class LoginInput extends StatefulWidget {
   const LoginInput({super.key});
 
@@ -28,7 +30,7 @@ class _LoginState extends State<LoginInput> {
     // You can add your authentication logic here.
     String email = _emailController.text;
     String password = _passwordController.text;
-    final url =  Uri.parse('https://28ec-102-89-32-124.eu.ngrok.io/api/signin');
+    final url =  Uri.parse('${AppUrl.baseUrl}/signin');
     final response = await http.post(
       url,
       body: {

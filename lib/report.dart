@@ -6,6 +6,8 @@ import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'models/db.dart';
+
 class Report extends StatefulWidget {
   const Report({Key? key}) : super(key: key);
 
@@ -39,7 +41,7 @@ class ReportState extends State<Report> {
                                   'task_status': 'Pending'
                                 };
                                 var body = json.encode(data);
-                                var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                                var url = Uri.parse('${AppUrl.baseUrl}/task/update/$docid/');
                                 http.Response response = await http.put(url, body: body, headers: {
                                   "Content-Type": "application/json",
 
@@ -57,7 +59,7 @@ class ReportState extends State<Report> {
                                   'is_approved': 'Rejected'
                                 };
                                 var body = json.encode(data);
-                                var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                                var url = Uri.parse('${AppUrl.baseUrl}/task/update/$docid/');
                                 http.Response response = await http.put(url, body: body, headers: {
                                   "Content-Type": "application/json",
                                 });
@@ -94,18 +96,18 @@ class ReportState extends State<Report> {
 
   }
   void fetchReport() async{
-    var url =  Uri.parse('https://www.sun-kingfieldapp.com/api/reports/');
+    var url =  Uri.parse('${AppUrl.baseUrl}/reports/');
 
 
   }
 
   void singleTask(){
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    var url = Uri.parse('${AppUrl.baseUrl}/tasks');
 
   }
 
   void fetchData() async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/reports/');
+    var url = Uri.parse('${AppUrl.baseUrl}/reports/');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
@@ -289,7 +291,7 @@ class SingleReportState extends State<SingleReport> {
   Map<String, dynamic>  data = {};
   String code = '';
   Future fetchData() async {
-    var url = Uri.parse('https://9949-102-88-37-146.ngrok-free.app/api/report/${widget.id}');
+    var url = Uri.parse('${AppUrl.baseUrl}/report/${widget.id}');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
@@ -309,7 +311,7 @@ class SingleReportState extends State<SingleReport> {
   var description;
   final List<String> _priorities = ['High', 'Medium', 'Low'];
   Future fetchGoal(id) async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    var url = Uri.parse('${AppUrl.baseUrl}/taskgoals');
     http.Response response = await http.get(url, headers: {
       "Content-Type": "application/json",
 
@@ -390,7 +392,7 @@ class SingleReportState extends State<SingleReport> {
                           "priority": priority,
                         };
                         var body = json.encode(data);
-                        var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/$id/update/');
+                        var url = Uri.parse('${AppUrl.baseUrl}/taskgoals/$id/update/');
                         http.Response response = await http.post(url, body: body, headers: {
                           "Content-Type": "application/json",
                         });
@@ -431,7 +433,7 @@ class SingleReportState extends State<SingleReport> {
                                   'task_status': 'Pending'
                                 };
                                 var body = json.encode(data);
-                                var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                                var url = Uri.parse('${AppUrl.baseUrl}/task/update/$docid/');
                                 http.Response response = await http.put(url, body: body, headers: {
                                   "Content-Type": "application/json",
 
@@ -451,7 +453,7 @@ class SingleReportState extends State<SingleReport> {
                                   'is_approved': 'Rejected'
                                 };
                                 var body = json.encode(data);
-                                var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                                var url = Uri.parse('${AppUrl.baseUrl}/task/update/$docid/');
                                 http.Response response = await http.put(url, body: body, headers: {
                                   "Content-Type": "application/json",
                                 });

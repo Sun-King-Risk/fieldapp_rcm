@@ -10,6 +10,8 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import 'models/db.dart';
+
 class Visiting extends StatefulWidget {
   final sub;
   final id;
@@ -48,7 +50,7 @@ class _Visiting extends State<Visiting> {
   final List<DocumentSnapshot> _result = [];
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    var url = Uri.parse('${AppUrl.baseUrl}/taskgoals');
     http.Response response = await http.get(url, headers: {
       "Content-Type": "application/json",
 
@@ -139,7 +141,7 @@ class _Visiting extends State<Visiting> {
       "headline": null,
       "submited_by": widget.submited_by,};
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -219,7 +221,7 @@ class _Visiting extends State<Visiting> {
       "submited_by": widget.submited_by,};
     print('nne');
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -366,7 +368,7 @@ class _Work extends State<Work> {
   final List<DocumentSnapshot> _result = [];
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    var url = Uri.parse('${AppUrl.baseUrl}/taskgoals');
     http.Response response = await http.get(url, headers: {
       "Content-Type": "application/json",
 
@@ -457,7 +459,7 @@ class _Work extends State<Work> {
       "headline": null,
       "submited_by": widget.submited_by,};
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -542,7 +544,7 @@ class _Work extends State<Work> {
       "headline": null,
       "submited_by": widget.submited_by,};
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -989,7 +991,7 @@ class _FieldVisit extends State<FieldVisit> {
       "headline": null,
       "submited_by": widget.submited_by,};
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -1072,7 +1074,7 @@ class _FieldVisit extends State<FieldVisit> {
       "headline": null,
       "submited_by": widget.submited_by,};
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -1254,7 +1256,7 @@ class _Accuracy extends State<Accuracy>{
     });
   }
   Future<void> _getAction(id,subtask) async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    var url = Uri.parse('${AppUrl.baseUrl}/taskgoals');
     http.Response response = await http.get(url, headers: {
       "Content-Type": "application/json",
 
@@ -1307,7 +1309,7 @@ class _Accuracy extends State<Accuracy>{
       "team_raise_warning": false, "team_raise_new_task": false, "team_inform_next_visit": false, "team_who": null, "team_when": null,
       "headline": null, "submited_by": "('test',)", "timestamp": "2023-06-26T06:04:50.663Z"};
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('h${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -1338,7 +1340,7 @@ class _Accuracy extends State<Accuracy>{
     };
     print('nne');
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -1566,7 +1568,7 @@ class _Repo extends State<Repo>{
       "submited_by": widget.submited_by,};
     print(data);
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -1644,7 +1646,7 @@ class _Repo extends State<Repo>{
       "headline": null,
       "submited_by": widget.submited_by,};
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -1818,7 +1820,7 @@ class _TVcostomers extends State<TVcostomers>{
   String? selectedaction;
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    var url = Uri.parse('${AppUrl.baseUrl}/taskgoals');
     http.Response response = await http.get(url, headers: {
       "Content-Type": "application/json",
 
@@ -1910,7 +1912,7 @@ class _TVcostomers extends State<TVcostomers>{
       "headline": null,
       "submited_by": widget.submited_by,};
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -1996,7 +1998,7 @@ class _TVcostomers extends State<TVcostomers>{
       "submited_by": widget.submited_by,};
     print('nne');
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -2343,7 +2345,7 @@ class _WorkUpdate extends State<WorkUpdate> {
       "headline": null,
       "submited_by": widget.submited_by,};
     var body = json.encode(data);
-    var url = Uri.parse('https://2d1e-41-216-166-170.ngrok-free.app/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -2427,7 +2429,7 @@ class _WorkUpdate extends State<WorkUpdate> {
       "headline": null,
       "submited_by": widget.submited_by,};
     var body = json.encode(data);
-    var url = Uri.parse('https://2d1e-41-216-166-170.ngrok-free.app/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -2610,7 +2612,7 @@ class _Agent extends State<Agent> {
   }
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    var url = Uri.parse('${AppUrl.baseUrl}/taskgoals');
     http.Response response = await http.get(url, headers: {
       "Content-Type": "application/json",
 
@@ -2701,7 +2703,7 @@ class _Agent extends State<Agent> {
       "headline": null,
       "submited_by": widget.submited_by,};
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -2786,7 +2788,7 @@ class _Agent extends State<Agent> {
       "submited_by": widget.submited_by,};
     print('nne');
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/report-create/');
+    var url = Uri.parse('${AppUrl.baseUrl}/report-create/');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });

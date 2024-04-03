@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'location.dart';
+import 'models/db.dart';
 import 'pending_task.dart';
 import 'team_task.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ import 'package:intl/intl.dart';
 
 class TaskData {
   Future<int> countTask(String taskTitle, String name) async {
-    final url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/tasks');
+    final url = Uri.parse('${AppUrl.baseUrl}/tasks');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -31,7 +32,7 @@ class TaskData {
 
   Future<int> countByStatus(
       String taskTitle, String status, String name) async {
-    final url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/tasks');
+    final url = Uri.parse('${AppUrl.baseUrl}/tasks');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -95,7 +96,7 @@ class _TaskState extends State<Task> {
   }
 
   void CompleteRate(String name) async {
-    final url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/tasks');
+    final url = Uri.parse('${AppUrl.baseUrl}/tasks');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -244,7 +245,7 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
   List? data = [];
   void fetchData() async {
-    var url = Uri.parse('https://https://sun-kingfieldapp.herokuapp.com/api/tasks');
+    var url = Uri.parse('${AppUrl.baseUrl}/tasks');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {

@@ -21,6 +21,7 @@ class ProfileState extends State<Profile> {
   String zone ='';
   String role = '';
   String email = "";
+
   void getUserAttributes() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -40,10 +41,13 @@ class ProfileState extends State<Profile> {
   }
   @override
   Widget build(BuildContext context) {
+    String roleName =role == "CCM" ? 'Country' : role == "Credit Analyst"||role == "ZCM" ? 'zone' : 'Region';
+    String roleBase =role == "CCM" ? country : role == "Credit Analyst"||role == "ZCM" ? zone : userRegion;
     return Scaffold(
       appBar: AppBar(),
       body: Column(
         children: [
+
 
           ClipOval(
                       child: Material(
@@ -61,10 +65,11 @@ class ProfileState extends State<Profile> {
                     Text(name),
                     Text(email),
                     Row(
+
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        TextButton(onPressed: (){},child: Text(role,style: const TextStyle(color: Colors.black),)),
-                        TextButton(onPressed: (){},child:Text('Region: $userRegion',style: const TextStyle(color: Colors.black))),
+                        TextButton(onPressed: (){},child: Text("Title: $role",style: const TextStyle(color: Colors.black),)),
+                        TextButton(onPressed: (){},child:Text('$roleName: $roleBase',style: const TextStyle(color: Colors.black))),
 
                       ],
 

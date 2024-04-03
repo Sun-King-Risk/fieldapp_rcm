@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'models/db.dart';
+
 
 class CustomerScreen extends StatefulWidget {
   final String? subTask;
@@ -357,7 +359,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
     'is_approved': 'No'
     };
     var body = json.encode(data);
-    var url = Uri.parse('https://1d39-102-89-46-32.ngrok-free.app/api/create');
+    var url = Uri.parse('${AppUrl.baseUrl}/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -389,7 +391,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
         "task_status": "Pending"
       };
       var body = json.encode(data);
-      var url = Uri.parse('https://f2e3-102-89-32-23.ngrok-free.app/api/taskgoals/create');
+      var url = Uri.parse('${AppUrl.baseUrl}/taskgoals/create');
       http.Response response = await http.post(url, body: body, headers: {
         "Content-Type": "application/json",
       });

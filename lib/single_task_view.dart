@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'models/db.dart';
+
 class SingleTask extends StatefulWidget {
   const SingleTask({Key? key,required this.subtask, required this.task, required this.id, required this.title})
       : super(key: key);
@@ -46,7 +48,7 @@ class SingleTaskState extends State<SingleTask> {
   final _key = GlobalKey();
   List data = [];
   Future<http.Response> fetchData() async {
-    const apiUrl = 'https://sun-kingfieldapp.herokuapp.com/api/task/12/';
+    const apiUrl = '${AppUrl.baseUrl}/task/12/';
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {

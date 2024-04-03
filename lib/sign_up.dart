@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+import 'models/db.dart';
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -28,7 +30,7 @@ class _SignUpPageState extends State<SignUpPage> {
       Map<String, dynamic> data = jsonDecode(jsonData);
       print(data);
 
-    final url = Uri.parse('https://28ec-102-89-32-124.eu.ngrok.io/api/signup');
+    final url = Uri.parse('h${AppUrl.baseUrl}/signup');
     print(_emailController.text);
     print(url);
     if (_formKey.currentState!.validate()) {

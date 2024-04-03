@@ -93,7 +93,7 @@ class _TaskAddState extends State<TaskAddDrop> {
     };
 
     var body = json.encode(data);
-    var url = Uri.parse('https:/sun-kingfieldapp.herokuapp.com/api/create');
+    var url = Uri.parse('${AppUrl.baseUrl}/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -118,7 +118,7 @@ class _TaskAddState extends State<TaskAddDrop> {
       "task_country": country,
     };
     var body = json.encode(data);
-    var url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/create');
+    var url = Uri.parse('${AppUrl.baseUrl}/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -149,7 +149,7 @@ class _TaskAddState extends State<TaskAddDrop> {
           "previous_goal":double.parse(percvalue)
         };
         var body = json.encode(data);
-        var url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/taskgoal/create/');
+        var url = Uri.parse('${AppUrl.baseUrl}/taskgoal/create/');
         http.Response response = await http.post(url, body: body, headers: {
           "Content-Type": "application/json",
         });
@@ -188,7 +188,7 @@ class _TaskAddState extends State<TaskAddDrop> {
           "previous_goal":0
         };
         var body = json.encode(data);
-        var url = Uri.parse('https://sun-kingfieldapp.herokuapp.com/api/taskgoal/create/');
+        var url = Uri.parse('${AppUrl.baseUrl}/taskgoal/create/');
         http.Response response = await http.post(url, body: body, headers: {
           "Content-Type": "application/json",
         });

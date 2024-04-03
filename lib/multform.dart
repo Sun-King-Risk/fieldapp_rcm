@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'models/db.dart';
 import 'multTeam.dart';
 class MyTaskNew extends StatefulWidget {
   const MyTaskNew({super.key});
@@ -129,7 +130,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
     };
 
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/create');
+    var url = Uri.parse('${AppUrl.baseUrl}/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -154,7 +155,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
       "task_country": country,
     };
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/create');
+    var url = Uri.parse('${AppUrl.baseUrl}/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -185,7 +186,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
           "previous_goal":double.parse(percvalue)
         };
         var body = json.encode(data);
-        var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
+        var url = Uri.parse('${AppUrl.baseUrl}/taskgoal/create/');
         http.Response response = await http.post(url, body: body, headers: {
           "Content-Type": "application/json",
         });
@@ -224,7 +225,7 @@ class _MyTaskNewState extends State<MyTaskNew> {
           "previous_goal":0
         };
         var body = json.encode(data);
-        var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
+        var url = Uri.parse('${AppUrl.baseUrl}/taskgoal/create/');
         http.Response response = await http.post(url, body: body, headers: {
           "Content-Type": "application/json",
         });

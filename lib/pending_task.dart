@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'models/db.dart';
+
 class PendingTask extends StatefulWidget {
   const PendingTask({Key? key}) : super(key: key);
 
@@ -41,7 +43,7 @@ _taskStatus(docid)async{
                                 'task_status': 'Pending'
                               };
                               var body = json.encode(data);
-                              var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                              var url = Uri.parse('${AppUrl.baseUrl}/task/update/$docid/');
                               http.Response response = await http.put(url, body: body, headers: {
                                 "Content-Type": "application/json",
 
@@ -59,7 +61,7 @@ _taskStatus(docid)async{
                                 'is_approved': 'Rejected'
                               };
                               var body = json.encode(data);
-                              var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                              var url = Uri.parse('${AppUrl.baseUrl}/task/update/$docid/');
                               http.Response response = await http.put(url, body: body, headers: {
                                 "Content-Type": "application/json",
                               });
@@ -124,7 +126,7 @@ List? data = [];
 
    }
   void fetchData() async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    var url = Uri.parse('${AppUrl.baseUrl}/tasks');
     var response = await http.get(url);
     print("Sdsf $name");
     print(response.statusCode);
@@ -338,7 +340,7 @@ class SinglePendingState extends State<SinglePending> {
   Map<String, dynamic>  data = {};
   String code = '';
   Future fetchData() async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks/${widget.id}');
+    var url = Uri.parse('${AppUrl.baseUrl}/tasks/${widget.id}');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
@@ -359,7 +361,7 @@ class SinglePendingState extends State<SinglePending> {
   var description;
   final List<String> _priorities = ['High', 'Medium', 'Low'];
   Future fetchGoal(id) async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    var url = Uri.parse('${AppUrl.baseUrl}/taskgoals');
     http.Response response = await http.get(url, headers: {
       "Content-Type": "application/json",
 
@@ -380,8 +382,8 @@ class SinglePendingState extends State<SinglePending> {
     }
   }
   Future<void> TaskUpdate(id)async {
-    var task = Uri.parse('https://www.sun-kingfieldapp.com/api/$id/taskgoals');
-    var goalUrl = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    var task = Uri.parse('h${AppUrl.baseUrl}/$id/taskgoals');
+    var goalUrl = Uri.parse('${AppUrl.baseUrl}/taskgoals');
     Map data = {
       "goals": goal ?? taskgoal![0]['goals'],
       "account_number":taskgoal![0]['account_number'],
@@ -390,7 +392,7 @@ class SinglePendingState extends State<SinglePending> {
       "task":taskgoal![0]['task']
     };
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals/$task_id/update/');
+    var url = Uri.parse('${AppUrl.baseUrl}/taskgoals/$task_id/update/');
     http.Response response = await http.put(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -493,7 +495,7 @@ class SinglePendingState extends State<SinglePending> {
                                   'task_status': 'Pending'
                                 };
                                 var body = json.encode(data);
-                                var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                                var url = Uri.parse('${AppUrl.baseUrl}/task/update/$docid/');
                                 http.Response response = await http.put(url, body: body, headers: {
                                   "Content-Type": "application/json",
 
@@ -513,7 +515,7 @@ class SinglePendingState extends State<SinglePending> {
                                   'is_approved': 'Rejected'
                                 };
                                 var body = json.encode(data);
-                                var url = Uri.parse('https://www.sun-kingfieldapp.com/api/task/update/$docid/');
+                                var url = Uri.parse('${AppUrl.baseUrl}/task/update/$docid/');
                                 http.Response response = await http.put(url, body: body, headers: {
                                   "Content-Type": "application/json",
                                 });

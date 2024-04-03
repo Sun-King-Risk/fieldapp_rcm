@@ -29,7 +29,6 @@ class DashViewState extends State<DashView> {
   bool isLoading = true;
   List<String> area_data= [];
   Future<StorageItem?> listItems(key) async {
-    print("dash $key");
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
       operation = await Database.listItems();
@@ -43,8 +42,9 @@ class DashViewState extends State<DashView> {
         StorageItem latestFile = resultList.first;
         if(widget.role == 'CCM'){
           ZoneData(latestFile.key);
-        }else if(widget.role == 'ZCM'|| widget.role == ''){
+        }else if(widget.role == 'ZCM'|| widget.role == 'Credit Analyst'){
           RegionData(latestFile.key);
+
         }else if(widget.role == 'RCM'){
           AreaData(latestFile.key);
         }
@@ -110,10 +110,9 @@ class DashViewState extends State<DashView> {
     }
   }
   Future<void> RegionData(key) async {
+    print(widget.zone);
     List<String> uniqueRegion = [];
-    print("object: $key");
-
-    try {
+       try {
       StorageGetUrlResult urlResult = await Amplify.Storage.getUrl(
           key: key)
           .result;
@@ -197,7 +196,7 @@ class DashViewState extends State<DashView> {
     }else if(widget.item=='country'){
       listItems("dashboard/zone");
     }else if(widget.item=='region'){
-      listItems("dashboard");
+      listItems("dashboard/dashboard");
     }
 
   }
@@ -284,16 +283,41 @@ class DashViewState extends State<DashView> {
               child: ListView.builder(
                   itemCount: data!.length,
                   itemBuilder: (BuildContext context, index) {
-                    return ListTile(
-                        trailing:
+                    if(widget.item=='country'){
+                      return ListTile(
+                          trailing:
 
-                        Text(
+                          Text(
 
-                          data![index][widget.title] ?? "0",
-                          style: const TextStyle(
-                              color: Colors.green, fontSize: 15),
-                        ),
-                        title: Text( data![index]['Region'],));
+                            data![index][widget.title] ?? "0",
+                            style: const TextStyle(
+                                color: Colors.green, fontSize: 15),
+                          ),
+                          title: Text( data![index]['Zone'],));
+                    }else if(widget.item=='zone'){
+                      return ListTile(
+                          trailing:
+
+                          Text(
+
+                            data![index][widget.title] ?? "0",
+                            style: const TextStyle(
+                                color: Colors.green, fontSize: 15),
+                          ),
+                          title: Text( data![index]['Region'],));
+                    }else if(widget.item=='region'){
+                      return ListTile(
+                          trailing:
+
+                          Text(
+
+                            data![index][widget.title] ?? "0",
+                            style: const TextStyle(
+                                color: Colors.green, fontSize: 15),
+                          ),
+                          title: Text( data![index]['Area'],));
+                    }
+
                   }),
             )
           ],

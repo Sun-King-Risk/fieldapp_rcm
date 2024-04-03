@@ -32,7 +32,7 @@ class _AuthCheckState extends State<AuthCheck> {
   @override
   Widget build(BuildContext context) {
     if(isLogin){
-      return const Home();
+      return Home();
     }else{
       return Login();
     }

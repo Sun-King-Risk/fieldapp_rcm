@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
+import 'models/db.dart';
 import 'models/task_detail.dart';
 
 class MyTaskView extends StatefulWidget {
@@ -31,7 +32,7 @@ class MyTaskViewState extends State<MyTaskView> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   List? data = [];
   void fetchData() async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/tasks');
+    var url = Uri.parse('${AppUrl.baseUrl}/tasks');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       setState(() {
@@ -54,7 +55,7 @@ class MyTaskViewState extends State<MyTaskView> {
   }
   List? taskgoal = [];
   Future<void> _getAction(id,subtask) async {
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoals');
+    var url = Uri.parse('${AppUrl.baseUrl}/taskgoals');
     http.Response response = await http.get(url, headers: {
       "Content-Type": "application/json",
 
@@ -267,7 +268,7 @@ class MyTaskViewState extends State<MyTaskView> {
   final _key=GlobalKey();
 
   Future<String> getData(title) async {
-    const apiUrl = 'https://sun-kingfieldapp.herokuapp.com/api/tasks';
+    const apiUrl = '${AppUrl.baseUrl}/tasks';
     final response = await http.get(Uri.parse(apiUrl,),headers:{
       "Content-Type": "application/json",});
     final List<dynamic> jsonData = json.decode(response.body);

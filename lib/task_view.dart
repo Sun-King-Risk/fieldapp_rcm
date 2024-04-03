@@ -6,6 +6,8 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'dart:core';
 import 'package:http/http.dart' as http;
 
+import 'models/db.dart';
+
 class TaskView extends StatefulWidget {
   const TaskView({super.key});
 
@@ -21,7 +23,7 @@ class TaskViewState extends State<TaskView> {
   }
 
   Future<String> getData() async {
-    const apiUrl = 'https://sun-kingfieldapp.herokuapp.com/api/tasks';
+    const apiUrl = '${AppUrl.baseUrl}/tasks';
     final response = await http.get(Uri.parse(apiUrl,),headers:{
       "Content-Type": "application/json",});
 

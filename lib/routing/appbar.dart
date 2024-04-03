@@ -15,7 +15,7 @@ class SKAppBar extends StatelessWidget implements PreferredSizeWidget {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.clear();
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginSignupApp()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginSignupPage()));
       print('User signed out successfully');
     } catch (e) {
       print('Error signing out: $e');

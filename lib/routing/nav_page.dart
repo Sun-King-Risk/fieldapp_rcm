@@ -33,8 +33,7 @@ class NavPagePageState extends State<NavPage> {
   }
   int _selectedIndex = 0;
   final List<Widget> _tabs = <Widget>[
-
-    const Home(),
+    Home(),
     const Task(),
     const Updates(),
     /*AreaDashboard(),
@@ -45,8 +44,11 @@ class NavPagePageState extends State<NavPage> {
 
     return Scaffold(
       appBar:SKAppBar(height: 70, context: context,),
-      body: Container(
-          child: _tabs.elementAt(_selectedIndex)),
+      body: Padding(
+        padding: EdgeInsets.all(15),
+        child: Container(
+            child: _tabs.elementAt(_selectedIndex)),
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColor.mycolor,

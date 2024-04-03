@@ -6,6 +6,8 @@ import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+import 'models/db.dart';
 class StepFormNew extends StatefulWidget{
   const StepFormNew({super.key});
 
@@ -1406,7 +1408,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
       'task_status':'Pending'
     };
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/create');
+    var url = Uri.parse('${AppUrl.baseUrl}/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -1429,7 +1431,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
      'task_status':'Pending'
     };
     var body = json.encode(data);
-    var url = Uri.parse('https://www.sun-kingfieldapp.com/api/create');
+    var url = Uri.parse('${AppUrl.baseUrl}/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
@@ -1458,7 +1460,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
           "previous_goal":double.parse(percvalue)
         };
         var body = json.encode(data);
-        var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
+        var url = Uri.parse('${AppUrl.baseUrl}/taskgoal/create/');
         http.Response response = await http.post(url, body: body, headers: {
           "Content-Type": "application/json",
         });
@@ -1496,7 +1498,7 @@ class _PreviewScreenNewState extends State<PreviewScreenNew> {
           "previous_goal":0
         };
         var body = json.encode(data);
-        var url = Uri.parse('https://www.sun-kingfieldapp.com/api/taskgoal/create/');
+        var url = Uri.parse('${AppUrl.baseUrl}/taskgoal/create/');
         http.Response response = await http.post(url, body: body, headers: {
           "Content-Type": "application/json",
         });
