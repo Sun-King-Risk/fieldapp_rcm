@@ -43,12 +43,10 @@ class NavPagePageState extends State<NavPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar:SKAppBar(height: 70, context: context,),
-      body: Padding(
-        padding: EdgeInsets.all(15),
-        child: Container(
-            child: _tabs.elementAt(_selectedIndex)),
-      ),
+      backgroundColor: Colors.white,
+      appBar:SKAppBar(height: 60, context: context,),
+      body: Container(
+          child: _tabs.elementAt(_selectedIndex)),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColor.mycolor,
@@ -74,10 +72,6 @@ class NavPagePageState extends State<NavPage> {
               tabBackgroundColor: Colors.black87,
               color: Colors.black,
               tabs: const [
-                /* GButton(
-                  icon: Icons.home,
-                  text: 'Home',
-                ),*/
                 GButton(
                   icon: Icons.home,
                   text: 'Home',
