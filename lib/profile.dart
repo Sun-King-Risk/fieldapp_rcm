@@ -74,6 +74,24 @@ class ProfileState extends State<Profile> {
                       ],
 
                     ),
+          PopupMenuButton(
+            icon: const Icon(Icons.language, color: Colors.black),
+            itemBuilder: (BuildContext context)   =>[
+              PopupMenuItem(
+                value: "hi",
+                child: const Icon(Icons.language, color: Colors.black),
+              ),
+              PopupMenuItem(
+                  value: "hi",
+                  child: const Icon(Icons.language, color: Colors.black),
+              ),
+              PopupMenuItem(
+                  value: "hi",
+                  child: const Icon(Icons.language, color: Colors.black),
+              ),
+            ],
+
+          ),
 
 
 
@@ -88,6 +106,57 @@ class ProfileState extends State<Profile> {
             ),
           ),
           ElevatedButton(onPressed: (){
+            showDialog(
+              context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Update Detail'),
+                content: Expanded(
+                  child: Column(
+                    children: [
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Enter your Name',
+                        ),
+                      ),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Enter your Role',
+                        ),
+                      ),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Enter your Area',
+                        ),
+
+                      ),
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Enter your Country',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                  actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    child: Text('Cancel'),
+                  ),
+              ElevatedButton(
+                onPressed: () {
+                  // Handle the input here, for example, print it
+                  print('Detail updated:');
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: Text('Update'),
+              )
+                  ]
+              );
+            }
+            );
 
           }, child: const Text("Update detail"))
 
