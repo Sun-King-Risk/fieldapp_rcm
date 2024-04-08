@@ -8,7 +8,7 @@ class Updates extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 1,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -16,7 +16,6 @@ class Updates extends StatelessWidget {
                 Tab(
                   text: "Insight",
                 ),
-                Tab(text: "Daily Update"),
                 //Tab(text: "Agent"),
               ]),
     Expanded(
@@ -25,9 +24,6 @@ class Updates extends StatelessWidget {
         child: const TabBarView(
           children: [
            Insight(),
-            DailyUpdate(),
-
-
           ],
         ),
 

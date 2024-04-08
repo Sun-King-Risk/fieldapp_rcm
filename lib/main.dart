@@ -46,7 +46,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isLogin = false;
+  bool isLogin = true;
   void getUserAuth() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? auth = prefs.getBool('isLogin');

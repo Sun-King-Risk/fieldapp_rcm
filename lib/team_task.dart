@@ -14,9 +14,7 @@ class TeamTask extends StatefulWidget {
 class TeamTaskState extends State<TeamTask> {
   @override
   initState() {
-    getUserAttributes();
-    agentList.toList();
-    getUser();
+    data = _allUsers;
 
   }
   List<String> agentList = [];
@@ -163,7 +161,7 @@ class TeamTaskState extends State<TeamTask> {
              ],
            ),
            Expanded(child: ListView.builder(
-             itemCount: data.length,
+             itemCount: 5,
 
              itemBuilder: (context, index) {
                return Container(
@@ -179,7 +177,7 @@ class TeamTaskState extends State<TeamTask> {
                        CircleAvatar(
                          backgroundColor: Colors.amber.shade800,
                          radius:35,
-                         child: Text(data[index][6]),),
+                         child: Text( "index"),),
                        const SizedBox(width: 10,),
                        Flexible(
                          child: SizedBox(
@@ -189,15 +187,15 @@ class TeamTaskState extends State<TeamTask> {
                              elevation: 5,
 
                              child: Padding(
-                               padding: const EdgeInsets.fromLTRB(20.0,10,0,0),
+                               padding: const EdgeInsets.fromLTRB(20.0,0,0,0),
                                child: Column(
 
                                  crossAxisAlignment: CrossAxisAlignment.start,
                                  children: [
-                                   Text("Name: ${data[index][6]} ${data[index][7]}"),
-                                   Text("Region:${data[index][9]}"),
-                                   Text("Area ${data[index][10]}"),
-                                   Text("Role ${data[index][11]}"),
+                                   Text("Name: $index"),
+                                   Text("Taks: $index"),
+                                   Text("Over due:  $index",style: TextStyle(color: Colors.red),),
+                                   Text("Pending:  $index",style: TextStyle(color: Colors.yellow)),
 
                                  ],
                                ),
@@ -216,45 +214,3 @@ class TeamTaskState extends State<TeamTask> {
        );
   }
 }
-
-class MySource extends DataTableSource {
-  List value;
-  MySource(this.value) {
-    print(value);
-  }
-  @override
-  DataRow getRow(int index) {
-    // TODO: implement getRow
-    return DataRow.byIndex(
-      index: index,
-      cells: [
-        DataCell(Text(value[index]["id"].toString())),
-        DataCell(Text(value[index]["task_title"].toString())),
-        DataCell(Text(value[index]["task_status"].toString())),
-        DataCell(Text(value[index]["task_start_date"].toString())),
-        DataCell(InkWell(
-          onTap:(){
-            //fill the form above the table and after user fill it, the data inside the table will be refreshed
-          },
-          child: const Text("Click"),
-        ),),
-      ],);
-  }
-
-  @override
-  // TODO: implement isRowCountApproximate
-  bool get isRowCountApproximate => false;
-
-  @override
-  // TODO: implement rowCount
-  int get rowCount => value.length;
-
-  @override
-  // TODO: implement selectedRowCount
-  int get selectedRowCount =>0;
-}
-/* ListTile(
-          title:
-          leading:
-          ),
-        )*/
