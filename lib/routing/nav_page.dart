@@ -43,13 +43,13 @@ class NavPagePageState extends State<NavPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       appBar:SKAppBar(height: 60, context: context,),
       body: Container(
           child: _tabs.elementAt(_selectedIndex)),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: AppColor.mycolor,
+          color: AppColor.appColor,
           boxShadow: [
             BoxShadow(
               blurRadius: 20,
@@ -65,7 +65,7 @@ class NavPagePageState extends State<NavPage> {
               rippleColor: Colors.grey[300]!,
               hoverColor: Colors.grey[100]!,
               gap: 8,
-              activeColor: AppColor.mycolor,
+              activeColor: AppColor.appColor,
               iconSize: 24,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               duration: const Duration(milliseconds: 400),

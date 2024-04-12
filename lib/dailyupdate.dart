@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
+import 'package:fieldapp_rcm/widget/title_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -123,7 +124,6 @@ class _DailyUpdateState extends State<DailyUpdate> {
     return Column(
       children: [
         const KpiTittle(
-          title_color: Colors.amberAccent,
           label: 'Sales Information',
           txtColor: Colors.black87,
         ),
@@ -276,7 +276,7 @@ class _DailyUpdateState extends State<DailyUpdate> {
         ),
       ),
         const KpiTittle(
-          title_color: Colors.amberAccent,
+
           label: 'Disablements Information',
           txtColor: Colors.black87,
         ),
@@ -449,7 +449,6 @@ class _DailyUpdateState extends State<DailyUpdate> {
           ),
         ),
         const KpiTittle(
-          title_color: Colors.amberAccent,
           label: 'Repayment',
           txtColor: Colors.black87,
         ),
@@ -545,27 +544,3 @@ class _DailyUpdateState extends State<DailyUpdate> {
   }
 }
 
-class KpiTittle extends StatelessWidget {
-  final Color title_color;
-  final String label;
-  final Color txtColor;
-  const KpiTittle(
-      {Key? key,
-        required this.title_color,
-        required this.txtColor,
-        required this.label})
-      : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shadowColor: Colors.amber,
-      color: title_color,
-      child: ListTile(
-        title: Center(
-            child:
-            Text(label, style: TextStyle(fontSize: 20, color: txtColor))),
-        dense: true,
-      ),
-    );
-  }
-}

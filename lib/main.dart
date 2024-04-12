@@ -54,7 +54,6 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           isLogin = auth;
         });
-        print(isLogin);
       }
 
 
@@ -70,92 +69,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    late String selectedTask='';
-    late String selectedSubTask='';
-    late String regionselected ='';
-    late String areaselected ='';
-    late String agentselected= '';
-    late String priority = '';
-    late String target;
-    List? myActivities;
     return MaterialApp(
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
       home: isLogin?const NavPage():const LoginSignupPage(),
     );
-    /*return Authenticator(
-        signUpForm: SignUpForm.custom(
-          fields: [
-            SignUpFormField.email(required: true),
-
-      SignUpFormField.name(required: true),
-      SignUpFormField.custom(
-          title: 'Country',
-          attributeKey: CognitoUserAttributeKey.custom('Country'),
-        required: true,
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please select a Country';
-          }
-          return null;
-        },
-
-      ),
-            SignUpFormField.custom(
-              title: 'Zone',
-              attributeKey: CognitoUserAttributeKey.custom('Zone'),
-              required: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please select a Zone';
-                }
-                return null;
-              },
-
-            ),
-            SignUpFormField.custom(
-              title: 'Region',
-              attributeKey: CognitoUserAttributeKey.custom('Region'),
-              required: true,
-
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please select a Region';
-                }
-                return null;
-              },
-
-
-            ),
-            SignUpFormField.custom(
-              title: 'Role',
-              attributeKey: const CognitoUserAttributeKey.custom('Role'),
-              required: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please select a Region';
-                }
-                return null;
-              },
-
-
-
-            ),
-
-            SignUpFormField.password(),
-            SignUpFormField.passwordConfirmation(),
-
-        ],
-
-        ),
-      child: MaterialApp(
-        theme: AppTheme.lightTheme,
-        debugShowCheckedModeBanner: false,
-        builder: Authenticator.builder(
-        ),
-        home:NavPage(),
-      ),
-    );*/
   }
 
 }

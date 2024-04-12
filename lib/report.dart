@@ -157,121 +157,126 @@ class ReportState extends State<Report> {
 
   @override
   Widget build(BuildContext context) {
-    return  Column(
-      children: [
-        Row(
+    return  Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        child: Column(
           children: [
-            Container(
-              alignment: Alignment.center,
-              child: IconButton(
-                onPressed: () =>
-                    setState(() => isDescending = !isDescending),
-                icon: Icon(
-                  isDescending ? Icons.arrow_upward : Icons.arrow_downward,
-                  size: 20,
-                  color: Colors.yellow,
+            Row(
+              children: [
+                Container(
+                  alignment: Alignment.center,
+                  child: IconButton(
+                    onPressed: () =>
+                        setState(() => isDescending = !isDescending),
+                    icon: Icon(
+                      isDescending ? Icons.arrow_upward : Icons.arrow_downward,
+                      size: 20,
+                      color: Colors.yellow,
+                    ),
+                    splashColor: Colors.lightGreen,
+                  ),
                 ),
-                splashColor: Colors.lightGreen,
-              ),
-            ),
-            PopupMenuButton(
-              onSelected:(reslust) =>_statusFilter(reslust),
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                    value: "All",
-                    child: Text("All")
-                ),
-                const PopupMenuItem(
-                    value: "Complete",
-                    child: Text("Complete")
-                ),
-                const PopupMenuItem(
-                    value: "Pending",
-                    child: Text("Pending")
-                ),
-                const PopupMenuItem(
-                    value: "Over due",
-                    child: Text("Over Due")
-                ),
-              ],
-              icon: const Icon(
-                  Icons.filter_list_alt,color: Colors.yellow
-              ),
+                PopupMenuButton(
+                  onSelected:(reslust) =>_statusFilter(reslust),
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                        value: "All",
+                        child: Text("All")
+                    ),
+                    const PopupMenuItem(
+                        value: "Complete",
+                        child: Text("Complete")
+                    ),
+                    const PopupMenuItem(
+                        value: "Pending",
+                        child: Text("Pending")
+                    ),
+                    const PopupMenuItem(
+                        value: "Over due",
+                        child: Text("Over Due")
+                    ),
+                  ],
+                  icon: const Icon(
+                      Icons.filter_list_alt,color: Colors.yellow
+                  ),
 
+                ),
+                Expanded(
+                  child: TextField(
+                    onChanged: (value) => _searchFilter(value),
+                    decoration: const InputDecoration(
+                        labelText: 'Search', suffixIcon: Icon(Icons.search)),
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 20,
             ),
             Expanded(
-              child: TextField(
-                onChanged: (value) => _searchFilter(value),
-                decoration: const InputDecoration(
-                    labelText: 'Search', suffixIcon: Icon(Icons.search)),
+              child: ListView.separated(
+                itemCount: data!.length, // Replace with your actual item count
+                separatorBuilder: (BuildContext context, int index) {
+                  return const Divider(
+                    color: Colors.grey,
+                    height: 1,
+                  );
+                },
+                itemBuilder: (BuildContext context, int index) {
+                  var task = data![index];
+                  return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SingleReport(
+                                  id:task["id"],
+                                sub_task: task["report_title"],
+                              ),
+                            ));
+
+                      },
+                      key: ValueKey(task),
+                      child: Row(
+                          children: [
+
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Flexible(
+                              child: SizedBox(
+                                width: 350,
+                                height: 100,
+                                child: Card(
+                                  elevation: 5,
+                                  child: Padding(
+                                      padding:  const EdgeInsets.fromLTRB(20.0, 10, 0, 0),
+                                      child: Column(
+                                        crossAxisAlignment:CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Report : ${task!['report_title']}"),
+                                          Text("Sub task : ${task!['sub_task']}"),
+                                          Text("submited_by : ${task!['submited_by']}"),
+                                          Text("submited_by : ${task!['id']}")
+
+                                        ],
+                                      )
+                                  ),
+                                ),
+                              ),
+                            )
+                          ]
+                      )
+
+
+                  );
+                },
               ),
             )
           ],
         ),
-        const SizedBox(
-          height: 20,
-        ),
-        Expanded(
-          child: ListView.separated(
-            itemCount: data!.length, // Replace with your actual item count
-            separatorBuilder: (BuildContext context, int index) {
-              return const Divider(
-                color: Colors.grey,
-                height: 1,
-              );
-            },
-            itemBuilder: (BuildContext context, int index) {
-              var task = data![index];
-              return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SingleReport(
-                              id:task["id"],
-                            sub_task: task["report_title"],
-                          ),
-                        ));
-
-                  },
-                  key: ValueKey(task),
-                  child: Row(
-                      children: [
-
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Flexible(
-                          child: SizedBox(
-                            width: 350,
-                            height: 100,
-                            child: Card(
-                              elevation: 5,
-                              child: Padding(
-                                  padding:  const EdgeInsets.fromLTRB(20.0, 10, 0, 0),
-                                  child: Column(
-                                    crossAxisAlignment:CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Report : ${task!['report_title']}"),
-                                      Text("Sub task : ${task!['sub_task']}"),
-                                      Text("submited_by : ${task!['submited_by']}"),
-                                      Text("submited_by : ${task!['id']}")
-
-                                    ],
-                                  )
-                              ),
-                            ),
-                          ),
-                        )
-                      ]
-                  )
-
-
-              );
-            },
-          ),
-        )
-      ],
+      ),
     );
   }
 }

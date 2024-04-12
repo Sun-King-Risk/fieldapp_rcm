@@ -291,7 +291,7 @@ class _Visiting extends State<Visiting> {
                     maxLines: 5,
                     decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
+                        borderSide: BorderSide(color: AppColor.appColor, width: 1.0),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black12, width: 1.0),
@@ -603,7 +603,7 @@ AppDropDown(
                   maxLines: 5,
                   decoration: const InputDecoration(
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
+                      borderSide: BorderSide(color: AppColor.appColor, width: 1.0),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black12, width: 1.0),
@@ -741,7 +741,7 @@ class _RedZone extends State<RedZone> {
             maxLines: 5,
             decoration: const InputDecoration(
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
+                borderSide: BorderSide(color: AppColor.appColor, width: 1.0),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.black12, width: 1.0),
@@ -808,7 +808,7 @@ class _Fraud extends State<Fraud> {
             maxLines: 5,
             decoration: const InputDecoration(
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
+                borderSide: BorderSide(color: AppColor.appColor, width: 1.0),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.black12, width: 1.0),
@@ -864,7 +864,7 @@ class _Audity extends State<Audity>{
             decoration: const InputDecoration(
               focusedBorder: OutlineInputBorder(
                 borderSide:
-                BorderSide(color: AppColor.mycolor, width: 1.0),
+                BorderSide(color: AppColor.appColor, width: 1.0),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide:
@@ -878,7 +878,7 @@ class _Audity extends State<Audity>{
             decoration: const InputDecoration(
               focusedBorder: OutlineInputBorder(
                 borderSide:
-                BorderSide(color: AppColor.mycolor, width: 1.0),
+                BorderSide(color: AppColor.appColor, width: 1.0),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide:
@@ -1137,7 +1137,7 @@ class _FieldVisit extends State<FieldVisit> {
                     maxLines: 5,
                     decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
+                        borderSide: BorderSide(color: AppColor.appColor, width: 1.0),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black12, width: 1.0),
@@ -1411,7 +1411,7 @@ class _Accuracy extends State<Accuracy>{
                     decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                        BorderSide(color: AppColor.mycolor, width: 1.0),
+                        BorderSide(color: AppColor.appColor, width: 1.0),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide:
@@ -1707,7 +1707,7 @@ class _Repo extends State<Repo>{
                     maxLines: 5,
                     decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
+                        borderSide: BorderSide(color: AppColor.appColor, width: 1.0),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black12, width: 1.0),
@@ -2491,7 +2491,7 @@ class _WorkUpdate extends State<WorkUpdate> {
                     maxLines: 5,
                     decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
+                        borderSide: BorderSide(color: AppColor.appColor, width: 1.0),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black12, width: 1.0),
@@ -2849,7 +2849,7 @@ class _Agent extends State<Agent> {
                     maxLines: 5,
                     decoration: const InputDecoration(
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: AppColor.mycolor, width: 1.0),
+                        borderSide: BorderSide(color: AppColor.appColor, width: 1.0),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black12, width: 1.0),

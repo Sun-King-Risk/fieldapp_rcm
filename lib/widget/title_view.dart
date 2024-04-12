@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/themes/theme.dart';
+
 class TitleView extends StatelessWidget {
   final String titleTxt;
   final String subTxt;
@@ -70,3 +72,25 @@ class TitleView extends StatelessWidget {
       }
 
   }
+class KpiTittle extends StatelessWidget {
+  final String label;
+  final Color txtColor;
+  const KpiTittle(
+      {Key? key,
+        required this.txtColor,
+        required this.label})
+      : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shadowColor: Colors.amber,
+      color: AppColor.appColor,
+      child: ListTile(
+        title: Center(
+            child:
+            Text(label, style: TextStyle(fontSize: 20, color: txtColor))),
+        dense: true,
+      ),
+    );
+  }
+}

@@ -221,7 +221,7 @@ class DashViewState extends State<DashView> {
                     fontWeight: FontWeight.bold, fontSize: 24.0),
               ),
               circularStrokeCap: CircularStrokeCap.round,
-              progressColor: AppColor.mycolor,
+              progressColor: AppColor.appColor,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

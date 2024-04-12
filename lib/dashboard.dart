@@ -252,7 +252,7 @@ class _HomeState extends State<Home> {
                                   child: CustomPaint(
                                     painter: CurvePainter(
                                         colors: [
-                                          AppColor.mycolor,
+                                          AppColor.appColor,
                                           Colors.lightGreen,
                                           Colors.lightGreenAccent,
 
@@ -489,7 +489,7 @@ class _HomeState extends State<Home> {
             ),
 
           const KpiTittle(
-              title_color: AppColor.mycolor,
+
               label: 'Sales Information',
               txtColor: Colors.black87,
             ),
@@ -570,7 +570,7 @@ class _HomeState extends State<Home> {
               )
           ),
             const KpiTittle(
-              title_color: AppColor.mycolor,
+
               label: 'Disabled Information',
               txtColor: Colors.black87,
             ),

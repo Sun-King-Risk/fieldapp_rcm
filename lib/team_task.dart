@@ -119,98 +119,104 @@ class TeamTaskState extends State<TeamTask> {
 
   @override
   Widget build(BuildContext context) {
-       return  Column(
-         children: [
-           Row(
-             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+       return  Padding(
+         padding: const EdgeInsets.symmetric(vertical: 0,horizontal: 8),
+         child: Container(
+           color: Colors.grey[50],
+           child: Column(
              children: [
-               const Text("Team Members"),
                Row(
+                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                  children: [
-                   Container(
-                     alignment: Alignment.center,
-                     child: IconButton(
-                       onPressed: () =>
-                           setState(() => isDescending = !isDescending),
-                       icon: Icon(
-                         isDescending ? Icons.arrow_upward : Icons.arrow_downward,
-                         size: 20,
-                         color: Colors.yellow,
-                       ),
-                       splashColor: Colors.lightGreen,
-                     ),
-                   ),
-                   PopupMenuButton(
-                     onSelected:(reslust) =>_nameFilter(reslust),
-                     itemBuilder: (context) => [
-
-                       const PopupMenuItem(
-                           value: "All",
-                           child: Text("All")
-                       ),
-                     ],
-                     icon: const Icon(
-                         Icons.filter_list_alt,color: Colors.yellow
-                     ),
-
-                   )
-                 ],
-               )
-
-
-             ],
-           ),
-           Expanded(child: ListView.builder(
-             itemCount: 5,
-
-             itemBuilder: (context, index) {
-               return Container(
-                 margin: const EdgeInsets.all(15),
-                 child: InkWell(
-                   onTap: (){
-                    /* Navigator.push(
-                         context,
-                         MaterialPageRoute(builder: (context) =>  TaskView()));*/
-                   },
-                   child:Row(
+                   const Text("Team Members"),
+                   Row(
                      children: [
-                       CircleAvatar(
-                         backgroundColor: Colors.amber.shade800,
-                         radius:35,
-                         child: Text( "index"),),
-                       const SizedBox(width: 10,),
-                       Flexible(
-                         child: SizedBox(
-                           width: 350,
-                           height: 100,
-                           child: Card(
-                             elevation: 5,
+                       Container(
+                         alignment: Alignment.center,
+                         child: IconButton(
+                           onPressed: () =>
+                               setState(() => isDescending = !isDescending),
+                           icon: Icon(
+                             isDescending ? Icons.arrow_upward : Icons.arrow_downward,
+                             size: 20,
+                             color: Colors.yellow,
+                           ),
+                           splashColor: Colors.lightGreen,
+                         ),
+                       ),
+                       PopupMenuButton(
+                         onSelected:(reslust) =>_nameFilter(reslust),
+                         itemBuilder: (context) => [
 
-                             child: Padding(
-                               padding: const EdgeInsets.fromLTRB(20.0,0,0,0),
-                               child: Column(
+                           const PopupMenuItem(
+                               value: "All",
+                               child: Text("All")
+                           ),
+                         ],
+                         icon: const Icon(
+                             Icons.filter_list_alt,color: Colors.yellow
+                         ),
 
-                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                 children: [
-                                   Text("Name: $index"),
-                                   Text("Taks: $index"),
-                                   Text("Over due:  $index",style: TextStyle(color: Colors.red),),
-                                   Text("Pending:  $index",style: TextStyle(color: Colors.yellow)),
+                       )
+                     ],
+                   )
 
-                                 ],
+
+                 ],
+               ),
+               Expanded(child: ListView.builder(
+                 itemCount: 5,
+
+                 itemBuilder: (context, index) {
+                   return Container(
+                     margin: const EdgeInsets.all(15),
+                     child: InkWell(
+                       onTap: (){
+                        /* Navigator.push(
+                             context,
+                             MaterialPageRoute(builder: (context) =>  TaskView()));*/
+                       },
+                       child:Row(
+                         children: [
+                           CircleAvatar(
+                             backgroundColor: Colors.amber.shade800,
+                             radius:35,
+                             child: Text( "index"),),
+                           const SizedBox(width: 10,),
+                           Flexible(
+                             child: SizedBox(
+                               width: 350,
+                               height: 100,
+                               child: Card(
+                                 elevation: 5,
+
+                                 child: Padding(
+                                   padding: const EdgeInsets.fromLTRB(20.0,0,0,0),
+                                   child: Column(
+
+                                     crossAxisAlignment: CrossAxisAlignment.start,
+                                     children: [
+                                       Text("Name: $index"),
+                                       Text("Taks: $index"),
+                                       Text("Over due:  $index",style: TextStyle(color: Colors.red),),
+                                       Text("Pending:  $index",style: TextStyle(color: Colors.yellow)),
+
+                                     ],
+                                   ),
+                                 ),
                                ),
                              ),
-                           ),
-                         ),
-                       )
+                           )
 
-                     ],
-                   ),
-                 ),
-               );
-             },
-           ))
-         ],
+                         ],
+                       ),
+                     ),
+                   );
+                 },
+               ))
+             ],
+           ),
+         ),
        );
   }
 }
