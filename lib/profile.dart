@@ -111,32 +111,30 @@ class ProfileState extends State<Profile> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text('Update Detail'),
-                content: Expanded(
-                  child: Column(
-                    children: [
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your Name',
-                        ),
+                content: Column(
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Enter your Name',
                       ),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your Role',
-                        ),
+                    ),
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Enter your Role',
                       ),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your Area',
-                        ),
+                    ),
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Enter your Area',
+                      ),
 
+                    ),
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Enter your Country',
                       ),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Enter your Country',
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                   actions: [
                   TextButton(

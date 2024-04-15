@@ -22,30 +22,32 @@ class _AppDropDownState extends State<AppDropDown>{
     return  DropdownButtonFormField<String>(
       value: selectedValue,
       validator:  widget.validator,
+      isExpanded: true,
+
       decoration: InputDecoration(
         enabled: widget.disable,
         filled: true,
         fillColor: Colors.white,
         labelText:widget.label,
         labelStyle: const TextStyle(color: Colors.black),
-        border: const OutlineInputBorder(),
-        hintStyle: TextStyle(color: Colors.grey[800]),
+        border:  OutlineInputBorder(
+    borderSide: BorderSide(
+      width: 2.0,
+        color: Colors.red,
+    ),
+    borderRadius: BorderRadius.circular(10),
+        ),
+        hintStyle: TextStyle(color: Colors.black),
         hintText: widget.hint,
       ),
       items: widget.items.map((String items) {
         return DropdownMenuItem(
           value: items,
-          child: Text(items),
+          child: Text(items,overflow: TextOverflow.ellipsis,),
         );
       }).toList(),
 
       onChanged:(String? value) {
-        setState(() {
-          selectedValue = value;
-          if (widget.onChanged != null) {
-            widget.onChanged!(value!);
-          }
-        });
       },
       onSaved: widget.onSave,
     );

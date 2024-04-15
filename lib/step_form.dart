@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
+import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -22,11 +23,12 @@ enum TaskMode {
 }
 class _TaskAddState extends State<TaskAddDrop> {
   TaskMode _taskMode = TaskMode.Task;
+
   final Map<String, Map<String, String>> _actions = {};
   List<String> textFieldValues = [];
   List<String> dropdownValues = [];
-  bool isLoading = true;
-  bool isLoadingArea = true;
+  bool isLoading = false;
+  bool isLoadingArea = false;
   List<String> attributeList = [];
   String name ="";
   String task_zone ="";
@@ -46,15 +48,15 @@ class _TaskAddState extends State<TaskAddDrop> {
   List<String> SubTaskTitle =[];
   String selectedOption = '';
   String SelectedSubtask = '';
-  bool istaskLoding = true;
-  bool subvisibility = false;
+  bool istaskLoding = false;
+  bool subvisibility = true;
   bool areaVisibility = false;
-  bool regionVisibility = false;
-  bool isSubLoading = true;
-  bool isRegionLoad = true;
+  bool regionVisibility = true;
+  bool isSubLoading = false;
+  bool isRegionLoad = false;
   var taskResult= [];
   var regionResult = [];
-  bool isLoadingTable = true;
+  bool isLoadingTable = false;
   List? taskData = [];
   List<Map<String, dynamic>> taskDataList = [];
   List<Map<String, dynamic>> selectedItems = [];
@@ -238,7 +240,7 @@ class _TaskAddState extends State<TaskAddDrop> {
 
     return taskData!.sublist(startIndex, endIndex < taskData!.length ? endIndex : taskData!.length);
   }
-  TaskData()async{
+ /* TaskData()async{
     var connection = await Database.connect();
     var results = await connection.query( "SELECT * FROM myfieldapp_title");
     for (var title in results) {
@@ -248,7 +250,7 @@ class _TaskAddState extends State<TaskAddDrop> {
       istaskLoding = false;
       taskResult =results;
     });
-  }
+  }*/
   SubTaskData(id)async{
     var connection = await Database.connect();
     var results = await connection.query( "SELECT * FROM myfieldapp_sub_title WHERE kpititleid_id = @kpititleid_id",
@@ -406,13 +408,14 @@ class _TaskAddState extends State<TaskAddDrop> {
   }
 
 
+
   @override
   void initState() {
     super.initState();
-    getUserAttributes();
-    TaskData();
+    //getUserAttributes();
+    //TaskData();
   }
-  void getUserAttributes() async {
+  /*void getUserAttributes() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
 
@@ -431,641 +434,1023 @@ class _TaskAddState extends State<TaskAddDrop> {
     // Process the user attributes
 
 
-  }
+  }*/
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Task'),
       ),
-    body: Container(
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        children: [
-          if(_taskMode == TaskMode.Task)
-            Expanded(
-              child: Column(
-                children: [
-                  istaskLoding?const Center(
-                    child: CircularProgressIndicator(),
-                  ):
-                  AppDropDown(
-                      disable: true,
-                      label: "Task Title",
-                      hint: "hint",
-                      items: taskTitle,
-                      onChanged: (value){
+    body: Padding(
+      padding: EdgeInsets.all(10),
+        child: Container(
+          color: Colors.white,
+            child: _buildTaskModeWidget())) ,
+    );
+  }
+  Widget _buildTaskModeWidget() {
+    switch (_taskMode) {
+      case TaskMode.Task:
+        return _buildTaskWidget();
+      case TaskMode.TableTask:
+        return _buildTableTaskWidget();
+      case TaskMode.ActionPlan:
+        return _buildActionPlanWidget();
+      case TaskMode.Date:
+        return _buildDateWidget();
+      case TaskMode.Preview:
+        return _buildPreviewWidget();
+      default:
+        return Container();
+    }
 
-                        setState(() {
-                          isSubLoading =true;
-                          SubTaskTitle =[];
-                          selectedOption =value;
-                          subvisibility = true;
-                          loadVisibility =  false;
-                          buttonVisibility= false;
-                        });
-                          var id = taskResult.firstWhere((taskid) => taskid[1]==selectedOption)[0];
-                        SubTaskData(id);
-                        print(isSubLoading);
-                      }),
-                  const SizedBox(height: 10,),
-                  Visibility(
-                    visible: subvisibility,
-                    child: isSubLoading?const Center(
-                      child: CircularProgressIndicator(),
-                    ):AppDropDown(
-                        disable: true,
-                        label: "Sub Task",
-                        hint: "Select option",
-                        items: SubTaskTitle,
-                        onChanged: (value){
-                          setState(() {
-                            isRegionLoad =true;
-                            region = [];
+    }
+  Widget _buildTaskWidget() {
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
 
-                            SelectedSubtask =value;
-                            regionVisibility= true;
-                            areaVisibility = false;
-                            areadata = [];
-                            loadVisibility =  false;
-                            buttonVisibility= false;
-                          });
-                            regionData();
+            istaskLoding?const Center(
+              child: CircularProgressIndicator(),
+            ):
+            AppDropDown(
+                disable: true,
+                label: "Task Title",
+                hint: "hint",
+                items: ["Task","Task 2"],
+                onChanged: (value){
 
-
-                        }),
-                  ),
-                  const SizedBox(height: 10,),
-                  Visibility(
-                    visible: regionVisibility,
-                    child:  isRegionLoad?const Center(
-                      child: CircularProgressIndicator(),
-                    ):AppDropDown(
-                        disable: true,
-                        label: "Region",
-                        hint: "Select Region",
-                        items: region,
-                        onChanged: (value){
-                          setState(() {
-                            areadata = [];
-                            isLoadingArea = true;
-                            selectedRegion =value;
-                            areaVisibility =true;
-                            buttonVisibility= false;
-                            loadVisibility =  false;
-
-                          });
-                          var id = regionResult.firstWhere((regionname) => regionname[1]==selectedRegion)[0];
-                          print("region selected $selectedRegion");
-                          AreaData(id);
-
-                        }),
-                  ),
-                  const SizedBox(height: 10,),
-                  Visibility(
-                    visible: areaVisibility,
-                    child:  isLoadingArea?const Center(
-                      child: CircularProgressIndicator(),
-                    ):AppDropDown(
-                        disable: true,
-                        label: "Area",
-                        hint: "Select Area",
-                        items: areadata,
-                        onChanged: (value){
-                          setState(() {
-                            selectedArea =value;
-                            loadVisibility =  false;
-                            buttonVisibility= true;
-                          });
-
-                        }),
-                  ),
-                  Visibility(
-                    visible: buttonVisibility,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-
-                            onPressed: () {
-                              if(selectedOption=='Team Management'){
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(builder: (context) => TeamTaskCreate(
-                                    title: selectedOption,
-                                    sub: SelectedSubtask,
-                                  )),
-                                );
-                              }else{
-                                if(country == "Kenya"){
-                                  print("Kenya");
-                                  listItems("KE/${SelectedSubtask.replaceAll(' ', '_')}");
-                                }else if(country == "Nigeria"){
-                                  print("Nigeria");
-                                  listItems("NG/${SelectedSubtask.replaceAll(' ', '_')}");
-                                }else if(country == "Tanzania"){
-                                  print("Tanzania");
-                                  listItems("TZ/${SelectedSubtask.replaceAll(' ', '_')}");
-                                }else{
-                                  print("other");
-                                  listItems("other/${SelectedSubtask.replaceAll(' ', '_')}");
-                                }
-                                setState(() {
-                                  loadVisibility =  true;
-                                  isLoading = true;
-                                });
-                              }
-
-                            },
-                            child: const Text("Next"),
-
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Visibility(
-                    visible: loadVisibility,
-                    child: Center(
-                      child: isLoading?const Column(
-                        children: [
-                          CircularProgressIndicator(),
-                          Text("Please wait data is loding.."),
-                        ],
-                      ):Column(children: [
-                        Text("No task: $SelectedSubtask for the selected Area: $selectedArea")
-                      ],),
-                    ),
-                  )
-                ],
-              ),),
-          if(_taskMode == TaskMode.TableTask)
-            Expanded(
-              child: isLoadingTable?const Center(
+                  setState(() {
+                    isSubLoading =false;
+                    SubTaskTitle =[];
+                    selectedOption =value;
+                    subvisibility = true;
+                    loadVisibility =  false;
+                    buttonVisibility= false;
+                  });
+                  var id = taskResult.firstWhere((taskid) => taskid[1]==selectedOption)[0];
+                  SubTaskData(id);
+                  print(isSubLoading);
+                }),
+            const SizedBox(height: 10,),
+            Visibility(
+              visible: subvisibility,
+              child: isSubLoading?const Center(
                 child: CircularProgressIndicator(),
-              ):
-              SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    TextField(
-                      onChanged: (value) {
+              ):AppDropDown(
+                  disable: true,
+                  label: "Sub Task",
+                  hint: "Select option",
+                  items: ["suTask 1","subTask 2"],
+                  onChanged: (value){
+                    setState(() {
+                      isRegionLoad =false;
+                      region = [];
+
+                      SelectedSubtask =value;
+                      regionVisibility= true;
+                      areaVisibility = false;
+                      areadata = [];
+                      loadVisibility =  false;
+                      buttonVisibility= false;
+                    });
+                    //regionData();
+
+
+                  }),
+            ),
+            const SizedBox(height: 10,),
+            Visibility(
+              visible: regionVisibility,
+              child:  isRegionLoad?const Center(
+                child: CircularProgressIndicator(),
+              ):AppDropDown(
+                  disable: true,
+                  label: "Region",
+                  hint: "Select Region",
+                  items: ["region 1"],
+                  onChanged: (value){
+                    setState(() {
+                      areadata = [];
+                      isLoadingArea = false;
+                      selectedRegion =value;
+                      areaVisibility =true;
+                      buttonVisibility= false;
+                      loadVisibility =  false;
+
+                    });
+                   // var id = regionResult.firstWhere((regionname) => regionname[1]==selectedRegion)[0];
+                    print("region selected $selectedRegion");
+                    //AreaData(id);
+
+                  }),
+            ),
+            const SizedBox(height: 10,),
+            Visibility(
+              visible: true,
+              child:  isLoadingArea?const Center(
+                child: CircularProgressIndicator(),
+              ):AppDropDown(
+                  disable: true,
+                  label: "Area",
+                  hint: "Select Area",
+                  items: ["area 1","Area 2"],
+                  onChanged: (value){
+                    setState(() {
+                      selectedArea =value;
+                      loadVisibility =  false;
+                      buttonVisibility= true;
+                    });
+
+                  }),
+            ),
+            Visibility(
+              visible: true,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+
+                      onPressed: () {
                         setState(() {
-                          searchQuery = value;
+                          loadVisibility =  false;
+                          TableData();
+                          _taskMode = TaskMode.TableTask;
+                          //isLoading = true;
+                        });
+                        /*if(selectedOption=='Team Management'){
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (context) => TeamTaskCreate(
+                              title: selectedOption,
+                              sub: SelectedSubtask,
+                            )),
+                          );
+                        }
+                        else{
+                          if(country == "Kenya"){
+                            print("Kenya");
+                            listItems("KE/${SelectedSubtask.replaceAll(' ', '_')}");
+                          }else if(country == "Nigeria"){
+                            print("Nigeria");
+                            listItems("NG/${SelectedSubtask.replaceAll(' ', '_')}");
+                          }else if(country == "Tanzania"){
+                            print("Tanzania");
+                            listItems("TZ/${SelectedSubtask.replaceAll(' ', '_')}");
+                          }else{
+                            print("other");
+                            listItems("other/${SelectedSubtask.replaceAll(' ', '_')}");
+                          }
+                          setState(() {
+                            loadVisibility =  false;
+                            //isLoading = true;
+                          });
+                        }*/
+
+                      },
+                      child: const Text("Next"),
+
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: loadVisibility,
+              child: Center(
+                child: isLoading?const Column(
+                  children: [
+                    CircularProgressIndicator(),
+                    Text("Please wait data is loding.."),
+                  ],
+                ):Column(children: [
+                  Text("No task: $SelectedSubtask for the selected Area: $selectedArea")
+                ],),
+              ),
+            )
+          ],
+        );
+
+  }
+  Widget _buildTableTaskWidget() {
+    return isLoadingTable?const Center(
+      child: CircularProgressIndicator(),
+    ): SingleChildScrollView(
+      scrollDirection: Axis.vertical,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          TextField(
+            onChanged: (value) {
+              setState(() {
+                searchQuery = value;
+              });
+            },
+            decoration: const InputDecoration(
+              labelText: 'Search',
+              prefixIcon: Icon(Icons.search),
+            ),
+          ),
+
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              columns: [
+                for (int index = 0; index < keys.length; index++)
+                  if (keys[index] != 'Country' && keys[index] != 'Region' && keys[index] != 'Area')
+                    DataColumn(
+                      label: Row(
+                        children: [
+                          Text(keys[index]),
+                          if (_sortColumnIndex == index)
+                            _sortAscending
+                                ? const Icon(Icons.arrow_upward)
+                                : const Icon(Icons.arrow_downward),
+                        ],
+                      ),
+                      onSort: (columnIndex, ascending) {
+                        setState(() {
+                          if (_sortColumnIndex == columnIndex) {
+                            // Toggle the sorting direction if the same column is selected
+                            _sortAscending = !_sortAscending;
+                          } else {
+                            _sortAscending = true;
+                            _sortColumnIndex = columnIndex;
+                          }
+                          taskData!.sort((a, b) {
+                            var aValue = a[keys[columnIndex]].toString();
+                            var bValue = b[keys[columnIndex]].toString();
+                            return _sortAscending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
+                          });
                         });
                       },
-                      decoration: const InputDecoration(
-                        labelText: 'Search',
-                        prefixIcon: Icon(Icons.search),
-                      ),
                     ),
+                const DataColumn(label: Text('Select')),
+              ],
+              rows: [
+                for (final item in getPageData())
+                  DataRow(
+                    cells: [
+                      for (int cellIndex = 0; cellIndex < keys.length; cellIndex++)
+                        if (keys[cellIndex] != 'Country' && keys[cellIndex] != 'Region' && keys[cellIndex] != 'Area')
 
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                        columns: [
-                          for (int index = 0; index < keys.length; index++)
-                            if (keys[index] != 'Country' && keys[index] != 'Region' && keys[index] != 'Area')
-                              DataColumn(
-                                label: Row(
-                                  children: [
-                                    Text(keys[index]),
-                                    if (_sortColumnIndex == index)
-                                      _sortAscending
-                                          ? const Icon(Icons.arrow_upward)
-                                          : const Icon(Icons.arrow_downward),
-                                  ],
+                          DataCell(
+                            Text(item[keys[cellIndex]].toString()),
+                          ),
+                      DataCell(
+                        Checkbox(
+                          value: taskDataList.contains(item),
+                          onChanged: (value) {
+                            setState(() {
+                              if (taskDataList.contains(item)) {
+                                taskDataList.remove(item);
+                              } else {
+                                taskDataList.add(item);
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                    selected: taskDataList.contains(item),
+                    onSelectChanged: (value) {
+                      setState(() {
+                        if (taskDataList.contains(item)) {
+                          taskDataList.remove(item);
+                        } else {
+                          taskDataList.add(item);
+                          if (taskDataList.length <= 5) {
+                            if (kDebugMode) {
+                              print(taskDataList);
+                            }
+                          } else {
+                            safePrint('Only 5 tasks allowed');
+                          }
+                        }
+                      });
+                    },
+                  ),
+              ],
+            )
+
+            ,
+          ),
+
+
+          // Pagination buttons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                      _currentPage = _currentPage > 0 ? _currentPage - 1 : 0;
+                    });
+                  },
+                  child: const Text("Previous Table"
+                    ,style: TextStyle(color: Colors.black),)),
+              TextButton(
+                  onPressed: (){
+                    setState(() {
+                      final nextPageStartIndex = (_currentPage + 1) * _pageSize;
+                      if (nextPageStartIndex < taskData!.length) {
+                        _currentPage++;
+                      }
+                    });
+                  },
+                  child: const Text("Next Table"
+                    ,style: TextStyle(color: Colors.black),)),
+
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(onPressed: (){
+                setState(() {
+                  _taskMode = TaskMode.Task;
+                  taskDataList = [];
+                });
+              }, child: const Text("Back")),
+              ElevatedButton(onPressed: (){
+               /* if(taskDataList.length<=5&&taskDataList.isNotEmpty){
+                  setState(() {
+                    _taskMode = TaskMode.ActionPlan;
+
+                  });
+
+                }
+                else if(taskDataList.length>5){
+                  const snackBar = SnackBar(
+                    content: Text('Exceeded task selection limit!'),
+                    duration: Duration(seconds: 2),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                }
+                else{
+                  print("No task selected");
+                  const snackBar = SnackBar(
+                    content: Text('No task selected!'),
+                    duration: Duration(seconds: 2),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                }*/
+                setState(() {
+
+                  _taskMode = TaskMode.ActionPlan;
+                });
+              }, child: const Text("Next"))
+            ],
+          )
+        ],
+      ),
+    );
+  }
+  Widget _buildActionPlanWidget() {
+    return Column(
+      children: [
+        if (target) Expanded(
+          child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: taskDataList.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic> data = taskDataList[index];
+                String agent = data[key];
+                String agentRate = data[rate];
+                if (!_actions.containsKey(agent)) {
+                  _actions[agent] = {'action': '', 'priority': _priorities[0]};
+                }
+                String datanew = taskDataList[index].toString();
+                return Card(
+                    child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '$key: $agent - $agentRate ',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 8),
+                              TextField(
+                                decoration: const InputDecoration(
+                                  hintText: 'Enter action plan',
+                                  labelText: 'Action Plan',
                                 ),
-                                onSort: (columnIndex, ascending) {
+                                onChanged: (value) {
                                   setState(() {
-                                    if (_sortColumnIndex == columnIndex) {
-                                      // Toggle the sorting direction if the same column is selected
-                                      _sortAscending = !_sortAscending;
-                                    } else {
-                                      _sortAscending = true;
-                                      _sortColumnIndex = columnIndex;
-                                    }
-                                    taskData!.sort((a, b) {
-                                      var aValue = a[keys[columnIndex]].toString();
-                                      var bValue = b[keys[columnIndex]].toString();
-                                      return _sortAscending ? aValue.compareTo(bValue) : bValue.compareTo(aValue);
-                                    });
+                                    _actions[agent]!['action'] = value;
+                                  });
+                                },
+                                maxLines: 3,
+                              ),
+                              const SizedBox(height: 8),
+                              TextField(
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                decoration: const InputDecoration(
+                                  hintText: 'Enter Target',
+                                  labelText: 'Target',
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _actions[agent]!['target'] = value;
                                   });
                                 },
                               ),
-                          const DataColumn(label: Text('Select')),
-                        ],
-                        rows: [
-                          for (final item in getPageData())
-                            DataRow(
-                              cells: [
-                                for (int cellIndex = 0; cellIndex < keys.length; cellIndex++)
-                                  if (keys[cellIndex] != 'Country' && keys[cellIndex] != 'Region' && keys[cellIndex] != 'Area')
+                              const SizedBox(height: 8),
+                              AppDropDown(
+                                  disable: true,
+                                  label: "Priority",
+                                  items: _priorities,
+                                  hint: "Priority",
+                                  onChanged: (value){
+                                    setState(() {
+                                      _actions[agent]!['priority'] = value;
+                                    });
+                                  })
 
-                                    DataCell(
-                                      Text(item[keys[cellIndex]].toString()),
-                                    ),
-                                DataCell(
-                                  Checkbox(
-                                    value: taskDataList.contains(item),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        if (taskDataList.contains(item)) {
-                                          taskDataList.remove(item);
-                                        } else {
-                                          taskDataList.add(item);
-                                        }
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ],
-                              selected: taskDataList.contains(item),
-                              onSelectChanged: (value) {
-                                setState(() {
-                                  if (taskDataList.contains(item)) {
-                                    taskDataList.remove(item);
-                                  } else {
-                                    taskDataList.add(item);
-                                    if (taskDataList.length <= 5) {
-                                      if (kDebugMode) {
-                                        print(taskDataList);
-                                      }
-                                    } else {
-                                      safePrint('Only 5 tasks allowed');
-                                    }
-                                  }
-                                });
-                              },
-                            ),
-                        ],
-                      )
+                            ]
 
-                      ,
-                    ),
-
-
-                    // Pagination buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                            onPressed: (){
-                              setState(() {
-                                _currentPage = _currentPage > 0 ? _currentPage - 1 : 0;
-                              });
-                            },
-                            child: const Text("Previous Table"
-                              ,style: TextStyle(color: Colors.black),)),
-                        TextButton(
-                            onPressed: (){
-                              setState(() {
-                                final nextPageStartIndex = (_currentPage + 1) * _pageSize;
-                                if (nextPageStartIndex < taskData!.length) {
-                                  _currentPage++;
-                                }
-                              });
-                            },
-                            child: const Text("Next Table"
-                              ,style: TextStyle(color: Colors.black),)),
-
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        ElevatedButton(onPressed: (){
-                          setState(() {
-                            _taskMode = TaskMode.Task;
-                            taskDataList = [];
-                          });
-                        }, child: const Text("Back")),
-                        ElevatedButton(onPressed: (){
-                          if(taskDataList.length<=5&&taskDataList.isNotEmpty){
-                            setState(() {
-                              _taskMode = TaskMode.ActionPlan;
-
-                            });
-
-                          }else if(taskDataList.length>5){
-                            const snackBar = SnackBar(
-                              content: Text('Exceeded task selection limit!'),
-                              duration: Duration(seconds: 2),
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                          }
-                          else{
-                            print("No task selected");
-                            const snackBar = SnackBar(
-                              content: Text('No task selected!'),
-                              duration: Duration(seconds: 2),
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-                          }
-                        }, child: const Text("Next"))
-                      ],
+                        )
                     )
-                  ],
-                ),
-              ),
-            ),
-          if(_taskMode == TaskMode.ActionPlan)
-            Expanded(
-              child: Column(
-                children: [
-                  if (target) Expanded(
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: taskDataList.length,
-                        itemBuilder: (context, index) {
-                          Map<String, dynamic> data = taskDataList[index];
-                          String agent = data[key];
-                          String agentRate = data[rate];
-                          if (!_actions.containsKey(agent)) {
-                            _actions[agent] = {'action': '', 'priority': _priorities[0]};
-                          }
-                          String datanew = taskDataList[index].toString();
-                          return Card(
-                              child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '$key: $agent - $agentRate ',
-                                          style: const TextStyle(fontWeight: FontWeight.bold),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        TextField(
-                                          decoration: const InputDecoration(
-                                            hintText: 'Enter action plan',
-                                            labelText: 'Action Plan',
-                                          ),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              _actions[agent]!['action'] = value;
-                                            });
-                                          },
-                                          maxLines: 3,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        TextField(
-                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                          decoration: const InputDecoration(
-                                            hintText: 'Enter Target',
-                                            labelText: 'Target',
-                                          ),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              _actions[agent]!['target'] = value;
-                                            });
-                                          },
-                                        ),
-                                        const SizedBox(height: 8),
-                                        AppDropDown(
-                                            disable: true,
-                                            label: "Priority",
-                                            items: _priorities,
-                                            hint: "Priority",
-                                            onChanged: (value){
-                                              setState(() {
-                                                _actions[agent]!['priority'] = value;
-                                              });
-                                            })
+                );
 
-                                      ]
+              }),
+        ) else
 
-                                  )
-                              )
-                          );
+          Expanded(
 
-                        }),
-                  ) else
-
-                    Expanded(
-
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: taskDataList.length,
-                          itemBuilder: (context, index) {
-                            Map<String, dynamic> data = taskDataList[index];
-                            String agent = data[key];
-                            if (!_actions.containsKey(agent)) {
-                              _actions[agent] = {'action': '', 'priority': _priorities[0]};
-                            }
-                            String datanew = taskDataList[index].toString();
-                            return Card(
-                                child: Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '$key: $agent',
-                                            style: const TextStyle(fontWeight: FontWeight.bold),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          TextField(
-                                            decoration: const InputDecoration(
-                                              hintText: 'Enter action plan',
-                                              labelText: 'Action Plan',
-                                            ),
-                                            onChanged: (value) {
-                                              print(value);
-                                              setState(() {
-                                                _actions[agent]!['action'] = value;
-                                              });
-                                            },
-                                            maxLines: 3,
-                                          ),
-                                          const SizedBox(height: 8),
-                                          AppDropDown(
-                                              disable: true,
-                                              label: "Priority",
-                                              items: _priorities,
-                                              hint: "Priority",
-                                              onChanged: (value){
-                                                setState(() {
-                                                  _actions[agent]!['priority'] = value;
-                                                });
-                                              })
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: taskDataList.length,
+                itemBuilder: (context, index) {
+                  Map<String, dynamic> data = taskDataList[index];
+                  String agent = data[key];
+                  if (!_actions.containsKey(agent)) {
+                    _actions[agent] = {'action': '', 'priority': _priorities[0]};
+                  }
+                  String datanew = taskDataList[index].toString();
+                  return Card(
+                      child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '$key: $agent',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 8),
+                                TextField(
+                                  decoration: const InputDecoration(
+                                    hintText: 'Enter action plan',
+                                    labelText: 'Action Plan',
+                                  ),
+                                  onChanged: (value) {
+                                    print(value);
+                                    setState(() {
+                                      _actions[agent]!['action'] = value;
+                                    });
+                                  },
+                                  maxLines: 3,
+                                ),
+                                const SizedBox(height: 8),
+                                AppDropDown(
+                                    disable: true,
+                                    label: "Priority",
+                                    items: _priorities,
+                                    hint: "Priority",
+                                    onChanged: (value){
+                                      setState(() {
+                                        _actions[agent]!['priority'] = value;
+                                      });
+                                    })
 
 
-                                        ]
+                              ]
 
-                                    )
-                                )
-                            );
+                          )
+                      )
+                  );
 
-                          }),
-                    ),
+                }),
+          ),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(onPressed: (){
-                        setState(() {
-                          _taskMode = TaskMode.TableTask;
-                        });
-                      }, child: const Text("Back")),
-                      ElevatedButton(onPressed: (){
-                        setState(() {
-                          _taskMode = TaskMode.Date;
-                        });
-                      }, child: const Text("Next"))
-                    ],
-                  )
-                ],
-              ),
-            ),
-          if(_taskMode == TaskMode.Date)
-            Expanded(child: Column(
-              children: [
-                ElevatedButton(onPressed: (){
-                  _selectDate(context);
-                }, child: const Text("Date start")),
-                ElevatedButton(onPressed: (){
-                  _endDate(context);
-                }, child: const Text("Date End")),
-
-                Text("Start: $startDate"),
-                Text("End: $endDate"),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-
-                    ElevatedButton(onPressed: (){
-                      setState(() {
-                        _taskMode = TaskMode.ActionPlan;
-                      });
-                    }, child: const Text("Back")),
-                    ElevatedButton(onPressed: (){
-                      setState(() {
-                        _taskMode = TaskMode.Preview;
-                      });
-                    }, child: const Text("Next"))
-                  ],
-                )
-              ],
-            )),
-          if(_taskMode == TaskMode.Preview)
-            Expanded(
-              child: Column(
-                children: [
-                  const Text("Preveiw"),
-                  Text(
-                    'Region: $singleRegion',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Area: $selectedArea',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Task: $selectedOption',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Sub Task: $SelectedSubtask',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Task start date: $startDate',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Task End date: $endDate',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Task Action:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  target?Column(
-                    children: [
-                      const SizedBox(height: 8),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: taskDataList.map((task) {
-                          String taskName = task[key];
-                          String current = task[rate];
-                          Map<String, String>? actions = _actions[taskName];
-                          String? percvalue = current.substring(0,current.length - 1);
-                          double total = double.parse(actions!['target']!)+double.parse(percvalue);
-
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Name: $taskName '),
-                              const SizedBox(height: 8),
-                              Text("Priority: ${actions['priority']}"),
-                              Text("Action Plan: ${actions['action']}"),
-                              Text('Current: $percvalue'),
-                              Text('Target: ${actions['target']}'),
-                              Text('Goal: $total'),
-
-                              const SizedBox(height: 8),
-                            ],
-                          );
-                        }).toList(),)
-                    ],
-                  ):Column(
-
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: taskDataList.map((task) {
-                          String taskName = task[key];
-                          Map<String, String>? actions = _actions[taskName];
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Name: $taskName '),
-                              const SizedBox(height: 8),
-                              Text("Priority: ${actions!['priority']}"),
-                              Text("Action Plan: ${actions['action']}"),
-
-                              const SizedBox(height: 8),
-                            ],
-                          );
-                        }).toList(),)
-
-
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ElevatedButton(onPressed: (){
-                        setState(() {
-                          _taskMode = TaskMode.Date;
-                        });
-                      }, child: const Text("Back")),
-                      ElevatedButton(onPressed: (){
-                        print(target);
-                        target?_save():_saveNo();
-                      }, child: const Text("Submit"))
-                    ],
-                  )
-                ],
-              ),
-            ),
-
-
-
-        ],
-      ),
-    )
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ElevatedButton(onPressed: (){
+              setState(() {
+                _taskMode = TaskMode.TableTask;
+              });
+            }, child: const Text("Back")),
+            ElevatedButton(onPressed: (){
+              setState(() {
+                _taskMode = TaskMode.Date;
+              });
+            }, child: const Text("Next"))
+          ],
+        )
+      ],
     );
   }
+  Widget _buildDateWidget() {
+    return  Column(
+      children: [
+        ElevatedButton(onPressed: (){
+          _selectDate(context);
+        }, child: const Text("Date start")),
+        ElevatedButton(onPressed: (){
+          _endDate(context);
+        }, child: const Text("Date End")),
+
+        Text("Start: $startDate"),
+        Text("End: $endDate"),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+
+            ElevatedButton(onPressed: (){
+              setState(() {
+                _taskMode = TaskMode.ActionPlan;
+              });
+            }, child: const Text("Back")),
+            ElevatedButton(onPressed: (){
+              setState(() {
+                _taskMode = TaskMode.Preview;
+              });
+            }, child: const Text("Next"))
+          ],
+        )
+      ],
+    );
+  }
+  Widget _buildPreviewWidget() {
+    return Column(
+      children: [
+        Table(
+          border: TableBorder.all(),
+          columnWidths: {
+            0: FlexColumnWidth(1), // Width of the first column
+            1: FlexColumnWidth(1),
+            // Width of the second column
+          },
+            children: [
+              TableRow(
+                decoration: BoxDecoration(
+                  color: AppColor.appColor, // Header row background color
+                ),
+
+                children: [
+                  TableCell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  TableCell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Priview',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              TableRow(
+                  children: [
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Region:',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Northern'),
+                      ),
+                    ),
+                  ]
+              ),
+              TableRow(
+                  children: [
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Area:',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Arusha'),
+                      ),
+                    ),
+                  ]
+              ),
+              TableRow(
+                  children: [
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Task: $selectedOption',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Task'),
+                      ),
+                    ),
+                  ]
+              ),
+              TableRow(
+                  children: [
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Sub Task: $SelectedSubtask',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Sub task 1'),
+                      ),
+                    ),
+                  ]
+              ),
+              TableRow(
+                  children: [
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Task start date: $startDate',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('10/04/2024'),
+                      ),
+                    ),
+                  ]
+              ),
+              TableRow(
+                  children: [
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child:  Text(
+                          'Task End date: $endDate',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('25/05/2024'),
+                      ),
+                    ),
+                  ]
+              ),
+
+            ]
+        ),
+        SizedBox(height: 10,),
+        const Text(
+          'Task Action:',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Column(
+
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Table(
+                    border: TableBorder.all(),
+                    columnWidths: {
+                      0: FlexColumnWidth(1), // Width of the first column
+                      1: FlexColumnWidth(1),
+                      // Width of the second column
+                    },
+                    children: [
+                      TableRow(
+                        decoration: BoxDecoration(
+                          color: AppColor.appColor, // Header row background color
+                        ),
+
+                        children: [
+                          TableCell(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                '',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          TableCell(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Task 1',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      TableRow(
+                          children: [
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Action: $selectedOption',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('Action'),
+                              ),
+                            ),
+                          ]
+                      ),
+                      TableRow(
+                          children: [
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Priority: $SelectedSubtask',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('High'),
+                              ),
+                            ),
+                          ]
+                      ),
+                      TableRow(
+                          children: [
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Action Plan: $startDate',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('Plan'),
+                              ),
+                            ),
+                          ]
+                      ),
+
+
+                    ]
+                ),
+                SizedBox(height: 10,),
+                Table(
+                    border: TableBorder.all(),
+                    columnWidths: {
+                      0: FlexColumnWidth(1), // Width of the first column
+                      1: FlexColumnWidth(1),
+                      // Width of the second column
+                    },
+                    children: [
+                      TableRow(
+                        decoration: BoxDecoration(
+                          color: AppColor.appColor, // Header row background color
+                        ),
+
+                        children: [
+                          TableCell(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                '',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          TableCell(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Task 2',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      TableRow(
+                          children: [
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Action: $selectedOption',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('Action'),
+                              ),
+                            ),
+                          ]
+                      ),
+                      TableRow(
+                          children: [
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Priority: $SelectedSubtask',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('High'),
+                              ),
+                            ),
+                          ]
+                      ),
+                      TableRow(
+                          children: [
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Action Plan: $startDate',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('Plan'),
+                              ),
+                            ),
+                          ]
+                      ),
+
+
+                    ]
+                ),
+
+              ]
+
+              /*taskDataList.map((task) {
+                String taskName = task[key];
+                Map<String, String>? actions = _actions[taskName];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Name: $taskName '),
+                    const SizedBox(height: 8),
+                    Text("Priority: ${actions!['priority']}"),
+                    Text("Action Plan: ${actions['action']}"),
+
+                    const SizedBox(height: 8),
+                  ],
+                );
+              }).toList(),*/)
+
+
+          ],
+        ),
+        /*target?
+        Column(
+          children: [
+            const SizedBox(height: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: taskDataList.map((task) {
+                String taskName = task[key];
+                String current = task[rate];
+                Map<String, String>? actions = _actions[taskName];
+                String? percvalue = current.substring(0,current.length - 1);
+                double total = double.parse(actions!['target']!)+double.parse(percvalue);
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Name: $taskName '),
+                    const SizedBox(height: 8),
+                    Text("Priority: ${actions['priority']}"),
+                    Text("Action Plan: ${actions['action']}"),
+                    Text('Current: $percvalue'),
+                    Text('Target: ${actions['target']}'),
+                    Text('Goal: $total'),
+
+                    const SizedBox(height: 8),
+                  ],
+                );
+              }).toList(),)
+          ],
+        ):
+        Column(
+
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: taskDataList.map((task) {
+                String taskName = task[key];
+                Map<String, String>? actions = _actions[taskName];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Name: $taskName '),
+                    const SizedBox(height: 8),
+                    Text("Priority: ${actions!['priority']}"),
+                    Text("Action Plan: ${actions['action']}"),
+
+                    const SizedBox(height: 8),
+                  ],
+                );
+              }).toList(),)
+
+
+          ],
+        ),*/
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Expanded(
+              child: ElevatedButton(onPressed: (){
+                setState(() {
+                  _taskMode = TaskMode.Date;
+                });
+              }, child: const Text("Back")),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              child: ElevatedButton(onPressed: (){
+                print(target);
+                target?_save():_saveNo();
+              }, child: const Text("Submit")),
+            )
+          ],
+        )
+      ],
+    );
+  }
+
+
+
 
 }

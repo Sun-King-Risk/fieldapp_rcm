@@ -95,7 +95,7 @@ class _TaskState extends State<Task> {
                       BoXDesign(cardLength: 2,title: "Process Management",),
                     ],),
                     TitleView(
-                      titleTxt: 'Upcoming Task',
+                      titleTxt: 'Task Due Today',
                       subTxt: 'Details',
                     ),
                     Expanded(
@@ -158,7 +158,7 @@ class BoXDesign extends StatelessWidget{
                   children: [
                     TableRow(
                         decoration: BoxDecoration(
-                          color: Colors.grey[200], // Header row background color
+                          color: AppColor.appColor, // Header row background color
                         ),
                         children: [
                           TableCell(
@@ -186,29 +186,13 @@ class BoXDesign extends StatelessWidget{
                           TableCell(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('Pending'),
+                              child: Text('Over due'),
                             ),
                           ),
                           TableCell(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('30'),
-                            ),
-                          ),
-                        ]
-                    ),
-                    TableRow(
-                        children: [
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('Pending'),
-                            ),
-                          ),
-                          TableCell(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text('30'),
+                              child: Text('10'),
                             ),
                           ),
                         ]
@@ -225,6 +209,22 @@ class BoXDesign extends StatelessWidget{
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text('30'),
+                            ),
+                          ),
+                        ]
+                    ),
+                    TableRow(
+                        children: [
+                          TableCell(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('Total Task'),
+                            ),
+                          ),
+                          TableCell(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('40'),
                             ),
                           ),
                         ]
