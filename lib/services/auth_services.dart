@@ -1,9 +1,7 @@
 import 'package:fieldapp_rcm/login.dart';
 import 'package:fieldapp_rcm/routing/bottom_nav.dart';
-import 'package:fieldapp_rcm/services/auth_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -22,7 +20,7 @@ class Authentication {
     if (user != null) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => NavPage(),
+          builder: (context) => const NavPage(),
         ),
       );
     }else{
@@ -44,7 +42,7 @@ class Authentication {
       backgroundColor: Colors.black,
       content: Text(
         content,
-        style: TextStyle(color: Colors.redAccent, letterSpacing: 0.5),
+        style: const TextStyle(color: Colors.redAccent, letterSpacing: 0.5),
       ),
     );
   }
@@ -95,8 +93,8 @@ class Authentication {
     return user;
   }
   static Future<void> signOut() async {
-    FirebaseAuth _auth = FirebaseAuth.instance;
-    await _auth.signOut();
+    FirebaseAuth auth = FirebaseAuth.instance;
+    await auth.signOut();
 
 
 

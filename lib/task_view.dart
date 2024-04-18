@@ -6,7 +6,11 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'dart:core';
 import 'package:http/http.dart' as http;
 
+import 'models/db.dart';
+
 class TaskView extends StatefulWidget {
+  const TaskView({super.key});
+
   @override
   TaskViewState createState() => TaskViewState();
 }
@@ -19,11 +23,11 @@ class TaskViewState extends State<TaskView> {
   }
 
   Future<String> getData() async {
-    const apiUrl = 'https://sun-kingfieldapp.herokuapp.com/api/tasks';
+    const apiUrl = '${AppUrl.baseUrl}/tasks';
     final response = await http.get(Uri.parse(apiUrl,),headers:{
       "Content-Type": "application/json",});
 
-    this.setState(() {
+    setState(() {
       data = json.decode(response.body);
     });
 
@@ -32,7 +36,7 @@ class TaskViewState extends State<TaskView> {
   }
   @override
   void initState(){
-    this.getData();
+    getData();
   }
 
 
@@ -48,12 +52,12 @@ class TaskViewState extends State<TaskView> {
           Container(
             height: 200,
 
-            padding:EdgeInsets.only(left: 15,right: 25,bottom: 5,top: 5),
-            margin: EdgeInsets.only(left: 20,right: 25,bottom: 0,top: 5),
+            padding:const EdgeInsets.only(left: 15,right: 25,bottom: 5,top: 5),
+            margin: const EdgeInsets.only(left: 20,right: 25,bottom: 0,top: 5),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.white,
-                boxShadow: <BoxShadow>[
+                boxShadow: const <BoxShadow>[
                   BoxShadow(
                       color: Color.fromRGBO(0, 0, 0, 0.57), //shadow for button
                       blurRadius: 5) //blur radius of shadow
@@ -62,26 +66,26 @@ class TaskViewState extends State<TaskView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text("Task Summary",
+                const Text("Task Summary",
                   style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
-                SizedBox(height: 5,),
+                const SizedBox(height: 5,),
                 LinearPercentIndicator(
                   animation: true,
                   animationDuration: 1000,
                   lineHeight: 15.0,
                   percent: 0.4,
                   progressColor: Colors.red,
-                  center: Text("40.0%"),
+                  center: const Text("40.0%"),
                 ),
 
-                SizedBox(height: 10,),
-                SizedBox(
+                const SizedBox(height: 10,),
+                const SizedBox(
                   height: 5,
                 ),
-                Text("Task Status",
+                const Text("Task Status",
                   style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
-                SizedBox(height:10),
-            Row(
+                const SizedBox(height:10),
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text("6 Complete",style: TextStyle(color: Colors.green),),
@@ -92,13 +96,13 @@ class TaskViewState extends State<TaskView> {
 
               ],
             ),
-                SizedBox(height: 10,),
-              Text("Priority",
+                const SizedBox(height: 10,),
+              const Text("Priority",
                   style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
 
-                SizedBox(height:10),
+                const SizedBox(height:10),
 
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                       Text("6 High",style: TextStyle(color: Colors.green)),
@@ -113,10 +117,10 @@ class TaskViewState extends State<TaskView> {
             ),
           ),
           Container(
-            padding:EdgeInsets.only(left: 30, right: 30, bottom: 5, top: 5),
-              margin: EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
+            padding:const EdgeInsets.only(left: 30, right: 30, bottom: 5, top: 5),
+              margin: const EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
             height: 30,
-           child: Row(
+           child: const Row(
              mainAxisAlignment: MainAxisAlignment.spaceBetween,
              children: [
                 Icon(Icons.filter_alt_rounded),
@@ -124,27 +128,27 @@ class TaskViewState extends State<TaskView> {
                                ],
             )
           ),
-          SizedBox(height: 5,),
+          const SizedBox(height: 5,),
           Expanded(
             child:SingleChildScrollView(
               child: ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: data.length,
                 itemBuilder: (context, index) => Container(
-                  padding: EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(6),
                   child: InkWell(
                     onTap: (){
                       Navigator.push(
                           context, MaterialPageRoute(builder: (_) =>PendingRequest(id: data[index]['id'], TittleName: data[index]['sub_task'], status:Colors.cyan)));
 
                     },
-                    child:Row(
+                    child:const Row(
                       children: [
                         Icon(Icons.brightness_1,color: Colors.green,),
                         SizedBox(width: 10,),
                         Flexible(
-                          child: Container(
+                          child: SizedBox(
                             width: 350,
                             height: 70,
                             child: Card(
@@ -188,31 +192,32 @@ class TaskDetail extends StatelessWidget {
   final String task_title;
   final String sub_task;
   final String date;
-  const TaskDetail({Key? key,
+  const TaskDetail({super.key, Key,
     required this.task_title,
     required this.sub_task,
     required this.date,
   });
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: (){},
       child: Card(
         elevation: 3,
-        margin: EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(child: Text(task_title,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),),
               Row(
 
                 children: [
-                  Text("Sub Task:",
+                  const Text("Sub Task:",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                  SizedBox(width: 15),
-                  Text(sub_task, style: TextStyle(fontSize: 15,)),
+                  const SizedBox(width: 15),
+                  Text(sub_task, style: const TextStyle(fontSize: 15,)),
                 ],
               ),
 
@@ -220,18 +225,18 @@ class TaskDetail extends StatelessWidget {
               Row(
 
                 children: [
-                  Text("Date start:",
+                  const Text("Date start:",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                  SizedBox(width: 5),
-                  Text(date, style: TextStyle(fontSize: 15,)),
-                  SizedBox(width: 20),
-                  Text("Date end:",
+                  const SizedBox(width: 5),
+                  Text(date, style: const TextStyle(fontSize: 15,)),
+                  const SizedBox(width: 20),
+                  const Text("Date end:",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                  SizedBox(width: 5),
-                  Text(date, style: TextStyle(fontSize: 15,)),
+                  const SizedBox(width: 5),
+                  Text(date, style: const TextStyle(fontSize: 15,)),
                 ],
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
 
             ],
           ),

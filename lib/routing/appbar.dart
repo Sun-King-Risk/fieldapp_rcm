@@ -1,31 +1,34 @@
 
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../login.dart';
+import '../main.dart';
 import '../notification.dart';
 import '../profile.dart';
-import '../services/auth_services.dart';
-
 
 class SKAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
-  void signOut() async {
+  final BuildContext context; // Add this line
+
+  void signOut(BuildContext context) async {
     try {
-      await Amplify.Auth.signOut();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.clear();
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginSignupPage()));
       print('User signed out successfully');
     } catch (e) {
       print('Error signing out: $e');
     }
   }
 
-  SKAppBar({
+  const SKAppBar({super.key, 
+    required this.context, // Add this line
     this.height = kToolbarHeight,
   });
 
   @override
   Size get preferredSize => Size.fromHeight(height);
-
 
   @override
   Widget build(BuildContext context) {
@@ -38,29 +41,25 @@ class SKAppBar extends StatelessWidget implements PreferredSizeWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>UserNotification(),
+                builder: (context) => const UserNotification(),
               ));
-        }, icon: Icon(Icons.notifications)),
+        }, icon: const Icon(Icons.notifications)),
         IconButton(onPressed: (){
-          signOut();
+          signOut(context); // Pass the context here
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => Login(
-
-              ),
+              builder: (context) => Login(),
             ),
           );
-        }, icon: Icon(Icons.logout)),
+        }, icon: const Icon(Icons.logout)),
       ],
-      leading:IconButton(onPressed: (){
+      leading: IconButton(onPressed: (){
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>Profile(),
+              builder: (context) => const Profile(),
             ));
-      }, icon: Icon(Icons.person,)),
-
-
+      }, icon: const Icon(Icons.person)),
     );
   }
 }

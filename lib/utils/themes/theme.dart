@@ -50,10 +50,10 @@ class AppTheme{
     fontFamily: 'Roboto',
       colorScheme: ColorScheme.fromSwatch(
         primarySwatch: AppColor.mycolor,).copyWith(secondary: Colors.red, brightness: Brightness.light),
-    appBarTheme: AppBarTheme(),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(),
+    appBarTheme: const AppBarTheme(),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(),
       indicatorColor: AppColor.mycolor,
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: const TabBarTheme(
       labelColor: Colors.black,
       labelStyle: TextStyle(color: Colors.black),
 
@@ -65,15 +65,15 @@ class AppTheme{
       colorScheme: ColorScheme.fromSwatch(
         primarySwatch: AppColor.mycolor,).copyWith(secondary: Colors.red, brightness: Brightness.dark),
 
-      textTheme: TextTheme(
+      textTheme: const TextTheme(
       ).apply(
         bodyColor: Colors.yellow,
         displayColor:  Colors.yellow,
 
       ),
-      appBarTheme: AppBarTheme(),
+      appBarTheme: const AppBarTheme(),
       indicatorColor: AppColor.mycolor,
-      floatingActionButtonTheme: FloatingActionButtonThemeData(),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(),
 
       elevatedButtonTheme: ElevatedButtonThemeData(style:ElevatedButton.styleFrom())
   );
@@ -81,19 +81,19 @@ class AppTheme{
 }
 
 class AppColor {
-  static const MaterialColor mycolor = const MaterialColor(
+  static const MaterialColor mycolor = MaterialColor(
     0xffffea00,
-    const <int, Color>{
-      50: const Color(0xffffec1a ),//10%
-      100: const Color(0xffffee33),//20%
-      200: const Color(0xfffff04d),//30%
-      300: const Color(0xfffff266),//40%
-      400: const Color(0xfffff580	),//50%
-      500: const Color(0xfffff799),//60%
-      600: const Color(0xfffff9b3),//70%
-      700: const Color(0xfffffbcc),//80%
-      800: const Color(0xfffffde6),//90%
-      900: const Color(0xffffffff),//100%
+    <int, Color>{
+      50: Color(0xffffec1a ),//10%
+      100: Color(0xffffee33),//20%
+      200: Color(0xfffff04d),//30%
+      300: Color(0xfffff266),//40%
+      400: Color(0xfffff580	),//50%
+      500: Color(0xfffff799),//60%
+      600: Color(0xfffff9b3),//70%
+      700: Color(0xfffffbcc),//80%
+      800: Color(0xfffffde6),//90%
+      900: Color(0xffffffff),//100%
     },
   );
 }

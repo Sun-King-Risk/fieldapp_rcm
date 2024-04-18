@@ -8,12 +8,13 @@ class Collection extends StatefulWidget {
   final String? subtask;
   final String? area;
   final List? data;
-  Collection({required this.data,required this.area,required this.subtask,required this.onSave});
+  const Collection({super.key, required this.data,required this.area,required this.subtask,required this.onSave});
   @override
   State<Collection> createState() => _CollectionState();
 }
 
 class _CollectionState extends State<Collection> {
+  @override
   initState() {
     getTaskList();
   }
@@ -96,8 +97,8 @@ class _CollectionState extends State<Collection> {
         String agent = item['Agent'];
         String unreachabilityRate = item['%Unreachabled rate within SLA'];
         Map<String, dynamic> dataItem = {
-          'display': '$agent',
-          'value': '$agent',
+          'display': agent,
+          'value': agent,
         };
         dataTask?.add(dataItem);
         uniqueAgentList.add(dataItem);
@@ -107,8 +108,8 @@ class _CollectionState extends State<Collection> {
         String agent = item['Agent'];
         String unreachabilityRate = item['%Unreachabled rate within SLA'];
         Map<String, dynamic> dataItem = {
-          'display': '$agent',
-          'value': '$agent',
+          'display': agent,
+          'value': agent,
         };
         dataTask?.add(dataItem);
         uniqueAgentList.add(dataItem);
@@ -118,8 +119,8 @@ class _CollectionState extends State<Collection> {
         String agent = item['Agent'];
         String unreachabilityRate = item['%Unreachabled rate within SLA'];
         Map<String, dynamic> dataItem = {
-          'display': '$agent',
-          'value': '$agent',
+          'display': agent,
+          'value': agent,
         };
         dataTask?.add(dataItem);
         uniqueAgentList.add(dataItem);
@@ -146,7 +147,7 @@ class _CollectionState extends State<Collection> {
   Widget build(BuildContext context) {
     return Column(
         children: [
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           AppMultselect(
             title: widget.subtask!,
             onSave: (value) {

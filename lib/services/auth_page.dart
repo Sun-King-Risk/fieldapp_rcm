@@ -1,15 +1,14 @@
 
 
 import 'package:fieldapp_rcm/login.dart';
-import 'package:fieldapp_rcm/services/auth_services.dart';
-import 'package:fieldapp_rcm/utils/themes/theme.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../dashboard.dart';
 
 class AuthCheck extends StatefulWidget {
+  const AuthCheck({super.key});
+
   @override
   State<AuthCheck> createState() => _AuthCheckState();
 }

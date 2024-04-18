@@ -1,18 +1,8 @@
 
 
-import 'dart:convert';
-import 'dart:io';
-import 'package:fieldapp_rcm/area/dashboard.dart';
-import 'package:fieldapp_rcm/services/user_detail.dart';
-import 'package:googleapis_auth/auth_io.dart';
-import 'package:googleapis_auth/googleapis_auth.dart';
-import 'package:googleapis/fcm/v1.dart' as fcm;
-import 'package:fieldapp_rcm/services/auth_services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:http/http.dart'as http;
-import '../area/acl_task.dart';
+
+
+import '../updates.dart';
 import 'appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -21,6 +11,8 @@ import '../../task.dart';
 import '../../dashboard.dart';
 
 class NavPage extends StatefulWidget{
+  const NavPage({super.key});
+
   @override
   State<StatefulWidget> createState() {
     return NavPagePageState();
@@ -28,7 +20,6 @@ class NavPage extends StatefulWidget{
 
 }
 class NavPagePageState extends State<NavPage> {
-
 
 
   @override
@@ -42,9 +33,9 @@ class NavPagePageState extends State<NavPage> {
   }
   int _selectedIndex = 0;
   final List<Widget> _tabs = <Widget>[
-
     Home(),
-    Task(),
+    const Task(),
+    const Updates(),
     /*AreaDashboard(),
     Customer(),*/
   ];
@@ -52,7 +43,8 @@ class NavPagePageState extends State<NavPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar:SKAppBar(height: 70,),
+      backgroundColor: Colors.white,
+      appBar:SKAppBar(height: 60, context: context,),
       body: Container(
           child: _tabs.elementAt(_selectedIndex)),
       bottomNavigationBar: Container(
@@ -75,15 +67,11 @@ class NavPagePageState extends State<NavPage> {
               gap: 8,
               activeColor: AppColor.mycolor,
               iconSize: 24,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              duration: Duration(milliseconds: 400),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              duration: const Duration(milliseconds: 400),
               tabBackgroundColor: Colors.black87,
               color: Colors.black,
               tabs: const [
-                /* GButton(
-                  icon: Icons.home,
-                  text: 'Home',
-                ),*/
                 GButton(
                   icon: Icons.home,
                   text: 'Home',
@@ -91,6 +79,10 @@ class NavPagePageState extends State<NavPage> {
                 GButton(
                   icon: Icons.task,
                   text: 'Task',
+                ),
+                GButton(
+                  icon: Icons.access_time,
+                  text: 'Update',
                 ),
               ],
               onTabChange: (index){

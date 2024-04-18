@@ -1,15 +1,7 @@
-import 'dart:convert';
 
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:amplify_storage_s3/amplify_storage_s3.dart';
-import 'package:fieldapp_rcm/task_actions.dart';
-import 'package:fieldapp_rcm/utils/themes/theme.dart';
 import 'package:fieldapp_rcm/widget/drop_down.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:multiselect_formfield/multiselect_formfield.dart';
-import 'package:http/http.dart' as http;
 
 class Portfolio extends StatefulWidget {
   final Function(List?) onSave;
@@ -17,13 +9,13 @@ class Portfolio extends StatefulWidget {
   final String? area;
   final List? data;
 
-  Portfolio({required this.data,required this.area,required this.subtask,required this.onSave});
+  const Portfolio({super.key, required this.data,required this.area,required this.subtask,required this.onSave});
   @override
   State<Portfolio> createState() => _PortfolioState();
 }
 
 class _PortfolioState extends State<Portfolio> {
-  List<String> _data = [];
+  final List<String> _data = [];
   List? dataTask = [];
   /*Future<StorageItem?> listItems(key) async {
     try {
@@ -248,8 +240,8 @@ class _PortfolioState extends State<Portfolio> {
           String agent = item['Agent'];
           String unreachabilityRate = item['%Unreachabled rate within SLA'];
           Map<String, dynamic> dataItem = {
-            'display': '$agent',
-            'value': '$agent',
+            'display': agent,
+            'value': agent,
           };
           dataTask?.add(dataItem);
           uniqueAgentList.add(dataItem);
@@ -263,7 +255,8 @@ class _PortfolioState extends State<Portfolio> {
       });
 
   }
-  List? _mydata = [];
+  final List _mydata = [];
+  @override
   initState() {
     getTaskList();
     //listItems(widget.subtask?.replaceAll(" ", "_"));
@@ -310,7 +303,7 @@ class _PortfolioState extends State<Portfolio> {
       children: [
 
 
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
     Column(
     children: [
     Text("Number of Task ${dataTask!.length}"),

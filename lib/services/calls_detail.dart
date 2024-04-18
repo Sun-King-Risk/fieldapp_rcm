@@ -17,7 +17,7 @@ class USerCallDetail{
   var user = FirebaseFirestore.instance.collection('Users');
 
 
-  CollectionReference<Map<String, dynamic>> _calling =
+  final CollectionReference<Map<String, dynamic>> _calling =
   FirebaseFirestore.instance.collection('new_calling');
   CollectionReference<Map<String, dynamic>> feedback =
   FirebaseFirestore.instance.collection('FeedBack');
@@ -34,7 +34,7 @@ class USerCallDetail{
    countDocuments(String value) async {
 
     QuerySnapshot querySnapshot = await _calling.where('Area', isEqualTo: value).get();
-    int documentCount = await querySnapshot.docs.length;
+    int documentCount = querySnapshot.docs.length;
     return documentCount;
   }
   //get data by user area
@@ -91,10 +91,10 @@ class USerCallDetail{
     where('Area', isEqualTo: await UserDetail().getUserArea()).
     where('Task Type',isEqualTo: taskType).get();
     // Get data from docs and convert map to List
-    querySnapshot.docs.forEach((element) {
+    for (var element in querySnapshot.docs) {
       var fieldValue = element.data()['Amount Collected'];
       total = total + fieldValue;
-    });
+    }
     return total.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
 
   }
@@ -107,17 +107,17 @@ class USerCallDetail{
    var query = await _calling.
     where('Area', isEqualTo: area).
     where('Task Type',isEqualTo: value).get();
-    query.docs.forEach((element) {
+    for (var element in query.docs) {
       int fieldValue = element.data()['Amount Collected'];
       total = total + fieldValue;
-    });
+    }
     // Get data from docs and convert map to List
     return total;
   }
   Future<int> CountComplete(String value) async {
     // Get docs from collection reference
     var querySnapshot = await feedback.
-    where('User UID', isEqualTo: await currentUser).
+    where('User UID', isEqualTo: currentUser).
     where('Status', isEqualTo: 'Complete').
         where('Task Type',isEqualTo: value).get();
     // Get data from docs and convert map to List
@@ -149,18 +149,18 @@ class USerCallDetail{
     int pending = await CountPendingCall(value);
     int complete = await CountCallMade(value);
     double rate  = (complete.toDouble()/(complete.toDouble()+pending.toDouble()))*100;
-    return rate.toStringAsFixed(0)+"%";
+    return "${rate.toStringAsFixed(0)}%";
   }
   Future<String> CompleteVistRate(String value) async {
 
     int pending = await CountPendingVisit(value);
     int complete = await CountVisitMade(value);
     double rate  = (complete.toDouble()/(complete.toDouble()+pending.toDouble()))*100;
-    return rate.toStringAsFixed(0)+"%";
+    return "${rate.toStringAsFixed(0)}%";
   }
     Future getDataByArea() async {
     // Get docs from collection reference
-    return await _calling.where('Area', isEqualTo: await UserDetail().getUserArea().snapshot());
+    return _calling.where('Area', isEqualTo: await UserDetail().getUserArea().snapshot());
     // Get data from docs and convert map to List
   }
 
@@ -174,7 +174,7 @@ GetAccountDetail() async{
   var headers = {
     "Accept": "application/json",
     "method":"GET",
-    "Authorization": '${basicAuth}',
+    "Authorization": basicAuth,
     "account_qid" : "AC5156322",
   };
   var uri = Uri.parse('https://payg.angazadesign.com/data/accounts/AC7406321');

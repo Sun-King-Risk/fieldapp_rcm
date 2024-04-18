@@ -1,35 +1,34 @@
 import 'dart:convert';
 
-import 'package:fieldapp_rcm/pending_task.dart';
 import 'package:fieldapp_rcm/task.dart';
-import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'task.dart';
+import 'models/db.dart';
+
 
 class CustomerScreen extends StatefulWidget {
   final String? subTask;
   final List? customerList;
 
-  const CustomerScreen({required this.subTask, required this.customerList});
+  const CustomerScreen({super.key, required this.subTask, required this.customerList});
 
   @override
   _CustomerScreenState createState() => _CustomerScreenState();
 }
 
 class _CustomerScreenState extends State<CustomerScreen> {
-  List<String> _customers = [    'Customer 1',    'Customer 2',    'Customer 3',    'Customer 4',    'Customer 5',    'Customer 6',    'Customer 7',    'Customer 8',    'Customer 9',    'Customer 10',  ];
+  final List<String> _customers = [    'Customer 1',    'Customer 2',    'Customer 3',    'Customer 4',    'Customer 5',    'Customer 6',    'Customer 7',    'Customer 8',    'Customer 9',    'Customer 10',  ];
 
-  List<String> _selectedCustomers = [];
+  final List<String> _selectedCustomers = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Customers'),
+        title: const Text('Select Customers'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -55,13 +54,13 @@ class _CustomerScreenState extends State<CustomerScreen> {
                     }
                   },
                   trailing: _selectedCustomers.contains(customer)
-                      ? Icon(Icons.check)
+                      ? const Icon(Icons.check)
                       : null,
                 );
               },
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           ElevatedButton(
             onPressed: _selectedCustomers.isEmpty
                 ? null
@@ -70,7 +69,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
               // Move to the next screen
               print(_selectedCustomers);
             },
-            child: Text('Next'),
+            child: const Text('Next'),
           ),
         ],
       ),
@@ -90,7 +89,7 @@ class ActionScreen extends StatefulWidget {
   final String task;
   final String subtask;
 
-  const ActionScreen({
+  const ActionScreen({super.key, 
     required this.customers,
     required this.onChange,
     required this.Area,
@@ -104,6 +103,7 @@ class ActionScreen extends StatefulWidget {
 }
 
 class _ActionScreenState extends State<ActionScreen> {
+  @override
   initState() {
     print(widget.customers?.length);
     if(
@@ -124,9 +124,9 @@ class _ActionScreenState extends State<ActionScreen> {
     }
   }
 
-  List<String> _priorities = ['High', 'Medium', 'Low'];
+  final List<String> _priorities = ['High', 'Medium', 'Low'];
 
-  Map<String, Map<String, String>> _actions = {};
+  final Map<String, Map<String, String>> _actions = {};
   bool target = false;
   List<String> data = ["1%","2%","3%","4%","5%"];
   String? label = '';
@@ -159,11 +159,11 @@ class _ActionScreenState extends State<ActionScreen> {
                           children: [
                             Text(
                               'Customer: $customer',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             TextField(
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 hintText: 'Enter action plan',
                                 labelText: 'Action Plan',
                               ),
@@ -174,16 +174,16 @@ class _ActionScreenState extends State<ActionScreen> {
                               },
                               maxLines: 3,
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             TextField(
-                              keyboardType: TextInputType.numberWithOptions(decimal: true),
-                              decoration: InputDecoration(
+                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                              decoration: const InputDecoration(
                                 hintText: 'Enter Target',
                                 labelText: 'Target',
                               ),
                               onChanged: (value) {
                                 setState(() {
-                                  _actions[customer]!['target'] = value!;
+                                  _actions[customer]!['target'] = value;
                                 });
                               },
                             ),
@@ -197,7 +197,7 @@ class _ActionScreenState extends State<ActionScreen> {
                                     _actions[customer]!['target'] = value!;
                                   });
                                 }),*/
-                            Text('Priority'),
+                            const Text('Priority'),
                             DropdownButtonFormField<String>(
                               value: _actions[customer]!['priority'],
                               items: _priorities.map((priority) {
@@ -232,11 +232,11 @@ class _ActionScreenState extends State<ActionScreen> {
                           children: [
                             Text(
                               'Customer: $customer',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             TextField(
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 hintText: 'Enter action plan',
                                 labelText: 'Action Plan',
                               ),
@@ -249,7 +249,7 @@ class _ActionScreenState extends State<ActionScreen> {
                             ),
 
 
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             /*AppDropDown(
                               disable: false,
                                 label: label,
@@ -260,7 +260,7 @@ class _ActionScreenState extends State<ActionScreen> {
                                     _actions[customer]!['target'] = value!;
                                   });
                                 }),*/
-                            Text('Priority'),
+                            const Text('Priority'),
                             DropdownButtonFormField<String>(
                               value: _actions[customer]!['priority'],
                               items: _priorities.map((priority) {
@@ -294,10 +294,10 @@ class _ActionScreenState extends State<ActionScreen> {
                             task: widget.task,
                             subTask: widget.subtask,
                             customers:widget.customers,
-                            actions: _actions!,)));
+                            actions: _actions,)));
                     print(_actions);
                   },
-                 child: Text("Next"))
+                 child: const Text("Next"))
             ],
           ),
        ),
@@ -314,7 +314,7 @@ class PreviewScreen extends StatefulWidget {
   final List? customers;
   final Map<String, Map<String, String>> actions;
 
-  const PreviewScreen({
+  const PreviewScreen({super.key, 
     required this.region,
     required this.area,
     required this.target,
@@ -359,19 +359,19 @@ class _PreviewScreenState extends State<PreviewScreen> {
     'is_approved': 'No'
     };
     var body = json.encode(data);
-    var url = Uri.parse('https://1d39-102-89-46-32.ngrok-free.app/api/create');
+    var url = Uri.parse('${AppUrl.baseUrl}/create');
     http.Response response = await http.post(url, body: body, headers: {
       "Content-Type": "application/json",
     });
-    var result_task = jsonDecode(response.body);
-    subCollection(result.id,result_task["id"]);
+    var resultTask = jsonDecode(response.body);
+    subCollection(result.id,resultTask["id"]);
   }
   void subCollection(id,task) async{
     CollectionReference task = firestore.collection("task");
     widget.customers!.forEach((customer) async {
       List<String> items = customer.split("-");
       String? perc = items[1].substring(0, items[1].length - 1);
-      double total = double.parse(widget.actions[customer]!['target']!)+double.parse(perc!);
+      double total = double.parse(widget.actions[customer]!['target']!)+double.parse(perc);
       task.doc(id).collection("action").add({
         "Customer":items[0],
         "Current":items[1],
@@ -391,7 +391,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
         "task_status": "Pending"
       };
       var body = json.encode(data);
-      var url = Uri.parse('https://f2e3-102-89-32-23.ngrok-free.app/api/taskgoals/create');
+      var url = Uri.parse('${AppUrl.baseUrl}/taskgoals/create');
       http.Response response = await http.post(url, body: body, headers: {
         "Content-Type": "application/json",
       });
@@ -400,7 +400,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Task(),
+        builder: (context) => const Task(),
       ),
     );
 
@@ -412,53 +412,53 @@ class _PreviewScreenState extends State<PreviewScreen> {
         title: Text('Preview ${widget.target}'),
       ),
       body: widget.target?SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Region: ${widget.region}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             Text(
               'Area: ${widget.area}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Task: ${widget.task}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Sub Task: ${widget.subTask}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'Task Action:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widget.customers!.map((customer) {
                 Map<String, String>? action1 = widget.actions[customer];
                 List<String> items = customer.split("-");
                 String? perc = items[1].substring(0, items[1].length - 1);
-                double total = double.parse(action1!['target']!)+double.parse(perc!);
+                double total = double.parse(action1!['target']!)+double.parse(perc);
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Name: ${customer}'),
-                    SizedBox(height: 8),
-                    Text("Priority: ${action1!['priority']}"),
-                    Text("Action Plan: ${action1!['action']}"),
+                    Text('Name: $customer'),
+                    const SizedBox(height: 8),
+                    Text("Priority: ${action1['priority']}"),
+                    Text("Action Plan: ${action1['action']}"),
                     Text('Current: ${items[1]}'),
-                    Text('Target: ${action1!['target']}'),
+                    Text('Target: ${action1['target']}'),
                     Text('Goal: $total'),
 
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                   ],
                 );
               }).toList(),
@@ -466,40 +466,40 @@ class _PreviewScreenState extends State<PreviewScreen> {
             ElevatedButton(onPressed:
             (){
               _save();
-            }, child: Text("Submit"))
+            }, child: const Text("Submit"))
           ],
         ),
       ):
 
       SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Region: ${widget.region}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             Text(
               'Area: ${widget.area}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Task: ${widget.task}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Sub Task: ${widget.subTask}',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'Task Action:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: widget.customers!.map((customer) {
@@ -510,11 +510,11 @@ class _PreviewScreenState extends State<PreviewScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Name: ${customer}'),
-                    SizedBox(height: 8),
+                    Text('Name: $customer'),
+                    const SizedBox(height: 8),
                     Text("Priority: ${action1!['priority']}"),
-                    Text("Action Plan: ${action1!['action']}"),
-                    SizedBox(height: 8),
+                    Text("Action Plan: ${action1['action']}"),
+                    const SizedBox(height: 8),
                   ],
                 );
               }).toList(),
@@ -522,7 +522,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
             ElevatedButton(onPressed:
                 (){
               _save();
-            }, child: Text("Submit"))
+            }, child: const Text("Submit"))
           ],
         ),
       ),

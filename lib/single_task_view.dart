@@ -1,18 +1,13 @@
-import 'dart:convert';
 
-import 'package:fieldapp_rcm/update/collection_update.dart';
 import 'package:fieldapp_rcm/update/pilot_update.dart';
-import 'package:fieldapp_rcm/update/portfolio_update.dart';
-import 'package:fieldapp_rcm/routing/bottom_nav.dart';
-import 'package:fieldapp_rcm/services/region_data.dart';
-import 'package:fieldapp_rcm/task_actions.dart';
-import 'package:fieldapp_rcm/widget/drop_down.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'models/db.dart';
+
 class SingleTask extends StatefulWidget {
-  SingleTask({Key? key,required this.subtask, required this.task, required this.id, required this.title})
+  const SingleTask({Key? key,required this.subtask, required this.task, required this.id, required this.title})
       : super(key: key);
   final title;
   final id;
@@ -21,7 +16,7 @@ class SingleTask extends StatefulWidget {
 
 
   @override
-  SingleTaskState createState() => new SingleTaskState();
+  SingleTaskState createState() => SingleTaskState();
 
 
 }
@@ -50,10 +45,10 @@ class SingleTaskState extends State<SingleTask> {
       selectedTask = value;
     });
   }
-  var _key = GlobalKey();
+  final _key = GlobalKey();
   List data = [];
   Future<http.Response> fetchData() async {
-    const apiUrl = 'https://sun-kingfieldapp.herokuapp.com/api/task/12/';
+    const apiUrl = '${AppUrl.baseUrl}/task/12/';
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
@@ -77,7 +72,7 @@ class SingleTaskState extends State<SingleTask> {
 
   @override
   void initState() {
-    this.fetchData();
+    fetchData();
     _getDocuments();
   }
 
@@ -89,16 +84,16 @@ class SingleTaskState extends State<SingleTask> {
             body: SingleChildScrollView(
               child: Form(
                 child: Container(
-                  margin: EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(10),
                   child: Column(
                     children: [
                       if(widget.title == "Portfolio Quality")
-                        PilotUpdate(subtask: null, task: null, id: null, title: null,),
+                        const PilotUpdate(subtask: null,taskGoalId: null,  id: null, title: null,),
                       if(widget.title== "Pilot Management")
-                        PilotUpdate(subtask: null, task: null, id: null, title: null,),
+                        const PilotUpdate(subtask: null, taskGoalId: null, id: null, title: null,),
                       if(widget.title == "Collection Drive")
-                        PilotUpdate(subtask: null, task: null, id: null, title: null,),
-                      SizedBox(height: 10,),
+                        const PilotUpdate(subtask: null,taskGoalId: null,  id: null, title: null,),
+                      const SizedBox(height: 10,),
 
                     ],
                   ),
@@ -123,6 +118,7 @@ class PendingRequest extends StatelessWidget {
     required this.TittleName,
     required this.id,
   }) : super(key: key);
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -130,8 +126,8 @@ class PendingRequest extends StatelessWidget {
       ),
       body: Container(
         height: 305,
-        padding: EdgeInsets.only(left: 5, right: 10, bottom: 0, top: 5),
-        margin: EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
+        padding: const EdgeInsets.only(left: 5, right: 10, bottom: 0, top: 5),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 5, top: 5),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
@@ -145,9 +141,9 @@ class PendingRequest extends StatelessWidget {
           children: [
             Text(
               TittleName,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(
+            const SizedBox(
                 height: 20,
                 child: ListTile(
                   title: Text(
@@ -158,7 +154,7 @@ class PendingRequest extends StatelessWidget {
                   EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
                   dense: true,
                 )),
-            SizedBox(
+            const SizedBox(
                 height: 20,
                 child: ListTile(
                   title: Text(
@@ -169,7 +165,7 @@ class PendingRequest extends StatelessWidget {
                   EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
                   dense: true,
                 )),
-            SizedBox(
+            const SizedBox(
                 height: 20,
                 child: ListTile(
                   title: Text(
@@ -180,7 +176,7 @@ class PendingRequest extends StatelessWidget {
                   EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
                   dense: true,
                 )),
-            SizedBox(
+            const SizedBox(
                 height: 20,
                 child: ListTile(
                   title: Text(
@@ -191,7 +187,7 @@ class PendingRequest extends StatelessWidget {
                   EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
                   dense: true,
                 )),
-            SizedBox(
+            const SizedBox(
                 height: 20,
                 child: ListTile(
                   title: Text(
@@ -202,7 +198,7 @@ class PendingRequest extends StatelessWidget {
                   EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
                   dense: true,
                 )),
-            SizedBox(
+            const SizedBox(
                 height: 20,
                 child: ListTile(
                   title: Text(
@@ -213,7 +209,7 @@ class PendingRequest extends StatelessWidget {
                   EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
                   dense: true,
                 )),
-            SizedBox(
+            const SizedBox(
                 height: 20,
                 child: ListTile(
                   title: Text(
@@ -224,10 +220,10 @@ class PendingRequest extends StatelessWidget {
                   EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
                   dense: true,
                 )),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Text("Start Date: 24/10"),

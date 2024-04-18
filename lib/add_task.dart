@@ -13,6 +13,8 @@ import 'package:http/http.dart' as http;
 import 'http_online.dart';
 
 class AddTask extends StatefulWidget {
+  const AddTask({super.key});
+
   @override
   _AddTaskState createState() => _AddTaskState();
 }
@@ -26,12 +28,13 @@ class _AddTaskState extends State<AddTask> {
   late String priority = '';
   late String target;
   List? _myActivities;
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Column(
         children: [
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           AddTaskForm(
@@ -66,7 +69,7 @@ class _AddTaskState extends State<AddTask> {
                               subtask: selectedSubTask,
                             )));
               },
-              child: Text('Next'))
+              child: const Text('Next'))
         ],
       ),
     );
@@ -80,7 +83,7 @@ class AddTaskForm extends StatefulWidget {
   final Function(String) onregionselected;
   final Function(String?) onareaselected;
 
-  AddTaskForm(
+  const AddTaskForm(
       {super.key, required this.onregionselected,
       required this.onareaselected,
       required this.onTask,
@@ -92,6 +95,7 @@ class AddTaskForm extends StatefulWidget {
 }
 
 class _AddTaskFormState extends State<AddTaskForm> {
+  @override
   initState() {
 
     //listItems("visit");
@@ -161,7 +165,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
   Future<StorageItem?> listItems(key) async {
     try {
       StorageListOperation<StorageListRequest, StorageListResult<StorageItem>>
-      operation = await Amplify.Storage.list(
+      operation = Amplify.Storage.list(
         options: const StorageListOptions(
           accessLevel: StorageAccessLevel.guest,
           pluginOptions: S3ListPluginOptions.listAll(),
@@ -196,6 +200,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
     } on StorageException catch (e) {
       safePrint('Error listing items: $e');
     }
+    return null;
   }
   Future<void> RegionTask(key) async {
     List<String> uniqueRegion = [];
@@ -278,9 +283,10 @@ class _AddTaskFormState extends State<AddTaskForm> {
     }
   }*/
 
+  @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(10.0),
         child: Column(
       children: <Widget>[
 
@@ -301,7 +307,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
               });
 
             }),
-        SizedBox(
+        const SizedBox(
           height: 8,
         ),
         AppDropDown(
@@ -310,15 +316,15 @@ class _AddTaskFormState extends State<AddTaskForm> {
             hint: "Sub Task",
             items: dataTask[selectedTask] ?? [],
             onChanged: (value) {
-              listItems(value?.replaceAll(' ', '_'));
+              listItems(value.replaceAll(' ', '_'));
               setState(() {
-                selectedSubTask = value!;
+                selectedSubTask = value;
 
                 print(value);
               });
-              widget.onSubTask(value!);
+              widget.onSubTask(value);
             }),
-        SizedBox(
+        const SizedBox(
           height: 8,
         ),
         AppDropDown(
@@ -327,12 +333,12 @@ class _AddTaskFormState extends State<AddTaskForm> {
             hint: "Region",
             items: region,
             onChanged: (value) {
-              widget.onregionselected(value!);
+              widget.onregionselected(value);
               selectedregion = value;
               Area(value);
               //_getArea();
             }),
-        SizedBox(
+        const SizedBox(
           height: 8,
         ),
         AppDropDown(
@@ -344,9 +350,9 @@ class _AddTaskFormState extends State<AddTaskForm> {
               setState(() {
                 selectedarea = value;
               });
-              widget.onareaselected(value!);
+              widget.onareaselected(value);
             }),
-        SizedBox(
+        const SizedBox(
           height: 8,
         ),
 
@@ -360,15 +366,15 @@ class _AddTaskFormState extends State<AddTaskForm> {
                   widget.taskResult(value);
                 });
           } else if (
-          selectedTask == 'Team Management' && selectedarea != null)
-           return Portfolio(
+          selectedTask == 'Team Management' && selectedarea != null) {
+            return Portfolio(
              data: dataList,
               onSave: (value) {
                 widget.taskResult(value);
               },
               subtask: selectedSubTask??'',
              area: selectedarea,);
-          else if (selectedTask == 'Collection Drive' && selectedarea != null)
+          } else if (selectedTask == 'Collection Drive' && selectedarea != null) {
             return Collection(
               data: dataList,
               onSave: (value) {
@@ -376,7 +382,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
               },
               subtask: selectedSubTask??'',
               area: selectedarea,);
-          else if (selectedTask == 'Pilot/Process Management')
+          } else if (selectedTask == 'Pilot/Process Management') {
             return Pilot(
               data: dataList,
               onSave: (value) {
@@ -385,8 +391,8 @@ class _AddTaskFormState extends State<AddTaskForm> {
               subtask: selectedSubTask??'',
               area: selectedarea,
             );
-          else if (selectedTask == 'Customer Management' && selectedarea != null)
-           return CustomerManagement(
+          } else if (selectedTask == 'Customer Management' && selectedarea != null) {
+            return CustomerManagement(
              data: dataList,
              onSave: (value) {
                widget.taskResult(value);
@@ -394,12 +400,13 @@ class _AddTaskFormState extends State<AddTaskForm> {
              subtask: selectedSubTask??'',
              area: selectedarea,
            );
-          else
+          } else {
             return const Column(
               children: [
                Text("There is no Task under this category and area")
               ],
             );
+          }
 
         }),
       ],
@@ -419,7 +426,7 @@ class ActionPlan extends StatefulWidget {
   final String subtask;
 
   const ActionPlan(
-      {required this.customers,
+      {super.key, required this.customers,
       required this.onChange,
       required this.Area,
       required this.region,
@@ -431,6 +438,7 @@ class ActionPlan extends StatefulWidget {
 }
 
 class _ActionPlanState extends State<ActionPlan> {
+  @override
   initState() {
     print(widget.customers?.length);
   }
@@ -439,7 +447,7 @@ class _ActionPlanState extends State<ActionPlan> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Action Plan"),
+        title: const Text("Action Plan"),
       ),
       body: Container(
         child: Column(
